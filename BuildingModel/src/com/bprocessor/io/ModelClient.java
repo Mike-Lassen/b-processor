@@ -10,11 +10,11 @@ import com.bprocessor.Sketch;
 
 public class ModelClient {
 
-	public long save(Sketch  model) throws Exception {
-		URL url = new URL("http://localhost:8080/modelserver/models/");
-		URLConnection urlc = url.openConnection();
-		urlc.setRequestProperty("Content-Type", "application/json");
-		urlc.setDoOutput(true);
+    public long save(Sketch  model) throws Exception {
+        URL url = new URL("http://localhost:8080/modelserver/models/");
+        URLConnection urlc = url.openConnection();
+        urlc.setRequestProperty("Content-Type", "application/json");
+        urlc.setDoOutput(true);
         urlc.setAllowUserInteraction(false);
         OutputStream output = urlc.getOutputStream();
         Persistence.serialize(model, output);
@@ -25,24 +25,16 @@ public class ModelClient {
             System.out.println(line);
         }
         reader.close();
-		return 0;
-	}
-	public Sketch get(long id) {
-		return null;
-	}
-	public void update(long id, Sketch model) {
-		
-	}
-	public void delete(long id) {
-		
-	}
-	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+        return 0;
+    }
+    public Sketch get(long id) {
+        return null;
+    }
+    public void update(long id, Sketch model) {
 
-	}
+    }
+    public void delete(long id) {
+
+    }
 
 }

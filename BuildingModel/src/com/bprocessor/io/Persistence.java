@@ -24,424 +24,424 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class Persistence {
-	public static class PGeometry {
-		protected Geometry original;
-		private long id;
-		private long owner;
-		public PGeometry() {}
-		public long getId() {
-			return id;
-		}
-		public void setId(long id) {
-			this.id = id;
-		}
-		public long getOwner() {
-			return owner;
-		}
-		public void setOwner(long owner) {
-			this.owner = owner;
-		}
-	}
-	public static class PSketch extends PGeometry {
-		protected Geometry original;
-		private long uid;
-		private String name;
-		private PGroup group;
-		public PSketch() {}
-		public long getUid() {
-			return uid;
-		}
-		public void setUid(long uid) {
-			this.uid = uid;
-		}
-		public String getName() {
-			return name;
-		}
-		public void setName(String name) {
-			this.name = name;
-		}
-		public PGroup getGroup() {
-			return group;
-		}
-		public void setGroup(PGroup group) {
-			this.group = group;
-		}
-	}
-	public static class PEdge extends PGeometry {
-		private long from;
-		private long to;
-		public PEdge() {}
-		public long getFrom() {
-			return from;
-		}
-		public void setFrom(long from) {
-			this.from = from;
-		}
-		public long getTo() {
-			return to;
-		}
-		public void setTo(long to) {
-			this.to = to;
-		}
-	}
-	public static class PVertex extends PGeometry {
-		private double x;
-		private double y;
-		private double z;
-		public PVertex() {}
-		public double getX() {
-			return x;
-		}
-		public void setX(double x) {
-			this.x = x;
-		}
-		public double getY() {
-			return y;
-		}
-		public void setY(double y) {
-			this.y = y;
-		}
-		public double getZ() {
-			return z;
-		}
-		public void setZ(double z) {
-			this.z = z;
-		}
-	}
-	public static class PSurface extends PGeometry {
-		private boolean visible;
-		private long exterior;
-		private List<Long> holes;
-		private List<Long> edges;
-		
-		public PSurface() {}
-		public boolean isVisible() {
-			return visible;
-		}
-		public void setVisible(boolean visible) {
-			this.visible = visible;
-		}
-		public long getExterior() {
-			return exterior;
-		}
-		public void setExterior(long exterior) {
-			this.exterior = exterior;
-		}
-		public List<Long> getHoles() {
-			return holes;
-		}
-		public void setHoles(List<Long> holes) {
-			this.holes = holes;
-		}
-		public List<Long> getEdges() {
-			return edges;
-		}
-		public void setEdges(List<Long> edges) {
-			this.edges = edges;
-		}
-	}
-	public static class PGroup extends PGeometry {
-		private String name;
-		private List<PGroup> groups;
-		private List<PSurface> surfaces;
-		private List<PEdge> edges;
-		private List<PVertex> vertices;
-		
-		public PGroup() {}
-		
-		public String getName() {
-			return name;
-		}
-		public void setName(String name) {
-			this.name = name;
-		}
-		public List<PGroup> getGroups() {
-			return groups;
-		}
-		public void setGroups(List<PGroup> groups) {
-			this.groups = groups;
-		}
-		public List<PSurface> getSurfaces() {
-			return surfaces;
-		}
-		public void setSurfaces(List<PSurface> surfaces) {
-			this.surfaces = surfaces;
-		}
-		public List<PEdge> getEdges() {
-			return edges;
-		}
-		public void setEdges(List<PEdge> edges) {
-			this.edges = edges;
-		}
-		public List<PVertex> getVertices() {
-			return vertices;
-		}
-		public void setVertices(List<PVertex> vertices) {
-			this.vertices = vertices;
-		}
-	}
-	
-	public static void save(Sketch sketch, String filename) {
-		current_id = 1;
-		PSketch psketch = externalize(sketch);
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			mapper.writeValue(new File(filename), psketch);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	public static void serialize(Sketch sketch, OutputStream output) throws Exception {
-		current_id = 1;
-		PSketch psketch = externalize(sketch);
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.writeValue(output, psketch);
-	}
-	
-	public static Sketch load(String filename) {
-		return load(new File(filename));
-	}
-	public static Sketch load(File file) {
-		ObjectMapper mapper = new ObjectMapper();
-		Sketch sketch = null;
-		try {
-			PSketch psketch = mapper.readValue(file, PSketch.class);
-			Map<Long, Geometry> map = new HashMap<Long, Geometry>();
-			sketch = internalize(psketch, map);
-			internalizeReferences(psketch, map);
-		} catch (JsonParseException e) {
-		} catch (JsonMappingException e) {
-		} catch (IOException e) {
-		}
-		return sketch;
-	}
-	
-	private static long current_id;
-	
-	private static PSketch externalize(Sketch sketch) {
-		PSketch psketch = new PSketch();
-		psketch.original = sketch;
-		long id = current_id++;
-		psketch.setId(id);
-		sketch.setId(id);
-		psketch.setUid(sketch.getUid());
-		psketch.setName(sketch.getName());
-		psketch.setGroup(externalize(sketch.getGroup()));
-		externalizeReferenes(psketch);
-		return psketch;
-	}
-	private static PGroup externalize(Group group) {
-		PGroup pgroup = new PGroup();
-		pgroup.original = group;
-		pgroup.setId(current_id++);
-		group.setId(pgroup.getId());
-		pgroup.setName(group.getName());
-		{
-			List<PVertex> lst = new LinkedList<PVertex>();
-			for (Vertex vertex : group.getVertices()) {
-				lst.add(externalize(vertex));
-			}
-			pgroup.setVertices(lst);
-		}
-		{
-			List<PEdge> lst = new LinkedList<PEdge>();
-			for (Edge edge : group.getEdges()) {
-				lst.add(externalize(edge));
-			}
-			pgroup.setEdges(lst);
-		}
-		{
-			List<PSurface> lst = new LinkedList<PSurface>();
-			for (Surface surface : group.getSurfaces()) {
-				lst.add(externalize(surface));
-			}
-			pgroup.setSurfaces(lst);
-		}
-		return pgroup;
-	}
-	private static PSurface externalize(Surface surface) {
-		PSurface psurface = new PSurface();
-		psurface.original = surface;
-		long id = current_id++;
-		psurface.setId(id);
-		surface.setId(id);
-		psurface.setVisible(surface.isVisible());
-		return psurface;
-	}
-	private static PEdge externalize(Edge edge) {
-		PEdge pedge = new PEdge();
-		pedge.original = edge;
-		pedge.setId(current_id++);
-		edge.setId(pedge.getId());
-		return pedge;
-	}
-	private static PVertex externalize(Vertex vertex) {
-		PVertex pvertex = new PVertex();
-		pvertex.original = vertex;
-		pvertex.setId(current_id++);
-		vertex.setId(pvertex.getId());
-		pvertex.setX(vertex.getX());
-		pvertex.setY(vertex.getY());
-		pvertex.setZ(vertex.getZ());
-		return pvertex;
-	}
-	
-	private static void externalizeReferenes(PSketch psketch) {
-		externalizeReferenes(psketch.getGroup());
-	}
-	
-	private static void externalizeReferenes(PGroup pgroup) {
-		Group group = (Group) pgroup.original;
-		if (group.getOwner() != null) {
-			pgroup.setOwner(group.getOwner().getId());
-		}
-		for (PSurface psurface : pgroup.getSurfaces()) {
-			externalizeReferences(psurface);
-		}
-		for (PEdge pedge : pgroup.getEdges()) {
-			externalizeReferences(pedge);
-		}
-		for (PVertex pvertex : pgroup.getVertices()) {
-			externalizeReferences(pvertex);
-		}
-	}
+    public static class PGeometry {
+        protected Geometry original;
+        private long id;
+        private long owner;
+        public PGeometry() {}
+        public long getId() {
+            return id;
+        }
+        public void setId(long id) {
+            this.id = id;
+        }
+        public long getOwner() {
+            return owner;
+        }
+        public void setOwner(long owner) {
+            this.owner = owner;
+        }
+    }
+    public static class PSketch extends PGeometry {
+        protected Geometry original;
+        private long uid;
+        private String name;
+        private PGroup group;
+        public PSketch() {}
+        public long getUid() {
+            return uid;
+        }
+        public void setUid(long uid) {
+            this.uid = uid;
+        }
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+        public PGroup getGroup() {
+            return group;
+        }
+        public void setGroup(PGroup group) {
+            this.group = group;
+        }
+    }
+    public static class PEdge extends PGeometry {
+        private long from;
+        private long to;
+        public PEdge() {}
+        public long getFrom() {
+            return from;
+        }
+        public void setFrom(long from) {
+            this.from = from;
+        }
+        public long getTo() {
+            return to;
+        }
+        public void setTo(long to) {
+            this.to = to;
+        }
+    }
+    public static class PVertex extends PGeometry {
+        private double x;
+        private double y;
+        private double z;
+        public PVertex() {}
+        public double getX() {
+            return x;
+        }
+        public void setX(double x) {
+            this.x = x;
+        }
+        public double getY() {
+            return y;
+        }
+        public void setY(double y) {
+            this.y = y;
+        }
+        public double getZ() {
+            return z;
+        }
+        public void setZ(double z) {
+            this.z = z;
+        }
+    }
+    public static class PSurface extends PGeometry {
+        private boolean visible;
+        private long exterior;
+        private List<Long> holes;
+        private List<Long> edges;
 
-	private static void externalizeReferences(PSurface psurface) {
-		Surface surface = (Surface) psurface.original;
-		psurface.setOwner(surface.getOwner().getId());
-		List<Long> pedges = new LinkedList<Long>();
-		for (Edge edge : surface.getEdges()) {
-			pedges.add(edge.getId());
-		}
-		psurface.setEdges(pedges);
-		if (surface.getHoles().size() > 0) {
-			List<Long> pholes = new LinkedList<Long>();
-			for (Surface hole : surface.getHoles()) {
-				pholes.add(hole.getId());
-			}
-			psurface.setHoles(pholes);
-		}
-		if (surface.getExterior() != null) {
-			psurface.setExterior(surface.getExterior().getId());
-		}
-	}
-	private static void externalizeReferences(PEdge pedge) {
-		Edge edge = (Edge) pedge.original;
-		pedge.setOwner(edge.getOwner().getId());
-		pedge.setFrom(edge.getFrom().getId());
-		pedge.setTo(edge.getTo().getId());
-	}
-	private static void externalizeReferences(PVertex pvertex) {
-		Vertex vertex  = (Vertex) pvertex.original;
-		pvertex.setOwner(vertex.getOwner().getId());
-	}
-	
-	private static Sketch internalize(PSketch psketch, Map<Long, Geometry> map) {
-		Sketch sketch = new Sketch();
-		map.put(psketch.getId(), sketch);
-		psketch.original = sketch;
-		sketch.setUid(psketch.getUid());
-		sketch.setName(psketch.getName());
-		sketch.setGroup(internalize(psketch.getGroup(), map));
-		return sketch;
-	}
-	private static Group internalize(PGroup pgroup, Map<Long, Geometry> map) {
-		Group group = new Group();
-		map.put(pgroup.getId(), group);
-		group.setName(pgroup.getName());
-		pgroup.original = group;
-		{
-			List<Surface> surfaces = new LinkedList<Surface>();
-			for (PSurface psurface : pgroup.getSurfaces()) {
-				surfaces.add(internalize(psurface, map));
-			}
-			group.setSurfaces(surfaces);
-		}
-		{
-			List<Edge> edges = new LinkedList<Edge>();
-			for (PEdge pedge : pgroup.getEdges()) {
-				edges.add(internalize(pedge, map));
-			}
-			group.setEdges(edges);
-		}
-		{
-			List<Vertex> vertices = new LinkedList<Vertex>();
-			for (PVertex pvertex : pgroup.getVertices()) {
-				vertices.add(internalize(pvertex, map));
-			}
-			group.setVertices(vertices);
-		}
-		group.setItems(new LinkedList<Item>());
-		return group;
-	}
-	private static Surface internalize(PSurface psurface,  Map<Long, Geometry> map) {
-		Surface surface = new Surface();
-		map.put(psurface.getId(), surface);
-		psurface.original = surface;
-		surface.setVisible(psurface.isVisible());
-		return surface;
-	}
-	private static Edge internalize(PEdge pedge, Map<Long, Geometry> map) {
-		Edge edge = new Edge();
-		map.put(pedge.getId(), edge);
-		pedge.original = edge;
-		return edge;
-	}
-	private static Vertex internalize(PVertex pvertex, Map<Long, Geometry> map) {
-		Vertex vertex = new Vertex();
-		map.put(pvertex.getId(), vertex);
-		pvertex.original = vertex;
-		vertex.setX(pvertex.getX());
-		vertex.setY(pvertex.getY());
-		vertex.setZ(pvertex.getZ());
-		return vertex;
-	}
-	
-	private static void internalizeReferences(PSketch psketch, Map<Long, Geometry> map) {
-		internalizeReferences(psketch.getGroup(), map);
-	}
-	private static void internalizeReferences(PGroup pgroup, Map<Long, Geometry> map) {
-		for (PSurface psurface : pgroup.getSurfaces()) {
-			internalizeReferences(psurface, map);
-		}
-		for (PEdge pedge : pgroup.getEdges()) {
-			internalizeReferences(pedge, map);
-		}
-		for (PVertex pvertex : pgroup.getVertices()) {
-			internalizeReferences(pvertex, map);
-		}
-	}
-	private static void internalizeReferences(PSurface psurface, Map<Long, Geometry> map) {
-		Surface surface = (Surface) psurface.original;
-		surface.setOwner((Item) map.get(psurface.getOwner()));
-		List<Edge> edges = new LinkedList();
-		for (Long id : psurface.getEdges()) {
-			edges.add((Edge) map.get(id));
-		}
-		surface.setEdges(edges);
-		if (psurface.getHoles() != null) {
-			Set<Surface> holes = new HashSet<Surface>();
-			for (Long id : psurface.getHoles()) {
-				holes.add((Surface) map.get(id));
-			}
-			surface.setHoles(holes);
-		}
-		if (psurface.getExterior() != 0) {
-			surface.setExterior((Surface) map.get(psurface.getExterior()));
-		}
-	}
-	private static void internalizeReferences(PEdge pedge, Map<Long, Geometry> map) {
-		Edge edge = (Edge) pedge.original;
-		edge.setOwner((Item) map.get(pedge.getOwner()));
-		edge.setFrom((Vertex) map.get(pedge.getFrom()));
-		edge.setTo((Vertex) map.get(pedge.getTo()));
-	}
-	private static void internalizeReferences(PVertex pvertex, Map<Long, Geometry> map) {
-		Vertex vertex = (Vertex) pvertex.original;
-		vertex.setOwner((Item) map.get(pvertex.getOwner()));
-	}
+        public PSurface() {}
+        public boolean isVisible() {
+            return visible;
+        }
+        public void setVisible(boolean visible) {
+            this.visible = visible;
+        }
+        public long getExterior() {
+            return exterior;
+        }
+        public void setExterior(long exterior) {
+            this.exterior = exterior;
+        }
+        public List<Long> getHoles() {
+            return holes;
+        }
+        public void setHoles(List<Long> holes) {
+            this.holes = holes;
+        }
+        public List<Long> getEdges() {
+            return edges;
+        }
+        public void setEdges(List<Long> edges) {
+            this.edges = edges;
+        }
+    }
+    public static class PGroup extends PGeometry {
+        private String name;
+        private List<PGroup> groups;
+        private List<PSurface> surfaces;
+        private List<PEdge> edges;
+        private List<PVertex> vertices;
+
+        public PGroup() {}
+
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+        public List<PGroup> getGroups() {
+            return groups;
+        }
+        public void setGroups(List<PGroup> groups) {
+            this.groups = groups;
+        }
+        public List<PSurface> getSurfaces() {
+            return surfaces;
+        }
+        public void setSurfaces(List<PSurface> surfaces) {
+            this.surfaces = surfaces;
+        }
+        public List<PEdge> getEdges() {
+            return edges;
+        }
+        public void setEdges(List<PEdge> edges) {
+            this.edges = edges;
+        }
+        public List<PVertex> getVertices() {
+            return vertices;
+        }
+        public void setVertices(List<PVertex> vertices) {
+            this.vertices = vertices;
+        }
+    }
+
+    public static void save(Sketch sketch, String filename) {
+        current_id = 1;
+        PSketch psketch = externalize(sketch);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            mapper.writeValue(new File(filename), psketch);
+        } catch (JsonProcessingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    public static void serialize(Sketch sketch, OutputStream output) throws Exception {
+        current_id = 1;
+        PSketch psketch = externalize(sketch);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writeValue(output, psketch);
+    }
+
+    public static Sketch load(String filename) {
+        return load(new File(filename));
+    }
+    public static Sketch load(File file) {
+        ObjectMapper mapper = new ObjectMapper();
+        Sketch sketch = null;
+        try {
+            PSketch psketch = mapper.readValue(file, PSketch.class);
+            Map<Long, Geometry> map = new HashMap<Long, Geometry>();
+            sketch = internalize(psketch, map);
+            internalizeReferences(psketch, map);
+        } catch (JsonParseException e) {
+        } catch (JsonMappingException e) {
+        } catch (IOException e) {
+        }
+        return sketch;
+    }
+
+    private static long current_id;
+
+    private static PSketch externalize(Sketch sketch) {
+        PSketch psketch = new PSketch();
+        psketch.original = sketch;
+        long id = current_id++;
+        psketch.setId(id);
+        sketch.setId(id);
+        psketch.setUid(sketch.getUid());
+        psketch.setName(sketch.getName());
+        psketch.setGroup(externalize(sketch.getGroup()));
+        externalizeReferenes(psketch);
+        return psketch;
+    }
+    private static PGroup externalize(Group group) {
+        PGroup pgroup = new PGroup();
+        pgroup.original = group;
+        pgroup.setId(current_id++);
+        group.setId(pgroup.getId());
+        pgroup.setName(group.getName());
+        {
+            List<PVertex> lst = new LinkedList<PVertex>();
+            for (Vertex vertex : group.getVertices()) {
+                lst.add(externalize(vertex));
+            }
+            pgroup.setVertices(lst);
+        }
+        {
+            List<PEdge> lst = new LinkedList<PEdge>();
+            for (Edge edge : group.getEdges()) {
+                lst.add(externalize(edge));
+            }
+            pgroup.setEdges(lst);
+        }
+        {
+            List<PSurface> lst = new LinkedList<PSurface>();
+            for (Surface surface : group.getSurfaces()) {
+                lst.add(externalize(surface));
+            }
+            pgroup.setSurfaces(lst);
+        }
+        return pgroup;
+    }
+    private static PSurface externalize(Surface surface) {
+        PSurface psurface = new PSurface();
+        psurface.original = surface;
+        long id = current_id++;
+        psurface.setId(id);
+        surface.setId(id);
+        psurface.setVisible(surface.isVisible());
+        return psurface;
+    }
+    private static PEdge externalize(Edge edge) {
+        PEdge pedge = new PEdge();
+        pedge.original = edge;
+        pedge.setId(current_id++);
+        edge.setId(pedge.getId());
+        return pedge;
+    }
+    private static PVertex externalize(Vertex vertex) {
+        PVertex pvertex = new PVertex();
+        pvertex.original = vertex;
+        pvertex.setId(current_id++);
+        vertex.setId(pvertex.getId());
+        pvertex.setX(vertex.getX());
+        pvertex.setY(vertex.getY());
+        pvertex.setZ(vertex.getZ());
+        return pvertex;
+    }
+
+    private static void externalizeReferenes(PSketch psketch) {
+        externalizeReferenes(psketch.getGroup());
+    }
+
+    private static void externalizeReferenes(PGroup pgroup) {
+        Group group = (Group) pgroup.original;
+        if (group.getOwner() != null) {
+            pgroup.setOwner(group.getOwner().getId());
+        }
+        for (PSurface psurface : pgroup.getSurfaces()) {
+            externalizeReferences(psurface);
+        }
+        for (PEdge pedge : pgroup.getEdges()) {
+            externalizeReferences(pedge);
+        }
+        for (PVertex pvertex : pgroup.getVertices()) {
+            externalizeReferences(pvertex);
+        }
+    }
+
+    private static void externalizeReferences(PSurface psurface) {
+        Surface surface = (Surface) psurface.original;
+        psurface.setOwner(surface.getOwner().getId());
+        List<Long> pedges = new LinkedList<Long>();
+        for (Edge edge : surface.getEdges()) {
+            pedges.add(edge.getId());
+        }
+        psurface.setEdges(pedges);
+        if (surface.getHoles().size() > 0) {
+            List<Long> pholes = new LinkedList<Long>();
+            for (Surface hole : surface.getHoles()) {
+                pholes.add(hole.getId());
+            }
+            psurface.setHoles(pholes);
+        }
+        if (surface.getExterior() != null) {
+            psurface.setExterior(surface.getExterior().getId());
+        }
+    }
+    private static void externalizeReferences(PEdge pedge) {
+        Edge edge = (Edge) pedge.original;
+        pedge.setOwner(edge.getOwner().getId());
+        pedge.setFrom(edge.getFrom().getId());
+        pedge.setTo(edge.getTo().getId());
+    }
+    private static void externalizeReferences(PVertex pvertex) {
+        Vertex vertex  = (Vertex) pvertex.original;
+        pvertex.setOwner(vertex.getOwner().getId());
+    }
+
+    private static Sketch internalize(PSketch psketch, Map<Long, Geometry> map) {
+        Sketch sketch = new Sketch();
+        map.put(psketch.getId(), sketch);
+        psketch.original = sketch;
+        sketch.setUid(psketch.getUid());
+        sketch.setName(psketch.getName());
+        sketch.setGroup(internalize(psketch.getGroup(), map));
+        return sketch;
+    }
+    private static Group internalize(PGroup pgroup, Map<Long, Geometry> map) {
+        Group group = new Group();
+        map.put(pgroup.getId(), group);
+        group.setName(pgroup.getName());
+        pgroup.original = group;
+        {
+            List<Surface> surfaces = new LinkedList<Surface>();
+            for (PSurface psurface : pgroup.getSurfaces()) {
+                surfaces.add(internalize(psurface, map));
+            }
+            group.setSurfaces(surfaces);
+        }
+        {
+            List<Edge> edges = new LinkedList<Edge>();
+            for (PEdge pedge : pgroup.getEdges()) {
+                edges.add(internalize(pedge, map));
+            }
+            group.setEdges(edges);
+        }
+        {
+            List<Vertex> vertices = new LinkedList<Vertex>();
+            for (PVertex pvertex : pgroup.getVertices()) {
+                vertices.add(internalize(pvertex, map));
+            }
+            group.setVertices(vertices);
+        }
+        group.setItems(new LinkedList<Item>());
+        return group;
+    }
+    private static Surface internalize(PSurface psurface,  Map<Long, Geometry> map) {
+        Surface surface = new Surface();
+        map.put(psurface.getId(), surface);
+        psurface.original = surface;
+        surface.setVisible(psurface.isVisible());
+        return surface;
+    }
+    private static Edge internalize(PEdge pedge, Map<Long, Geometry> map) {
+        Edge edge = new Edge();
+        map.put(pedge.getId(), edge);
+        pedge.original = edge;
+        return edge;
+    }
+    private static Vertex internalize(PVertex pvertex, Map<Long, Geometry> map) {
+        Vertex vertex = new Vertex();
+        map.put(pvertex.getId(), vertex);
+        pvertex.original = vertex;
+        vertex.setX(pvertex.getX());
+        vertex.setY(pvertex.getY());
+        vertex.setZ(pvertex.getZ());
+        return vertex;
+    }
+
+    private static void internalizeReferences(PSketch psketch, Map<Long, Geometry> map) {
+        internalizeReferences(psketch.getGroup(), map);
+    }
+    private static void internalizeReferences(PGroup pgroup, Map<Long, Geometry> map) {
+        for (PSurface psurface : pgroup.getSurfaces()) {
+            internalizeReferences(psurface, map);
+        }
+        for (PEdge pedge : pgroup.getEdges()) {
+            internalizeReferences(pedge, map);
+        }
+        for (PVertex pvertex : pgroup.getVertices()) {
+            internalizeReferences(pvertex, map);
+        }
+    }
+    private static void internalizeReferences(PSurface psurface, Map<Long, Geometry> map) {
+        Surface surface = (Surface) psurface.original;
+        surface.setOwner((Item) map.get(psurface.getOwner()));
+        List<Edge> edges = new LinkedList();
+        for (Long id : psurface.getEdges()) {
+            edges.add((Edge) map.get(id));
+        }
+        surface.setEdges(edges);
+        if (psurface.getHoles() != null) {
+            Set<Surface> holes = new HashSet<Surface>();
+            for (Long id : psurface.getHoles()) {
+                holes.add((Surface) map.get(id));
+            }
+            surface.setHoles(holes);
+        }
+        if (psurface.getExterior() != 0) {
+            surface.setExterior((Surface) map.get(psurface.getExterior()));
+        }
+    }
+    private static void internalizeReferences(PEdge pedge, Map<Long, Geometry> map) {
+        Edge edge = (Edge) pedge.original;
+        edge.setOwner((Item) map.get(pedge.getOwner()));
+        edge.setFrom((Vertex) map.get(pedge.getFrom()));
+        edge.setTo((Vertex) map.get(pedge.getTo()));
+    }
+    private static void internalizeReferences(PVertex pvertex, Map<Long, Geometry> map) {
+        Vertex vertex = (Vertex) pvertex.original;
+        vertex.setOwner((Item) map.get(pvertex.getOwner()));
+    }
 }
