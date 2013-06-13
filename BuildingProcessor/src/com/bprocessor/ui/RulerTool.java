@@ -1,8 +1,11 @@
 package com.bprocessor.ui;
 
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+
+import javax.swing.JLabel;
 
 import com.bprocessor.Color;
 import com.bprocessor.Constructor;
@@ -19,6 +22,8 @@ public class RulerTool extends Tool {
     StringBuffer buffer;
     private Edge prototype;
     private Constructor constructor;
+    private JLabel legendFld;
+    private JLabel distanceFld;
 
     public RulerTool(BuildingEditor editor) {
         super(editor);
@@ -46,11 +51,28 @@ public class RulerTool extends Tool {
 
     }
 
+    private void updateDistance() {
+    	if (buffer.length() > 0) {
+    		distanceFld.setText(buffer.toString());
+    	} else {
+    		distanceFld.setText("n/a");
+    	}
+    }
+    private void updateDistance(double distance) {
+    	distanceFld.setText(String.valueOf(round(distance)));
+    }
+    
     public void prepare() {
         editor.restriction = new Plane(0, 0, 1, 0);
         editor.repaint();
         editor.requestFocus();
         buffer = new StringBuffer();
+        legendFld = new JLabel("Distance: ");
+        legendFld.setFont(new Font("Dialog", Font.BOLD, 12));
+        editor.statusbar.register(legendFld);
+        distanceFld = new JLabel("n/a");
+        distanceFld.setFont(new Font("Dialog", Font.PLAIN, 12));
+        editor.statusbar.register(distanceFld);
     }
     public void finish() {
         editor.restriction = null;
@@ -58,6 +80,10 @@ public class RulerTool extends Tool {
         buffer = null;
         constructor = null;
         prototype = null;
+        editor.statusbar.deregister(legendFld);
+        legendFld = null;
+        editor.statusbar.deregister(distanceFld);
+        distanceFld = null;
     }
 
     @Override
@@ -105,6 +131,7 @@ public class RulerTool extends Tool {
             constructor = new Constructor(from, to, blue);
             prototype = edge;
             editor.constructorLayer.add(constructor);
+            updateDistance(0.0);
             editor.repaint();
         }
     }
@@ -137,6 +164,10 @@ public class RulerTool extends Tool {
                     Vertex v = to.minus(from);
                     from.set(original);
                     to.set(from.add(v));
+                    {
+                        Vertex p = prototype.intersection(from);
+                        updateDistance(p.distance(from));
+                    }
                     editor.repaint();
                 }
             }
@@ -154,6 +185,7 @@ public class RulerTool extends Tool {
         char ch = event.getKeyChar();
         if (ch == KeyEvent.VK_ESCAPE) {
             buffer = new StringBuffer();
+            updateDistance();
         } else if (ch == KeyEvent.VK_ENTER) {
             evaluate(buffer.toString());
             buffer = new StringBuffer();
@@ -162,9 +194,11 @@ public class RulerTool extends Tool {
             constructor = null;
             prototype = null;
             buffer = new StringBuffer();
+            updateDistance();
             editor.repaint();
         } else {
             buffer.append(ch);
+            updateDistance();
         }
     }
 

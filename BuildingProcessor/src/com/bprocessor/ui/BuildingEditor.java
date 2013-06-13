@@ -59,7 +59,8 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
 
     private static float[] babyblue = new float[] {224f / 255, 255f / 255, 255f / 255};
 
-    protected Toolbar toolbar;
+    protected ToolBar toolbar;
+    protected StatusBar statusbar;
     protected Sketch sketch;
     protected Group overlay;
     protected ConstructorLayer constructorLayer;

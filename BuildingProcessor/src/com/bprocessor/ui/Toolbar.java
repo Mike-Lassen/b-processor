@@ -16,7 +16,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
 @SuppressWarnings("serial")
-public class Toolbar extends JPanel {
+public class ToolBar extends JPanel {
     private JToolBar toolBar;
     protected BuildingEditor editor;
 
@@ -63,7 +63,7 @@ public class Toolbar extends JPanel {
         editor.setActiveTool(tool);
     }
 
-    public Toolbar() {
+    public ToolBar() {
         toolBar = new JToolBar();
         toolBar.setFloatable(false);
         add(toolBar);

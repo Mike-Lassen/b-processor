@@ -5,8 +5,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 import com.bprocessor.Surface;
-import com.bprocessor.Vertex;
-import com.bprocessor.util.Plane;
 
 public class EraserTool extends Tool {
     public EraserTool(BuildingEditor editor) {
@@ -14,35 +12,22 @@ public class EraserTool extends Tool {
     }
 
     public void prepare() {
-        editor.restriction = new Plane(0, 0, 1, 0);
     }
     public void finish() {
-        editor.restriction = null;
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-        // TODO Auto-generated method stub
-
-    }
+    public void mouseClicked(MouseEvent e) { }
 
     @Override
-    public void mouseEntered(MouseEvent e) {
-        // TODO Auto-generated method stub
-
-    }
+    public void mouseEntered(MouseEvent e) { }
 
     @Override
-    public void mouseExited(MouseEvent e) {
-        // TODO Auto-generated method stub
-
-    }
+    public void mouseExited(MouseEvent e) { }
 
     @Override
     public void mousePressed(MouseEvent event) {
-        Plane plane = editor.restriction;
-        Vertex original = editor.getPlaneIntersection(event.getX(), event.getY(), plane);		
-        Surface surface = editor.selectSurface(event.getX(), event.getY(), plane, original);
+        Surface surface = editor.selectSurface(event.getX(), event.getY(), null, null);
         if (surface != null) {
             if (surface.getExterior() != null) {
                 surface.setVisible(false);
@@ -53,45 +38,24 @@ public class EraserTool extends Tool {
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {
-        // TODO Auto-generated method stub
-
-    }
+    public void mouseReleased(MouseEvent e) { }
 
     @Override
-    public void mouseDragged(MouseEvent e) {
-        // TODO Auto-generated method stub
-
-    }
+    public void mouseDragged(MouseEvent e) { }
 
     @Override
-    public void mouseMoved(MouseEvent e) {
-        // TODO Auto-generated method stub
-
-    }
+    public void mouseMoved(MouseEvent e) { }
 
     @Override
-    public void keyPressed(KeyEvent e) {
-        // TODO Auto-generated method stub
-
-    }
+    public void keyPressed(KeyEvent e) { }
 
     @Override
-    public void keyReleased(KeyEvent e) {
-        // TODO Auto-generated method stub
-
-    }
+    public void keyReleased(KeyEvent e) { }
 
     @Override
-    public void keyTyped(KeyEvent e) {
-        // TODO Auto-generated method stub
-
-    }
+    public void keyTyped(KeyEvent e) { }
 
     @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        // TODO Auto-generated method stub
-
-    }
+    public void mouseWheelMoved(MouseWheelEvent e) { }
 
 }

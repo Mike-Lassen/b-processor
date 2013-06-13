@@ -31,7 +31,8 @@ import com.bprocessor.io.Persistence;
 public class MainFrame extends JFrame {
     public static MainFrame instance;
     private GlobalMenuBar menubar;
-    private Toolbar toolbar;
+    private ToolBar toolbar;
+    private StatusBar statusbar;
     private BuildingEditor editor;
 
     private Sketch sketch = null;
@@ -310,7 +311,7 @@ public class MainFrame extends JFrame {
         dragger = new Dragger();
         setLayout(new BorderLayout());
 
-        toolbar = new Toolbar();
+        toolbar = new ToolBar();
         toolbar.setPreferredSize(new Dimension(1280, 40));
         toolbar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         add(toolbar, BorderLayout.NORTH);
@@ -320,10 +321,10 @@ public class MainFrame extends JFrame {
         center.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.WHITE));
         add(center, BorderLayout.CENTER);
 
-        JPanel bottom = new JPanel();
-        bottom.setPreferredSize(new Dimension(1280, 40));
+        statusbar = new StatusBar();
+        statusbar.setPreferredSize(new Dimension(1280, 40));
 
-        bottom.setBorder(new EtchedBorder() {
+        statusbar.setBorder(new EtchedBorder() {
             public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
                 g.setColor(getShadowColor(c));
                 g.drawLine(x, y, x + width, y);
@@ -332,11 +333,12 @@ public class MainFrame extends JFrame {
                 g.drawLine(x, y + 1, x + width, y + 1);
             }
         });
-        add(bottom, BorderLayout.SOUTH);
+        add(statusbar, BorderLayout.SOUTH);
 
         toolbar.editor = editor;
         editor.toolbar = toolbar;
-
+        editor.statusbar = statusbar;
+        
         editor.setup();
         menubar.setup();
         setVisible(true);
