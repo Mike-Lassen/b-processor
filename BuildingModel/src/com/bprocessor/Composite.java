@@ -3,28 +3,28 @@ package com.bprocessor;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Composite<T extends Item> extends Item {
-    protected List<T> items;
+public class Composite extends Item {
+    protected List<Item> items;
 
     public Composite() {		
     }
 
     public Composite(String name) {
         super(name);
-        items = new LinkedList<T>();
+        items = new LinkedList<Item>();
     }
 
-    public void add(T child) {
+    public void add(Item child) {
         items.add(child);
     }
-    public void remove(T child) {
+    public void remove(Item child) {
         items.remove(child);
     }
 
-    public List<T> getItems() {
+    public List<Item> getItems() {
         return items;
     }
-    public void setItems(List<T> items) {
+    public void setItems(List<Item> items) {
         this.items = items;
     }
 

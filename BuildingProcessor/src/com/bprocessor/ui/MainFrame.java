@@ -69,7 +69,7 @@ public class MainFrame extends JFrame {
                     int i = name.lastIndexOf('.');
                     if (i > 0) {
                         extension = name.substring(i+1);
-                        return true; //extension.equals("json");
+                        extension.equals("bps");
                     }
                     return true;
                 }
@@ -88,34 +88,33 @@ public class MainFrame extends JFrame {
     }
     public boolean userClose() {
         if (sketch != null) {
-            if (userSave()) {
-                editor.setSketch(null);
-                sketch = null;
-            } else {
-                return false;
-            }
+        	if (sketch.isModified()) {
+        		int result = changesShouldBeSaved();
+        		if (result == JOptionPane.YES_OPTION) {
+        			if (!userSave()) {
+        				return false;
+        			}
+        		} else if (result == JOptionPane.CANCEL_OPTION) {
+        			return false;
+        		}
+        	}
+        	editor.setSketch(null);
+            sketch = null;
         }
         return true;
     }
     public boolean userSave() {
-        if (sketch.isModified()) {
-            int result = changesShouldBeSaved();
-            if (result == JOptionPane.YES_OPTION) {
-                if (sketch.getPath() != null) {
-                    Persistence.save(sketch, sketch.getPath());
-                    sketch.setModified(false);
-                    return true;
-                } else {
-                    return userSaveAs();
-                }
-            } else if (result == JOptionPane.CANCEL_OPTION) {
-                return false;
-            } else {
-                return true;
-            }
-        } else {
-            return true;
-        }
+    	if (sketch.isModified()) {
+    		if (sketch.getPath() != null) {
+    			Persistence.save(sketch, sketch.getPath());
+    			sketch.setModified(false);
+    			return true;
+    		} else {
+    			return userSaveAs();
+    		}
+    	} else {
+    		return true;
+    	}
     }
     public boolean userSaveAs() {
         FileDialog dialog = new FileDialog(this, "Save", FileDialog.SAVE);
@@ -123,12 +122,13 @@ public class MainFrame extends JFrame {
         dialog.setVisible(true);
         if (dialog.getFile() != null) {
             File file = new File(dialog.getDirectory(), dialog.getFile());
-            sketch.setPath(file.getAbsolutePath());
+            sketch.setPath(file.getAbsolutePath() + ".bps");
             Persistence.save(sketch, sketch.getPath());
             sketch.setModified(false);
             return true;
+        } else {
+        	return false;
         }
-        return false;
     }
 
     public class GlobalMenuBar extends MenuBar {

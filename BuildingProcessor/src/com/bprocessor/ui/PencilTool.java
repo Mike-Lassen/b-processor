@@ -15,7 +15,6 @@ import com.bprocessor.Surface;
 import com.bprocessor.Vertex;
 import com.bprocessor.io.ModelClient;
 import com.bprocessor.io.Persistence;
-import com.bprocessor.util.Command;
 import com.bprocessor.util.Plane;
 
 public class PencilTool extends Tool {
@@ -55,7 +54,7 @@ public class PencilTool extends Tool {
                 if (current.getExterior() == null) {
                     List<Surface> sides = new LinkedList<Surface>();
                     List<Surface> tops = new LinkedList<Surface>();
-                    Surface top = current.extrudeAll(new Vertex(0, 0, 1), 2.8, sides, tops);
+                    current.extrudeAll(new Vertex(0, 0, 1), length, sides, tops);
                     for (Surface side: sides) {
                         editor.sketch.getGroup().addAll(side);
                     }
@@ -82,7 +81,7 @@ public class PencilTool extends Tool {
     public void finish() {
         editor.restriction = null;
         editor.repaint();
-        setConstructors(Collections.EMPTY_LIST);
+        setConstructors(Collections.<Constructor>emptyList());
         editor.overlay.remove(editing);
         constructors = null;
         editing = null;
@@ -167,7 +166,7 @@ public class PencilTool extends Tool {
                         editing.add(edge);
                     }
                     makeSurface();
-                    setConstructors(Collections.EMPTY_LIST);
+                    setConstructors(Collections.<Constructor>emptyList());
                 } else {
                     vertex = existing;
                 }

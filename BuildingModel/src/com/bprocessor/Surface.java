@@ -100,7 +100,7 @@ public class Surface extends Geometry {
 
     public Surface extrude(Vertex normal, double delta, Collection<Surface> sides) {
         normal = normal.scale(delta);
-        List vertices = getVertices();
+        List<Vertex> vertices = getVertices();
         int n = vertices.size();
         Vertex[] v = new Vertex[n];
         Edge[] e = new Edge[n];
@@ -129,7 +129,7 @@ public class Surface extends Geometry {
             Edge r = sidemap[i];
             Edge l = sidemap[(i + 1) % n];
             Edge t = topmap[i];
-            List newEdges = new LinkedList();
+            List<Edge> newEdges = new LinkedList<Edge>();
             newEdges.add(r);
             newEdges.add(t);
             newEdges.add(l);
@@ -139,7 +139,7 @@ public class Surface extends Geometry {
         }
 
         {
-            List newEdges = new LinkedList();
+            List<Edge> newEdges = new LinkedList<Edge>();
             for (int i = 0; i < n; i++) {
                 newEdges.add(topmap[n - i - 1]);
             }

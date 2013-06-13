@@ -2,6 +2,7 @@ package com.bprocessor.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -200,6 +201,21 @@ public class Persistence {
         PSketch psketch = externalize(sketch);
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(output, psketch);
+    }
+    public static Sketch unserialize(InputStream input) {
+    	Sketch sketch = null;
+    	ObjectMapper mapper = new ObjectMapper();
+    	PSketch psketch;
+		try {
+			psketch = mapper.readValue(input, PSketch.class);
+			Map<Long, Geometry> map = new HashMap<Long, Geometry>();
+	        sketch = internalize(psketch, map);
+	        internalizeReferences(psketch, map);
+		} catch (JsonParseException e) {
+		} catch (JsonMappingException e) {
+		} catch (IOException e) {
+		}
+    	return sketch;
     }
 
     public static Sketch load(String filename) {
@@ -418,7 +434,7 @@ public class Persistence {
     private static void internalizeReferences(PSurface psurface, Map<Long, Geometry> map) {
         Surface surface = (Surface) psurface.original;
         surface.setOwner((Item) map.get(psurface.getOwner()));
-        List<Edge> edges = new LinkedList();
+        List<Edge> edges = new LinkedList<Edge>();
         for (Long id : psurface.getEdges()) {
             edges.add((Edge) map.get(id));
         }

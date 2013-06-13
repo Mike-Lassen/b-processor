@@ -32,8 +32,7 @@ public class Transformation {
         double y = vertex.getY();
         double z = vertex.getZ();
         double[] view = new double[3];
-        boolean success = 
-                glu.gluUnProject(x, y, z, modelview, 0, projection, 0, viewport, 0, view, 0);
+        glu.gluUnProject(x, y, z, modelview, 0, projection, 0, viewport, 0, view, 0);
         Vertex projection = new Vertex();
         projection.setX(round(view[0]));
         projection.setY(round(view[1]));

@@ -13,9 +13,9 @@ public class Group extends Composite {
     }
     public Group(String name) {
         super(name);
-        this.surfaces = new LinkedList();
-        this.edges = new LinkedList();
-        this.vertices = new LinkedList();
+        this.surfaces = new LinkedList<Surface>();
+        this.edges = new LinkedList<Edge>();
+        this.vertices = new LinkedList<Vertex>();
     }
 
     public List<Vertex> getVertices() {

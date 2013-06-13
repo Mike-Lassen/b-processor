@@ -44,7 +44,6 @@ import com.bprocessor.Sketch;
 import com.bprocessor.Surface;
 import com.bprocessor.Vertex;
 import com.bprocessor.io.ObjFileReader;
-import com.bprocessor.io.Persistence;
 import com.bprocessor.util.Plane;
 import com.jogamp.common.nio.Buffers;
 import static javax.media.opengl.GL.*;  // GL constants
@@ -292,10 +291,10 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
     }
 
 
-    private ArrayList objectTable;
+    private ArrayList<Object> objectTable;
 
     private void initNames(GL2 gl) {
-        objectTable = new ArrayList();
+        objectTable = new ArrayList<Object>();
         gl.glInitNames();
     }
     private void pushName(GL2 gl, Object object) {
@@ -467,6 +466,7 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
                 }
             }
         }
+        clearNames();
         picking = null;
         return new PickingResult(surfaces, edges, vertices);
     }
@@ -552,7 +552,8 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
         }
     }
 
-    private void apply(Material material) {
+    @SuppressWarnings("unused")
+	private void apply(Material material) {
         Color diffuse = material.getDiffuse();
         gl.glColor3f(diffuse.getRed(), diffuse.getGreen(), diffuse.getBlue());
     }

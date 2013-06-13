@@ -14,7 +14,7 @@ import com.bprocessor.Vertex;
 public class Command {
 	
 	public static Surface surface(Edge ...objects) {
-		List<Edge> edges = new LinkedList();
+		List<Edge> edges = new LinkedList<Edge>();
 		for (Edge current : objects) {
 			edges.add(current);
 		}
