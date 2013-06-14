@@ -40,7 +40,7 @@ public class ToolBar extends JPanel {
             this.name = name;
         }
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent event) {
             Tool tool = tools.get(name);
             editor.setActiveTool(tool);
         }
@@ -57,10 +57,26 @@ public class ToolBar extends JPanel {
     }
 
     public void selectTool(String name) {
-        JToggleButton button = buttons.get(name);
-        Tool tool = tools.get(name);
-        button.setSelected(true);
-        editor.setActiveTool(tool);
+    	if(name != null) {
+    		JToggleButton button = buttons.get(name);
+    		Tool tool = tools.get(name);
+    		button.setSelected(true);
+    		editor.setActiveTool(tool);
+    	} else {
+    		group.clearSelection();
+    		editor.setActiveTool(null);
+    	}
+    }
+    
+    public void disableAll() {
+    	for (JToggleButton button : buttons.values()) {
+    		button.setEnabled(false);
+    	}
+    }
+    public void enableAll() {
+    	for (JToggleButton button : buttons.values()) {
+    		button.setEnabled(true);
+    	}
     }
 
     public ToolBar() {

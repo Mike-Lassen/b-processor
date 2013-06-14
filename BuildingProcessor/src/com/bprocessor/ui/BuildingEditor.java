@@ -66,6 +66,7 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
     protected ConstructorLayer constructorLayer;
     protected BasicComponent man;
     protected Camera camera;
+    protected List<Tool> tools;
     protected Tool activeTool;
 
     protected double[] modelMatrix = new double[16];
@@ -158,7 +159,7 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
     }
 
     public void setup() {
-
+    	
         Tool select = new SelectTool(this);
 
         Tool pencil = new PencilTool(this);
@@ -180,7 +181,8 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
         toolbar.registerTool("camera-drag", "Bicondrag.gif", cameraDrag);
         toolbar.registerTool("camera-rotation", "Biconrotcam.png", cameraRotation);
         toolbar.registerTool("camera-zoom", "Biconzomeinout.gif", cameraZoom);
-        toolbar.selectTool("camera-drag");
+        
+        toolbar.disableAll();
     }
 
 
@@ -196,6 +198,13 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
 
     public void setSketch(Sketch sketch) {
         this.sketch = sketch;
+        if (sketch != null) {
+        	toolbar.enableAll();
+        	toolbar.selectTool("select");
+        } else {
+        	toolbar.disableAll();
+        	toolbar.selectTool(null);
+        }
         repaint();
     }
 
