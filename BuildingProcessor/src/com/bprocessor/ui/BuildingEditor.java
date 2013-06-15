@@ -61,6 +61,7 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
 
     protected ToolBar toolbar;
     protected StatusBar statusbar;
+    
     protected Sketch sketch;
     protected Group overlay;
     protected ConstructorLayer constructorLayer;
@@ -197,15 +198,17 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
     }
 
     public void setSketch(Sketch sketch) {
-        this.sketch = sketch;
-        if (sketch != null) {
-        	toolbar.enableAll();
-        	toolbar.selectTool("select");
-        } else {
-        	toolbar.disableAll();
-        	toolbar.selectTool(null);
-        }
-        repaint();
+    	if (sketch != this.sketch) {
+    		this.sketch = sketch;
+    		if (sketch != null) {
+    			toolbar.enableAll();
+    			toolbar.selectTool("select");
+    		} else {
+    			toolbar.disableAll();
+    			toolbar.selectTool(null);
+    		}
+    		repaint();
+    	}
     }
 
     public void checkpoint() {
