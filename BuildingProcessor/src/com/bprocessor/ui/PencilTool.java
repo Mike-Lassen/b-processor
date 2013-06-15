@@ -19,12 +19,11 @@ import com.bprocessor.io.Persistence;
 import com.bprocessor.util.Plane;
 
 public class PencilTool extends Tool {
-    LinkedList<Vertex> vertices;
-    LinkedList<Edge> edges;
-    List<Constructor> constructors;
-    Group editing;
-    Constructor axis;
-    StringBuffer buffer;
+    private LinkedList<Vertex> vertices;
+    private LinkedList<Edge> edges;
+    private List<Constructor> constructors;
+    private Group editing;
+    private StringBuffer buffer;
 
     private void makeSurface() {
         Surface surface = new Surface(edges);
@@ -34,7 +33,6 @@ public class PencilTool extends Tool {
             if (exterior != surface) {
                 if (exterior.surrounds(surface)) {
                     exterior.add(surface);
-                    //surface.setVisible(false);
                 }
             }
         }
@@ -88,7 +86,6 @@ public class PencilTool extends Tool {
         editing = null;
         vertices = null;
         edges = null;
-        axis = null;
     }
 
 
@@ -237,6 +234,7 @@ public class PencilTool extends Tool {
             ModelClient client = new ModelClient();
             try {
                 Sketch sketch = client.get(1);
+                System.out.println("sketch: " + sketch.getName());
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
