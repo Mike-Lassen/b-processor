@@ -1,7 +1,7 @@
 package com.bprocessor;
 
 public class Sketch extends Geometry {
-    private long uid;
+    private int uid;
     private String name;
     private Group group;
     private boolean modified;
@@ -14,10 +14,10 @@ public class Sketch extends Geometry {
         this.group = new Group("group");
     }
 
-    public long getUid() {
+    public int getUid() {
         return uid;
     }
-    public void setUid(long uid) {
+    public void setUid(int uid) {
         this.uid = uid;
     }
     public String getName() {
