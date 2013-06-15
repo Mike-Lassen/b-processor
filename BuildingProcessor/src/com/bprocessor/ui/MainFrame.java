@@ -5,11 +5,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Menu;
-import java.awt.MenuBar;
-import java.awt.MenuItem;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
@@ -20,8 +15,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.event.MouseInputAdapter;
 
 @SuppressWarnings("serial")
-public class MainFrame extends JFrame {
-	public static MainFrame instance;
+public class MainFrame extends JFrame implements SketchObserver {
 	private SketchController controller;
 
 	private GlobalMenuBar menubar;
@@ -30,90 +24,10 @@ public class MainFrame extends JFrame {
 	private BuildingEditor editor;
 	
 	public void setup() {
-		menubar.setup();
+		menubar.sketchChanged(this);
 	}
 	
-	public class GlobalMenuBar extends MenuBar {
-		public FileMenu fileMenu;
-
-		public void setup() {
-			MainFrame.this.setTitle(controller.title());
-			fileMenu.newItem.setEnabled(controller.isNewEnabled());
-			fileMenu.openItem.setEnabled(controller.isOpenEnabled());
-			fileMenu.closeItem.setEnabled(controller.isCloseEnabled());
-			fileMenu.saveItem.setEnabled(controller.isSaveEnabled());
-			fileMenu.saveAsItem.setEnabled(controller.isSaveAsEnabled());
-			editor.setSketch(controller.getActiveSketch());
-		}
-
-		public class FileMenu extends Menu {
-			public MenuItem newItem;
-			public MenuItem openItem;
-			public MenuItem closeItem;
-			public MenuItem saveItem;
-			public MenuItem saveAsItem;
-
-			public FileMenu(String title) {
-				super(title);
-				{ 
-					newItem = new MenuItem("New Sketch");
-					newItem.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent event) {
-							controller.userNew(MainFrame.this);
-							setup();
-						}
-					});
-					add(newItem);
-				}
-				{ 
-					openItem = new MenuItem("Open Sketch...");
-					openItem.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent event) {
-							controller.userOpen(MainFrame.this);
-							setup();
-						}
-					});
-					add(openItem);
-				}
-				addSeparator();
-				{ 
-					closeItem = new MenuItem("Close");
-					closeItem.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent event) {
-							controller.userClose(MainFrame.this);
-							setup();
-						}
-					});
-					add(closeItem);
-				}
-				{ 
-					saveItem = new MenuItem("Save");
-					saveItem.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent event) {
-							controller.userSave(MainFrame.this);
-							setup();
-						}
-					});
-					add(saveItem);
-				}
-				{ 
-					saveAsItem = new MenuItem("Save as...");
-					saveAsItem.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent event) {
-							controller.userSaveAs(MainFrame.this);
-							setup();
-						}
-					});
-					add(saveAsItem);
-				}
-			}
-		}
-		public GlobalMenuBar() {
-			fileMenu = new FileMenu("File");
-			this.add(fileMenu);
-		}
-	}
-
+	
 	public class TreeArea extends JPanel {
 		public TreeArea() {
 			this.addMouseListener(dragger);
@@ -139,7 +53,7 @@ public class MainFrame extends JFrame {
 			top.setPreferredSize(new Dimension(320, 24));
 			top.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.GRAY));
 			add(top, BorderLayout.NORTH);
-			editor = new BuildingEditor();
+			editor = new BuildingEditor(controller);
 			editor.addMouseListener(new Blocker());
 			add(editor, BorderLayout.CENTER);
 		}
@@ -192,10 +106,9 @@ public class MainFrame extends JFrame {
 	}
 
 	public MainFrame() {
-		instance = this;
-		controller = new SketchController();
+		controller = new SketchController(this);
 		this.setTitle("B-Processor");
-		menubar = new GlobalMenuBar();
+		menubar = new GlobalMenuBar(controller, MainFrame.this);
 		this.setMenuBar(menubar);
 		dragger = new Dragger();
 		setLayout(new BorderLayout());
@@ -229,12 +142,19 @@ public class MainFrame extends JFrame {
 		editor.statusbar = statusbar;
 
 		editor.setup();
-		menubar.setup();
+		menubar.sketchChanged(this);
 		setVisible(true);
 		pack();
 	}
 
 	public static void main(String[] args) {
 		new MainFrame();
+	}
+
+	@Override
+	public void sketchChanged(Object initiator) {
+		setTitle(controller.title());
+		editor.setSketch(controller.getActiveSketch());
+		menubar.sketchChanged(initiator);
 	}
 }

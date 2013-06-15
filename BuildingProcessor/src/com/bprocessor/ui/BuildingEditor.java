@@ -56,15 +56,17 @@ import static javax.media.opengl.GL2.*; // GL2 constants
  */
 @SuppressWarnings("serial")
 public class BuildingEditor extends GLCanvas implements GLEventListener {
-
     private static float[] babyblue = new float[] {224f / 255, 255f / 255, 255f / 255};
 
+    private SketchController controller;
+    
     protected ToolBar toolbar;
     protected StatusBar statusbar;
     
     protected Sketch sketch;
     protected Group overlay;
     protected ConstructorLayer constructorLayer;
+    
     protected BasicComponent man;
     protected Camera camera;
     protected List<Tool> tools;
@@ -124,7 +126,8 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
     }
 
     /** Constructor to setup the GUI for this Component */
-    public BuildingEditor() {
+    public BuildingEditor(SketchController controller) {
+    	this.controller = controller;
         FileInputStream file = null;
         try {
             ObjFileReader input = new ObjFileReader();
@@ -214,7 +217,7 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
     public void checkpoint() {
         if (sketch != null) {
             sketch.setModified(true);
-            MainFrame.instance.setup();
+            controller.changed();
         }
     }
 

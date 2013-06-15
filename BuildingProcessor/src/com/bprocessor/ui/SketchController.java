@@ -16,8 +16,10 @@ import com.bprocessor.io.Persistence;
 public class SketchController {
 	private List<Sketch> sketches;
 	private Sketch activeSketch;
+	private SketchObserver observer;
 
-	public SketchController() {
+	public SketchController(SketchObserver observer) {
+		this.observer = observer;
 		sketches = new LinkedList<Sketch>();
 	}
 
@@ -30,12 +32,20 @@ public class SketchController {
 	public List<Sketch> getSketches() {
 		return sketches;
 	}
-
 	public Sketch getActiveSketch() {
 		return activeSketch;
 	}
 	public void setActiveSketchSketch(Sketch sketch) {
 		this.activeSketch = sketch;
+	}
+	
+	public void changed(Object initiator) {
+		if (observer != null) {
+			observer.sketchChanged(initiator);
+		}
+	}
+	public void changed() {
+		changed(this);
 	}
 	
 	public String title() {
