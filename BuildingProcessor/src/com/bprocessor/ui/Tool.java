@@ -26,6 +26,18 @@ public abstract class Tool implements MouseListener, MouseMotionListener, KeyLis
     public void finish() {
 
     }
+    
+    public double round(double value) {
+        long i = Math.round((value * 1000));
+        double result = (double) (i / 1000.0);
+        return result;
+    }
+
+    public void roundIt(Vertex vertex) {
+        vertex.setX(round(vertex.getX()));
+        vertex.setY(round(vertex.getY()));
+        vertex.setZ(round(vertex.getZ()));
+    }
 
     public static class CameraDrag extends Tool {
         private int x;

@@ -11,6 +11,7 @@ import com.bprocessor.Color;
 import com.bprocessor.Constructor;
 import com.bprocessor.Edge;
 import com.bprocessor.Group;
+import com.bprocessor.Sketch;
 import com.bprocessor.Surface;
 import com.bprocessor.Vertex;
 import com.bprocessor.io.ModelClient;
@@ -127,18 +128,6 @@ public class PencilTool extends Tool {
 
     }
 
-    public double round(double value) {
-        long i = (long) (value * 1000);
-        double result = (double) (i / 1000.0);
-        return result;
-    }
-
-    public void roundIt(Vertex vertex) {
-        vertex.setX(round(vertex.getX()));
-        vertex.setY(round(vertex.getY()));
-        vertex.setZ(round(vertex.getZ()));
-    }
-
     @Override
     public void mousePressed(MouseEvent event) {		
         if (vertices == null) {
@@ -244,7 +233,15 @@ public class PencilTool extends Tool {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-        } else {
+        } else if (ch == 'g') {
+            ModelClient client = new ModelClient();
+            try {
+                Sketch sketch = client.get(1);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }else {
             buffer.append(ch);
         }
     }

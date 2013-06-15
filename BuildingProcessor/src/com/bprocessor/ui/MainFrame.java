@@ -168,7 +168,7 @@ public class MainFrame extends JFrame {
             public FileMenu(String title) {
                 super(title);
                 { 
-                    newItem = new MenuItem("New Sketch...");
+                    newItem = new MenuItem("New Sketch");
                     newItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {
                             userNew();

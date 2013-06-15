@@ -103,13 +103,7 @@ public class RulerTool extends Tool {
         // TODO Auto-generated method stub
 
     }
-
-    public double round(double value) {
-        long i = (long) (value * 1000);
-        double result = (double) (i / 1000.0);
-        return result;
-    }
-
+    
     @Override
     public void mousePressed(MouseEvent event) {
         startx = event.getX();
