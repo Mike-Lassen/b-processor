@@ -51,7 +51,7 @@ public class SketchController {
 	public String title() {
 		if (activeSketch != null) {
 			if (activeSketch.getPath() != null) {
-				return "B-Processor Ð activeSketch.getPath()";
+				return "B-Processor Ð " + activeSketch.getPath();
 			} else {
 				return "B-Processor Ð Untitled";
 			}
@@ -79,7 +79,8 @@ public class SketchController {
 	}
 	public void userNew(JFrame parent) {
 		if (userClose(parent)) {
-			activeSketch = new Sketch("sketch");
+			activeSketch = new Sketch("untitled");
+			add(activeSketch);
 		}
 	}
 
@@ -167,6 +168,7 @@ public class SketchController {
 		if (dialog.getFile() != null) {
 			File file = new File(dialog.getDirectory(), dialog.getFile());
 			activeSketch.setPath(file.getAbsolutePath() + ".bps");
+			activeSketch.setName(file.getName());
 			Persistence.save(activeSketch, activeSketch.getPath());
 			activeSketch.setModified(false);
 			return true;

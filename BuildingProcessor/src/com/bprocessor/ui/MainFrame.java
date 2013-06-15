@@ -22,6 +22,7 @@ public class MainFrame extends JFrame implements SketchObserver {
 	private ToolBar toolbar;
 	private StatusBar statusbar;
 	private BuildingEditor editor;
+	private BuildingHierarchy hierarchy;
 	
 	public void setup() {
 		menubar.sketchChanged(this);
@@ -37,10 +38,10 @@ public class MainFrame extends JFrame implements SketchObserver {
 			top.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.GRAY));
 			add(top, BorderLayout.NORTH);
 
-			JPanel center = new JPanel();
+			hierarchy = new BuildingHierarchy(controller);
 			Color ligth = new Color(0xF9, 0xF9, 0xF9);
-			center.setBackground(ligth);
-			JScrollPane scroll = new JScrollPane(center);
+			hierarchy.setBackground(ligth);
+			JScrollPane scroll = new JScrollPane(hierarchy);
 			scroll.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.LIGHT_GRAY));
 			add(scroll, BorderLayout.CENTER);
 		}
@@ -156,5 +157,6 @@ public class MainFrame extends JFrame implements SketchObserver {
 		setTitle(controller.title());
 		editor.setSketch(controller.getActiveSketch());
 		menubar.sketchChanged(initiator);
+		hierarchy.sketchChanged(initiator);
 	}
 }
