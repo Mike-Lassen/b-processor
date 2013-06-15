@@ -17,6 +17,7 @@ public class SketchController {
 	private List<Sketch> sketches;
 	private Sketch activeSketch;
 	private SketchObserver observer;
+	private static final boolean EXCLUSIVE = false;
 
 	public SketchController(SketchObserver observer) {
 		this.observer = observer;
@@ -35,7 +36,7 @@ public class SketchController {
 	public Sketch getActiveSketch() {
 		return activeSketch;
 	}
-	public void setActiveSketchSketch(Sketch sketch) {
+	public void setActiveSketch(Sketch sketch) {
 		this.activeSketch = sketch;
 	}
 	
@@ -78,6 +79,14 @@ public class SketchController {
 		return true;
 	}
 	public void userNew(JFrame parent) {
+		if (EXCLUSIVE) {
+			userNewEx(parent);
+		} else {
+			activeSketch = new Sketch("untitled");
+			add(activeSketch);
+		}
+	}
+	public void userNewEx(JFrame parent) {
 		if (userClose(parent)) {
 			activeSketch = new Sketch("untitled");
 			add(activeSketch);
@@ -87,32 +96,41 @@ public class SketchController {
 	public boolean isOpenEnabled() {
 		return true;
 	}
-
 	public void userOpen(JFrame parent) {
-		if (userClose(parent)) {
-			FileDialog dialog = new FileDialog(parent);
-			dialog.setModalityType(ModalityType.APPLICATION_MODAL);
-			dialog.setFilenameFilter(new FilenameFilter() {
-				public boolean accept(File dir, String name) {
-					String extension = "";
-					int i = name.lastIndexOf('.');
-					if (i > 0) {
-						extension = name.substring(i+1);
-						extension.equals("bps");
-					}
-					return true;
+		if (EXCLUSIVE) {
+			userOpenEx(parent);
+		} else {
+			userOpenNormal(parent);
+		}
+	}
+	public void userOpenNormal(JFrame parent) {
+		FileDialog dialog = new FileDialog(parent);
+		dialog.setModalityType(ModalityType.APPLICATION_MODAL);
+		dialog.setFilenameFilter(new FilenameFilter() {
+			public boolean accept(File dir, String name) {
+				String extension = "";
+				int i = name.lastIndexOf('.');
+				if (i > 0) {
+					extension = name.substring(i+1);
+					extension.equals("bps");
 				}
-			});
-			dialog.setVisible(true);
-			if (dialog.getFile() != null) {
-				File file = new File(dialog.getDirectory(), dialog.getFile());
-				Sketch theSketch = Persistence.load(file);
-				if (theSketch != null) {
-					theSketch.setPath(file.getAbsolutePath());
-					activeSketch = theSketch;
-					add(activeSketch);
-				}
+				return true;
 			}
+		});
+		dialog.setVisible(true);
+		if (dialog.getFile() != null) {
+			File file = new File(dialog.getDirectory(), dialog.getFile());
+			Sketch theSketch = Persistence.load(file);
+			if (theSketch != null) {
+				theSketch.setPath(file.getAbsolutePath());
+				activeSketch = theSketch;
+				add(activeSketch);
+			}
+		}
+	}
+	public void userOpenEx(JFrame parent) {
+		if (userClose(parent)) {
+			userOpenNormal(parent);
 		}
 	}
 
@@ -131,8 +149,16 @@ public class SketchController {
 					return false;
 				}
 			}
+			int index = sketches.indexOf(activeSketch);
 			remove(activeSketch);
-			activeSketch = null;
+			if (index > (sketches.size() - 1)) {
+				index = (sketches.size() - 1);
+			}
+			if (index >= 0 && index < sketches.size()) {
+				activeSketch = sketches.get(index);
+			} else {
+				activeSketch = null;
+			}
 		}
 		return true;
 	}

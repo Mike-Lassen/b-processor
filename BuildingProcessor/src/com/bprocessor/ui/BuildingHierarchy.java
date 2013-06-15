@@ -4,18 +4,21 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Rectangle;
+import java.util.Enumeration;
 
 import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 import com.bprocessor.Sketch;
 
 @SuppressWarnings("serial")
-public class BuildingHierarchy extends JTree {
+public class BuildingHierarchy extends JTree  implements TreeSelectionListener {
 
 	private SketchController controller;
 	private DefaultTreeModel model;
@@ -23,8 +26,10 @@ public class BuildingHierarchy extends JTree {
 
 	private DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer() {  
 
-		public Color getBackgroundNonSelectionColor() {  
-			return(null);  
+		private boolean selected;
+
+		public Color getBackgroundNonSelectionColor() { 
+			return(null);
 		}  
 		public Color getBackgroundSelectionColor() {  
 			return(null);  
@@ -36,14 +41,26 @@ public class BuildingHierarchy extends JTree {
 			return(null);
 		}
 		protected void paintComponent(Graphics g) {
-			if (getSelectionCount()>0) {
-				for(int i: getSelectionRows()) {
-					Rectangle r = getRowBounds(i);
-					g.setColor(new Color(0.3f, 0.5f, 0.9f));
-					g.fillRect(0, r.y - 1, BuildingHierarchy.this.getWidth(), r.height);
-				}
+			if (selected) {
+				g.setColor(new Color(0.3f, 0.5f, 0.9f));
+				g.fillRect(0, 0, BuildingHierarchy.this.getWidth(), 32);
 			}
 			super.paintComponent(g);
+		}
+		public java.awt.Component getTreeCellRendererComponent(
+				JTree tree,
+				Object value,
+				boolean sel,
+				boolean expanded,
+				boolean leaf,
+				int row,
+				boolean hasFocus) {
+			super.getTreeCellRendererComponent(
+					tree, value, sel,
+					expanded, leaf, row,
+					hasFocus);
+			this.selected = sel;
+			return this;
 		}
 		public Dimension getPreferredSize() {
 			Dimension d1 = super.getPreferredSize();
@@ -64,21 +81,71 @@ public class BuildingHierarchy extends JTree {
 		setRootVisible(false);
 		setCellRenderer(renderer);
 		setRowHeight(32);
+		getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		this.addTreeSelectionListener(this);
 		model = (DefaultTreeModel) getModel();
 		root = (DefaultMutableTreeNode) model.getRoot();
 		root.removeAllChildren();
 		model.nodeStructureChanged(root);
 	}
-	
-	public void sketchChanged(Object initiator) {
-		root.removeAllChildren();
-		for (Sketch current : controller.getSketches()) {
-			String name = current.getName();
-			root.add(new DefaultMutableTreeNode(name));
+
+	@SuppressWarnings("rawtypes")
+	public TreePath search(DefaultMutableTreeNode node, Object object) {
+		if (node.getUserObject() == object) {
+			return new TreePath(node.getPath());
+		} else {
+			Enumeration enumerator = node.children();
+			while (enumerator.hasMoreElements()) {
+				DefaultMutableTreeNode current = (DefaultMutableTreeNode) enumerator.nextElement();
+				TreePath result = search(current, object);
+				if (result != null) {
+					return result;
+				}
+			}
 		}
-		model.nodeStructureChanged(root);
-		TreePath path = getPathForRow(0);
-		setSelectionPath(path);  
-		repaint();
+		return null;
+	}
+
+	public class SketchNode extends DefaultMutableTreeNode {
+		private Sketch sketch;
+		
+		public SketchNode(Sketch sketch) {
+			super(sketch);
+			this.sketch = sketch;
+		}
+		
+		public String toString() {
+			return sketch.getName();
+		}
+	}
+
+	public void sketchChanged(Object initiator) {
+		if (initiator != this) {
+			root.removeAllChildren();
+			for (Sketch current : controller.getSketches()) {
+				root.add(new SketchNode(current));
+			}
+			model.nodeStructureChanged(root);
+
+			TreePath path = search(root, controller.getActiveSketch());
+			if (path != null) {
+				setSelectionPath(path); 
+			}
+			repaint();
+		}
+	}
+
+	@Override
+	public void valueChanged(TreeSelectionEvent e) {
+		TreePath[] paths = getSelectionPaths();
+		if (paths != null) {
+			Object object = paths[0].getLastPathComponent();
+			if (object instanceof SketchNode) {
+				SketchNode node = (SketchNode) object;
+				Sketch sketch = (Sketch) node.getUserObject();
+				controller.setActiveSketch(sketch);
+				controller.changed(this);
+			}
+		}
 	}
 }
