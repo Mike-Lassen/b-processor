@@ -4,15 +4,12 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.bprocessor.Sketch;
-import com.bprocessor.SketchInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ModelClient {
@@ -65,7 +62,8 @@ public class ModelClient {
         System.out.println("response " + response + " - " + message);
     }
 
-    public List<Sketch> getAll() throws Exception {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<Sketch> getAll() throws Exception {
     	URL url = new URL("http://localhost:8080/modelserver/models/");
     	HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
     	urlc.setRequestMethod("GET");
