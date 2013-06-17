@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?> <!DOCTYPE hibernate-mapping PUBLIC
+"-//Hibernate/Hibernate Mapping DTD//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.bprocessor">
+	<class name="Sketch" table="sketch">
+		<meta attribute="class-description">
+			This class contains sketch details.
+		</meta>
+		<id name="id" type="int" column="id">
+			<generator class="native" />
+		</id>
+		<many-to-one name="group" class="Group" column="group_id"
+			cascade="all"></many-to-one>
+		<property name="name" column="name" type="string" />
+	</class>
+	<class name="Group" table="sketch_group">
+		<meta attribute="class-description">
+			This class contains group details.
+		</meta>
+		<id name="id" type="int" column="id">
+			<generator class="native" />
+		</id>
+		<list name="vertices" cascade="all">
+			<key column="owner_id" />
+			<list-index column="inx"></list-index>
+			<one-to-many class="Vertex" />
+		</list>
+		<list name="edges" cascade="all">
+			<key column="owner_id" />
+			<list-index column="inx"></list-index>
+			<one-to-many class="Edge" />
+		</list>
+		<list name="surfaces" cascade="all">
+			<key column="owner_id" />
+			<list-index column="inx"></list-index>
+			<one-to-many class="Surface" />
+		</list>
+		<property name="name" column="name" type="string" />
+	</class>
+	<class name="Vertex" table="vertex">
+		<meta attribute="class-description">
+			This class contains vertex details.
+		</meta>
+		<id name="id" type="int" column="id">
+			<generator class="native" />
+		</id>
+		<many-to-one name="owner" class="Group" column="owner_id"/>
+		<property name="x" column="x" type="double" />
+		<property name="y" column="y" type="double" />
+		<property name="z" column="z" type="double" />
+	</class>
+	<class name="Edge" table="edge">
+		<meta attribute="class-description">
+			This class contains edge details.
+		</meta>
+		<id name="id" type="int" column="id">
+			<generator class="native" />
+		</id>
+		<many-to-one name="owner" class="Group" column="owner_id"/>
+		<many-to-one name="from" class="Vertex" column="from_id"></many-to-one>
+		<many-to-one name="to" class="Vertex" column="to_id"></many-to-one>
+	</class>
+	<class name="Surface" table="surface">
+		<meta attribute="class-description">
+			This class contains surface details.
+		</meta>
+		<id name="id" type="int" column="id">
+			<generator class="native" />
+		</id>
+		<many-to-one name="owner" class="Group" column="owner_id"/>
+		<property name="visible" column="visible" type="boolean" />
+		<set name="holes">
+			<key column="exterior_id" />
+			<one-to-many class="Surface" />
+		</set>
+		<list name="edges" table="surface_edge">
+			<key column="surface_id" />
+			<list-index column="inx"></list-index>
+			<many-to-many column="edge_id" class="Edge" />	
+		</list>
+	</class>
+</hibernate-mapping>
