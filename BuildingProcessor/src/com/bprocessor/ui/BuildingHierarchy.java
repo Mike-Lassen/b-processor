@@ -85,8 +85,6 @@ public class BuildingHierarchy extends JTree  implements TreeSelectionListener {
 		this.addTreeSelectionListener(this);
 		model = (DefaultTreeModel) getModel();
 		root = (DefaultMutableTreeNode) model.getRoot();
-		root.removeAllChildren();
-		model.nodeStructureChanged(root);
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -115,36 +113,50 @@ public class BuildingHierarchy extends JTree  implements TreeSelectionListener {
 		}
 		
 		public String toString() {
-			return sketch.getName();
+			if (sketch.getUid() != 0) {
+				return  sketch.getName() + " [server id " + sketch.getUid() + "]";
+			} else {
+				return sketch.getName();
+			}
 		}
 	}
 
+	public void update() {
+		updating = true;
+		root.removeAllChildren();
+		for (Sketch current : controller.getSketches()) {
+			root.add(new SketchNode(current));
+		}
+		model.nodeStructureChanged(root);
+
+		TreePath path = search(root, controller.getActiveSketch());
+		if (path != null) {
+			setSelectionPath(path); 
+		}
+		repaint();
+		updating = false;
+	}
+	
+	private boolean updating;
+	
 	public void sketchChanged(Object initiator) {
 		if (initiator != this) {
-			root.removeAllChildren();
-			for (Sketch current : controller.getSketches()) {
-				root.add(new SketchNode(current));
-			}
-			model.nodeStructureChanged(root);
-
-			TreePath path = search(root, controller.getActiveSketch());
-			if (path != null) {
-				setSelectionPath(path); 
-			}
-			repaint();
+			update();
 		}
 	}
 
 	@Override
 	public void valueChanged(TreeSelectionEvent e) {
-		TreePath[] paths = getSelectionPaths();
-		if (paths != null) {
-			Object object = paths[0].getLastPathComponent();
-			if (object instanceof SketchNode) {
-				SketchNode node = (SketchNode) object;
-				Sketch sketch = (Sketch) node.getUserObject();
-				controller.setActiveSketch(sketch);
-				controller.changed(this);
+		if (!updating) {
+			TreePath[] paths = getSelectionPaths();
+			if (paths != null) {
+				Object object = paths[0].getLastPathComponent();
+				if (object instanceof SketchNode) {
+					SketchNode node = (SketchNode) object;
+					Sketch sketch = (Sketch) node.getUserObject();
+					controller.setActiveSketch(sketch);
+					controller.changed(this);
+				}
 			}
 		}
 	}

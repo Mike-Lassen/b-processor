@@ -12,6 +12,7 @@ public class EraserTool extends Tool {
     }
 
     public void prepare() {
+    	editor.selected = null;
     }
     public void finish() {
     }

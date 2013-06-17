@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import com.bprocessor.util.Plane;
+
 
 public class Surface extends Geometry {
     protected List<Edge> edges;
@@ -97,6 +99,21 @@ public class Surface extends Geometry {
         normal.normalize();
         return normal;
     }
+    public Plane plane() {
+        double d = 0;
+        Vertex n = normal();
+        if (n != null) {
+          double a = n.getX();
+          double b = n.getY();
+          double c = n.getZ();
+          Edge e1 = (Edge) edges.get(0);
+          Vertex v1 = e1.getFrom();
+          d = -(a * v1.getX() + b * v1.getY() + c * v1.getZ());
+          return new Plane(a, b, c, d);
+        } else {
+          return null;
+        }
+      }
 
     public Surface extrude(Vertex normal, double delta, Collection<Surface> sides) {
         normal = normal.scale(delta);

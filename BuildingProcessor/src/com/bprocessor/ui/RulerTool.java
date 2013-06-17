@@ -63,6 +63,7 @@ public class RulerTool extends Tool {
     }
     
     public void prepare() {
+    	editor.selected = null;
         editor.restriction = new Plane(0, 0, 1, 0);
         editor.repaint();
         editor.requestFocus();

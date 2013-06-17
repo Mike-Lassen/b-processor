@@ -69,6 +69,7 @@ public class PencilTool extends Tool {
     }
 
     public void prepare() {
+    	editor.selected = null;
         editing = new Group("editing");
         editor.overlay.add(editing);
         editor.restriction = new Plane(0, 0, 1, 0);

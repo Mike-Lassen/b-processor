@@ -84,6 +84,6 @@ public class Edge  extends Geometry {
     }
 
     public String toString() {
-        return "[constructor " + from + " - " + to + "]"; 
+        return "[edge " + from + " - " + to + "]"; 
     }
 }

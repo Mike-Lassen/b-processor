@@ -17,4 +17,8 @@ public class Constructor extends Edge {
     public void setColor(Color value) {
         color = value;
     }
+    
+    public String toString() {
+        return "[constructor " + from + " - " + to + "]"; 
+    }
 }

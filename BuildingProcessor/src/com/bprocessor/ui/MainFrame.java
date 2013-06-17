@@ -107,7 +107,7 @@ public class MainFrame extends JFrame implements SketchObserver {
 	}
 
 	public MainFrame() {
-		controller = new SketchController(this);
+		controller = new SketchController(this, "sketches.lst");
 		this.setTitle("B-Processor");
 		menubar = new GlobalMenuBar(controller, MainFrame.this);
 		this.setMenuBar(menubar);
@@ -143,7 +143,7 @@ public class MainFrame extends JFrame implements SketchObserver {
 		editor.statusbar = statusbar;
 
 		editor.setup();
-		menubar.sketchChanged(this);
+		sketchChanged(this);
 		setVisible(true);
 		pack();
 	}
@@ -158,5 +158,6 @@ public class MainFrame extends JFrame implements SketchObserver {
 		editor.setSketch(controller.getActiveSketch());
 		menubar.sketchChanged(initiator);
 		hierarchy.sketchChanged(initiator);
+		editor.repaint();
 	}
 }

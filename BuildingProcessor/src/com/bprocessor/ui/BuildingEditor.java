@@ -57,6 +57,7 @@ import static javax.media.opengl.GL2.*; // GL2 constants
 @SuppressWarnings("serial")
 public class BuildingEditor extends GLCanvas implements GLEventListener {
     private static float[] babyblue = new float[] {224f / 255, 255f / 255, 255f / 255};
+    private static float[] selected_color = new float[] {0.8f, 0.2f, 0.3f};
 
     private SketchController controller;
     
@@ -82,6 +83,8 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
     private GLAutoDrawable drawable;
     protected int width;
     protected int height;
+    
+    protected Geometry selected;
 
     public class Picking {
         protected int x;
@@ -99,11 +102,13 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
         }
     }
     public class PickingResult {
+    	protected Geometry nearest;
         protected LinkedList<Surface> surfaces;
         protected LinkedList<Edge> edges;
         protected LinkedList<Vertex> vertices;
-        public PickingResult(LinkedList<Surface> surfaces, LinkedList<Edge> edges, LinkedList<Vertex> vertices) {
-            this.edges = edges;
+        public PickingResult(Geometry nearest, LinkedList<Surface> surfaces, LinkedList<Edge> edges, LinkedList<Vertex> vertices) {
+            this.nearest = nearest;
+        	this.edges = edges;
             this.vertices = vertices;
             this.surfaces = surfaces;
         }
@@ -447,7 +452,7 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
     }
 
 
-    public PickingResult selectObjects(int x, int y, Plane plane) {
+    public PickingResult selectObjects(int x, int y) {
         picking = new Picking(x, y);
         drawable.getContext().makeCurrent();
         display(drawable);
@@ -458,6 +463,13 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
         LinkedList<Vertex> vertices = new LinkedList<Vertex>();
         LinkedList<Edge> edges = new LinkedList<Edge>();
         LinkedList<Surface> surfaces = new LinkedList<Surface>();
+        
+        Vertex currentVertex = null;
+        double vertex_z = 1.0;
+        Edge currentEdge = null;
+        double edge_z = 1.0;
+        Surface currentSurface = null;
+        double surface_z = 1.0;
 
         for (int i = 0; i < picking.hits; i++) {
             names = picking.buffer.get(bufferOffset);
@@ -465,18 +477,33 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
             long z2 = 0xFFFFFFFFL & picking.buffer.get(bufferOffset + 2);
             double near = (double) z1 / (double) zMax;
             double far = (double) z2 / (double) zMax;
-            near = (near + far) / 2;
+            double z = (near + far) / 2;
             bufferOffset += 3;
             if (names > 0) {
                 int id = picking.buffer.get(bufferOffset + names - 1);
                 bufferOffset += names;
                 Object current = getObject(id);
                 if (current instanceof Vertex) {
+                	if (z < vertex_z) {
+                		currentVertex = (Vertex) current;
+                		vertex_z = z;
+                	}
                     vertices.add((Vertex) current);
                 } else if (current instanceof Edge) {
-                    edges.add((Edge) current);
+                	Edge edge = (Edge) current;
+                	if (edge.getOwner() instanceof Group) {
+                		if (z < edge_z) {
+                			currentEdge = edge;
+                			edge_z = z;
+                		}
+                	}
+                    edges.add(edge);
                 } else if (current instanceof Surface) {
-                    surfaces.add((Surface) current);
+                	if (z < surface_z) {
+                		currentSurface = (Surface) current;
+                		surface_z =z;
+                	}
+                	surfaces.add((Surface) current);
                 } else {
                     System.out.println("selected " + current.getClass().getName());
                 }
@@ -484,12 +511,44 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
         }
         clearNames();
         picking = null;
-        return new PickingResult(surfaces, edges, vertices);
+        if (currentSurface != null) {
+        	Plane plane = currentSurface.plane();
+        	if (currentVertex != null) {
+        		if (surface_z < vertex_z) {
+        			if (!plane.contains(currentVertex)) {
+        				currentVertex = null;
+        			}
+        		}
+        	}
+        	if (currentEdge != null) {
+        		if (surface_z < edge_z) {
+        			if (!plane.contains(currentEdge)) {
+        				currentEdge = null;
+        			}
+        		}
+        	}
+        }
+        if (currentEdge != null && currentVertex != null) {
+        	if (edge_z < vertex_z) {
+        		if (!currentEdge.intersects(currentVertex)) {
+        			currentVertex = null;
+        		}
+        	}
+        }
+        Geometry nearest = null;
+        if (currentVertex != null) {
+        	nearest = currentVertex;
+        } else if (currentEdge != null) {
+        	nearest = currentEdge;
+        } else if (currentSurface != null) {
+        	nearest = currentSurface;
+        }
+        return new PickingResult(nearest, surfaces, edges, vertices);
     }
 
     public Vertex selectVertex(int x, int y, Plane plane, Vertex original) {
         Vertex result = null;
-        PickingResult record = selectObjects(x, y, plane);
+        PickingResult record = selectObjects(x, y);
         LinkedList<Vertex> vertices = record.vertices;
         LinkedList<Edge> edges = record.edges;
         if (vertices.size() > 0) {
@@ -520,7 +579,7 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
 
     public Geometry selectGeometry(int x, int y, Plane plane, Vertex original) {
         Geometry result = null;
-        PickingResult record = selectObjects(x, y, plane);
+        PickingResult record = selectObjects(x, y);
         LinkedList<Vertex> vertices = record.vertices;
         LinkedList<Edge> edges = record.edges;
         if (vertices.size() > 0) {
@@ -540,11 +599,16 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
 
     public Surface selectSurface(int x, int y, Plane plane, Vertex original) {
         Surface result = null;
-        PickingResult record = selectObjects(x, y, plane);
+        PickingResult record = selectObjects(x, y);
         if (record.surfaces.size() > 0) {
             result = record.surfaces.getLast();
         }
         return result;
+    }
+    
+    public Geometry selectObject(int x, int y) {
+    	PickingResult record = selectObjects(x, y);
+    	return record.nearest;
     }
 
     private void applyCamera(Camera camera) {
@@ -719,7 +783,9 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
                         continue;
                     }
                 }
-                drawEdge(current);
+                if (current != selected) {
+                	drawEdge(current);
+                }
             }
         }
 
@@ -729,21 +795,32 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
             gl.glEnable(GL2.GL_LIGHTING);
             for (Surface current : surfaces) {
                 if (current.isVisible()) {
-                    drawSurface(current);
+                	if (current != selected) {
+                		drawSurface(current);
+                	}
                 }
             }
             gl.glDisable(GL2.GL_POLYGON_OFFSET_FILL);
             gl.glDisable(GL2.GL_LIGHTING);
+            
         }
 
         public void onGroup(Group current) {
             gl.glColor3f(0.0f, 0.0f, 0.0f);
             drawEdgesForDisplay(current.getEdges());
+            if (selected instanceof Edge) {
+            	apply(selected_color, 1.0f);
+            	drawEdge((Edge) selected);
+            }
             apply(babyblue, 1.0f);
             drawSurfacesForDisplay(current.getSurfaces());
             Set<Vertex> mark = new HashSet<Vertex>();
             for (Surface surface : current.getSurfaces()) {
                 mark.addAll(surface.getVertices());
+            }
+            if (selected instanceof Surface) {
+            	apply(selected_color, 1.0f);
+            	drawSurface((Surface) selected);
             }
             gl.glColor3f(0.0f, 0.0f, 0.0f);
 
@@ -754,6 +831,13 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
                     gl.glVertex3d(vertex.getX(), vertex.getY(), vertex.getZ());
                     gl.glEnd();
                 }
+            }
+            if (selected instanceof Vertex) {
+            	Vertex vertex = (Vertex) selected;
+            	apply(selected_color, 1.0f);
+            	gl.glBegin(GL2.GL_POINTS);
+                gl.glVertex3d(vertex.getX(), vertex.getY(), vertex.getZ());
+                gl.glEnd();
             }
             gl.glEnable(GL_DEPTH_TEST);
         }
