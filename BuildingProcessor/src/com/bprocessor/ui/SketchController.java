@@ -44,11 +44,8 @@ public class SketchController {
 				activeSketch = sketches.get(0);
 			}
 		} catch (JsonGenerationException e) {
-			e.printStackTrace();
 		} catch (JsonMappingException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 
