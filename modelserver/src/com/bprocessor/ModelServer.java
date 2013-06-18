@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.BasicConfigurator;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -35,6 +36,7 @@ public class ModelServer extends HttpServlet {
 	public ModelServer() {
 		super();
 		factory = HibernateUtil.getSessionFactory();
+		BasicConfigurator.configure();
 	}
 
 
