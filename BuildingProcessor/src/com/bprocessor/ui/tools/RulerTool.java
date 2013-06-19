@@ -1,4 +1,4 @@
-package com.bprocessor.ui;
+package com.bprocessor.ui.tools;
 
 import java.awt.Font;
 import java.awt.event.KeyEvent;
@@ -12,6 +12,8 @@ import com.bprocessor.Constructor;
 import com.bprocessor.Edge;
 import com.bprocessor.Geometry;
 import com.bprocessor.Vertex;
+import com.bprocessor.ui.BuildingEditor;
+import com.bprocessor.ui.Tool;
 import com.bprocessor.util.Plane;
 
 public class RulerTool extends Tool {
@@ -63,27 +65,27 @@ public class RulerTool extends Tool {
     }
     
     public void prepare() {
-    	editor.selected = null;
-        editor.restriction = new Plane(0, 0, 1, 0);
+    	editor.setSelected(null);
+        editor.setRestriction(new Plane(0, 0, 1, 0));
         editor.repaint();
         editor.requestFocus();
         buffer = new StringBuffer();
         legendFld = new JLabel("Distance: ");
         legendFld.setFont(new Font("Dialog", Font.BOLD, 12));
-        editor.statusbar.register(legendFld);
+        editor.statusbar().register(legendFld);
         distanceFld = new JLabel("n/a");
         distanceFld.setFont(new Font("Dialog", Font.PLAIN, 12));
-        editor.statusbar.register(distanceFld);
+        editor.statusbar().register(distanceFld);
     }
     public void finish() {
-        editor.restriction = null;
+        editor.setRestriction(null);
         editor.repaint();
         buffer = null;
         constructor = null;
         prototype = null;
-        editor.statusbar.deregister(legendFld);
+        editor.statusbar().deregister(legendFld);
         legendFld = null;
-        editor.statusbar.deregister(distanceFld);
+        editor.statusbar().deregister(distanceFld);
         distanceFld = null;
     }
 
@@ -111,7 +113,7 @@ public class RulerTool extends Tool {
         starty = event.getY();
         moving = false;
 
-        Plane plane = editor.restriction;
+        Plane plane = editor.getRestriction();
         Vertex original = editor.getPlaneIntersection(event.getX(), event.getY(), plane);
         original.setX(round(original.getX()));
         original.setY(round(original.getY()));
@@ -125,7 +127,7 @@ public class RulerTool extends Tool {
             Color blue = new Color(0.3, 0.6, 1.0);
             constructor = new Constructor(from, to, blue);
             prototype = edge;
-            editor.constructorLayer.add(constructor);
+            editor.addConstructor(constructor);
             updateDistance(0.0);
             editor.repaint();
         }
@@ -148,7 +150,7 @@ public class RulerTool extends Tool {
                 }
             }
             if (moving) {
-                Plane plane = editor.restriction;
+                Plane plane = editor.getRestriction();
                 Vertex original = editor.getPlaneIntersection(event.getX(), event.getY(), plane);
                 if (original != null) {
                     original.setX(round(original.getX()));
@@ -185,7 +187,7 @@ public class RulerTool extends Tool {
             evaluate(buffer.toString());
             buffer = new StringBuffer();
         } else if (ch == KeyEvent.VK_SPACE) {
-            editor.constructorLayer.clear();
+            editor.clearConstructors();
             constructor = null;
             prototype = null;
             buffer = new StringBuffer();

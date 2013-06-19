@@ -1,4 +1,4 @@
-package com.bprocessor.ui;
+package com.bprocessor.ui.tools;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -11,11 +11,10 @@ import com.bprocessor.Color;
 import com.bprocessor.Constructor;
 import com.bprocessor.Edge;
 import com.bprocessor.Group;
-import com.bprocessor.Sketch;
 import com.bprocessor.Surface;
 import com.bprocessor.Vertex;
-import com.bprocessor.io.ModelClient;
-import com.bprocessor.io.Persistence;
+import com.bprocessor.ui.BuildingEditor;
+import com.bprocessor.ui.Tool;
 import com.bprocessor.util.Plane;
 
 public class PencilTool extends Tool {
@@ -28,8 +27,8 @@ public class PencilTool extends Tool {
     private void makeSurface() {
         Surface surface = new Surface(edges);
         editing.clear();
-        editor.sketch.getGroup().addAll(surface);
-        for (Surface exterior : editor.sketch.getGroup().getSurfaces()) {
+        editor.getSketch().getGroup().addAll(surface);
+        for (Surface exterior : editor.getSketch().getGroup().getSurfaces()) {
             if (exterior != surface) {
                 if (exterior.surrounds(surface)) {
                     exterior.add(surface);
@@ -49,16 +48,16 @@ public class PencilTool extends Tool {
     public void evaluate(String value) {
         try {
             double length = Double.valueOf(value);
-            for (Surface current : editor.sketch.getGroup().getSurfaces()) {
+            for (Surface current : editor.getSketch().getGroup().getSurfaces()) {
                 if (current.getExterior() == null) {
                     List<Surface> sides = new LinkedList<Surface>();
                     List<Surface> tops = new LinkedList<Surface>();
                     current.extrudeAll(new Vertex(0, 0, 1), length, sides, tops);
                     for (Surface side: sides) {
-                        editor.sketch.getGroup().addAll(side);
+                    	editor.getSketch().getGroup().addAll(side);
                     }
                     for (Surface surface : tops) {
-                        editor.sketch.getGroup().addAll(surface);
+                    	editor.getSketch().getGroup().addAll(surface);
                     }
                 }
             }
@@ -69,20 +68,20 @@ public class PencilTool extends Tool {
     }
 
     public void prepare() {
-    	editor.selected = null;
+    	editor.setSelected(null);
         editing = new Group("editing");
-        editor.overlay.add(editing);
-        editor.restriction = new Plane(0, 0, 1, 0);
+        editor.addOverlay(editing);
+        editor.setRestriction(new Plane(0, 0, 1, 0));
         constructors = new LinkedList<Constructor>();
         buffer = new StringBuffer();
         editor.requestFocus();
         editor.repaint();
     }
     public void finish() {
-        editor.restriction = null;
+        editor.setRestriction(null);
         editor.repaint();
         setConstructors(Collections.<Constructor>emptyList());
-        editor.overlay.remove(editing);
+        editor.removeOverlay(editing);
         constructors = null;
         editing = null;
         vertices = null;
@@ -99,11 +98,11 @@ public class PencilTool extends Tool {
 
     public void setConstructors(List<Constructor> objects) {
         for (Constructor current : constructors) {
-            editor.constructorLayer.remove(current);
+            editor.removeConstructor(current);
         }
         constructors.clear();
         for (Constructor current : objects) {
-            editor.constructorLayer.add(current);
+            editor.addConstructor(current);
             constructors.add(current);
         }
     }
@@ -132,7 +131,7 @@ public class PencilTool extends Tool {
             vertices = new LinkedList<Vertex>();
             edges = new LinkedList<Edge>();
         }
-        Plane plane = editor.restriction;
+        Plane plane = editor.getRestriction();
         Vertex original = editor.getPlaneIntersection(event.getX(), event.getY(), plane);
         roundIt(original);
 
@@ -221,26 +220,7 @@ public class PencilTool extends Tool {
         } else if (ch == KeyEvent.VK_ENTER) {
             evaluate(buffer.toString());
             buffer = new StringBuffer();
-        } else if (ch == 's') {
-            Persistence.save(editor.sketch, "sketch.json");
-        } else if (ch == 'p') {
-            ModelClient client = new ModelClient();
-            try {
-                client.save(editor.sketch);
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        } else if (ch == 'g') {
-            ModelClient client = new ModelClient();
-            try {
-                Sketch sketch = client.get(1);
-                System.out.println("sketch: " + sketch.getName());
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }else {
+        } else {
             buffer.append(ch);
         }
     }

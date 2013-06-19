@@ -37,6 +37,10 @@ import com.bprocessor.Sketch;
 import com.bprocessor.Surface;
 import com.bprocessor.Vertex;
 import com.bprocessor.io.ObjFileReader;
+import com.bprocessor.ui.tools.EraserTool;
+import com.bprocessor.ui.tools.PencilTool;
+import com.bprocessor.ui.tools.RulerTool;
+import com.bprocessor.ui.tools.SelectTool;
 import com.bprocessor.util.Plane;
 import com.jogamp.common.nio.Buffers;
 import static javax.media.opengl.GL.*;  // GL constants
@@ -79,6 +83,42 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
     
     protected Geometry selected;
 
+    public void setSelected(Geometry selected) {
+    	this.selected = selected;
+    }
+    public Geometry getSelected() {
+    	return selected;
+    }
+    
+    public void addOverlay(Group geometry) {
+    	overlay.add(geometry);
+    }
+    public void removeOverlay(Group geometry) {
+    	overlay.remove(geometry);
+    }
+    public void addConstructor(Constructor constructor) {
+    	constructorLayer.add(constructor);
+    }
+    public void removeConstructor(Constructor constructor) {
+    	constructorLayer.remove(constructor);
+    }
+    public void clearConstructors() {
+    	constructorLayer.clear();
+    }
+    public void setRestriction(Plane plane) {
+    	this.restriction = plane;
+    }
+    public Plane getRestriction() {
+    	return restriction;
+    }
+    
+    public StatusBar statusbar() {
+    	return statusbar;
+    }
+    public ToolBar toolbar() {
+    	return toolbar;
+    }
+    
     public class Picking {
         protected int x;
         protected int y;
@@ -205,7 +245,10 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
     		repaint();
     	}
     }
-
+    public Sketch getSketch() {
+    	return sketch;
+    }
+    
     public void checkpoint() {
         if (sketch != null) {
             sketch.setModified(true);

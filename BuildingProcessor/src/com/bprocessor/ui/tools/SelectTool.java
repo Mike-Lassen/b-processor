@@ -1,10 +1,12 @@
-package com.bprocessor.ui;
+package com.bprocessor.ui.tools;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 import com.bprocessor.Geometry;
+import com.bprocessor.ui.BuildingEditor;
+import com.bprocessor.ui.Tool;
 
 public class SelectTool extends Tool {
 
@@ -34,8 +36,7 @@ public class SelectTool extends Tool {
     @Override
     public void mousePressed(MouseEvent event) {
         Geometry geometry = editor.selectObject(event.getX(), event.getY());
-        System.out.println("selected: " + geometry);
-        editor.selected = geometry;
+        editor.setSelected(geometry);
         editor.repaint();
     }
 

@@ -1,10 +1,12 @@
-package com.bprocessor.ui;
+package com.bprocessor.ui.tools;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 import com.bprocessor.Surface;
+import com.bprocessor.ui.BuildingEditor;
+import com.bprocessor.ui.Tool;
 
 public class EraserTool extends Tool {
     public EraserTool(BuildingEditor editor) {
@@ -12,7 +14,7 @@ public class EraserTool extends Tool {
     }
 
     public void prepare() {
-    	editor.selected = null;
+    	editor.setSelected(null);
     }
     public void finish() {
     }
