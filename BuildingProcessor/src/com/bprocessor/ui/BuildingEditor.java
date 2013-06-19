@@ -1,11 +1,4 @@
 package com.bprocessor.ui;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -131,8 +124,11 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
     }
 
     /** Constructor to setup the GUI for this Component */
-    public BuildingEditor(SketchController controller) {
+    public BuildingEditor(SketchController controller, ToolBar toolbar, StatusBar statusbar) {
     	this.controller = controller;
+    	this.toolbar = toolbar;
+    	this.statusbar = statusbar;
+    	
         FileInputStream file = null;
         try {
             ObjFileReader input = new ObjFileReader();
@@ -158,16 +154,12 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
         overlay.add(man);
         constructorLayer = new ConstructorLayer("Constructors");
         overlay.add(constructorLayer);
-
         this.addGLEventListener(this);
-        ToolHandler handler = new ToolHandler();
-        this.addMouseListener(handler);
-        this.addMouseMotionListener(handler);
-        this.addMouseWheelListener(handler);
-        this.addKeyListener(handler);
+        
+        registerTools();
     }
 
-    public void setup() {
+    public void registerTools() {
     	
         Tool select = new SelectTool(this);
 
@@ -178,6 +170,12 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
         Tool cameraDrag = new Tool.CameraDrag(this);
         Tool cameraRotation = new Tool.CameraRotation(this);
         Tool cameraZoom = new Tool.CameraZoom(this);
+        
+        InputListener listener = toolbar.getInputListener();
+        this.addMouseListener(listener);
+        this.addMouseMotionListener(listener);
+        this.addMouseWheelListener(listener);
+        this.addKeyListener(listener);
 
         toolbar.registerTool("select", "Biconselecttool.gif", select);
         toolbar.addSeperator(20);
@@ -193,18 +191,7 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
         
         toolbar.disableAll();
     }
-
-
-    public void setActiveTool(Tool tool) {
-        if (activeTool != null) {
-            activeTool.finish();
-        }
-        activeTool = tool;
-        if (activeTool != null) {
-            activeTool.prepare();
-        }
-    }
-
+    
     public void setSketch(Sketch sketch) {
     	if (sketch != this.sketch) {
     		this.sketch = sketch;
@@ -933,73 +920,4 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
      */
     @Override
     public void dispose(GLAutoDrawable drawable) { }
-
-    public class ToolHandler implements MouseListener, MouseMotionListener, KeyListener, MouseWheelListener  {
-        @Override
-        public void mouseWheelMoved(MouseWheelEvent e) {
-            if (activeTool != null && sketch != null) {
-                activeTool.mouseWheelMoved(e);
-            }
-        }
-        @Override
-        public void keyPressed(KeyEvent e) {
-            if (activeTool != null && sketch != null) {
-                activeTool.keyPressed(e);
-            }
-        }
-        @Override
-        public void keyReleased(KeyEvent e) {
-            if (activeTool != null && sketch != null) {
-                activeTool.keyReleased(e);
-            }
-        }
-        @Override
-        public void keyTyped(KeyEvent e) {
-            if (activeTool != null && sketch != null) {
-                activeTool.keyTyped(e);
-            }
-        }
-        @Override
-        public void mouseDragged(MouseEvent e) {
-            if (activeTool != null && sketch != null) {
-                activeTool.mouseDragged(e);
-            }
-        }
-        @Override
-        public void mouseMoved(MouseEvent e) {
-            if (activeTool != null && sketch != null) {
-                activeTool.mouseMoved(e);
-            }
-        }
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            if (activeTool != null && sketch != null) {
-                activeTool.mouseClicked(e);
-            }
-        }
-        @Override
-        public void mouseEntered(MouseEvent e) {
-            if (activeTool != null && sketch != null) {
-                activeTool.mouseEntered(e);
-            }
-        }
-        @Override
-        public void mouseExited(MouseEvent e) {
-            if (activeTool != null && sketch != null) {
-                activeTool.mouseExited(e);
-            }
-        }
-        @Override
-        public void mousePressed(MouseEvent e) {
-            if (activeTool != null && sketch != null) {
-                activeTool.mousePressed(e);
-            }
-        }
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            if (activeTool != null && sketch != null) {
-                activeTool.mouseReleased(e);
-            }
-        }
-    }
 }
