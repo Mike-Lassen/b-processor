@@ -13,11 +13,11 @@ import com.bprocessor.Vertex;
 import com.bprocessor.util.Plane;
 
 public abstract class Tool implements MouseListener, MouseMotionListener, KeyListener, MouseWheelListener {
-    protected BuildingEditor editor;
+    protected SketchView view;
 
 
-    public Tool(BuildingEditor editor) {
-        this.editor = editor;
+    public Tool(SketchView view) {
+        this.view = view;
     }
 
     public void prepare() {
@@ -43,8 +43,8 @@ public abstract class Tool implements MouseListener, MouseMotionListener, KeyLis
         private int x;
         private int y;
 
-        public CameraDrag(BuildingEditor editor) {
-            super(editor);
+        public CameraDrag(SketchView view) {
+            super(view);
         }
 
         @Override
@@ -65,7 +65,7 @@ public abstract class Tool implements MouseListener, MouseMotionListener, KeyLis
 
         @Override
         public void mouseDragged(MouseEvent event) {
-            Camera camera = editor.camera;
+            Camera camera = view.camera;
             Vertex center = camera.getCenter();
             Vertex eye = camera.getEye();
 
@@ -80,8 +80,8 @@ public abstract class Tool implements MouseListener, MouseMotionListener, KeyLis
             }
             double d = -dx * center.getX() - dy * center.getY() - dz * center.getZ();
 
-            Vertex first = editor.getPlaneIntersection(x, y, new Plane(dx, dy, dz, d));
-            Vertex second = editor.getPlaneIntersection(event.getX(),
+            Vertex first = view.getPlaneIntersection(x, y, new Plane(dx, dy, dz, d));
+            Vertex second = view.getPlaneIntersection(event.getX(),
                     event.getY(), 
                     new Plane(dx, dy, dz, d));
             Vertex vector = first.minus(second);
@@ -89,7 +89,7 @@ public abstract class Tool implements MouseListener, MouseMotionListener, KeyLis
 
             x = event.getX();
             y = event.getY();
-            editor.repaint();
+            view.repaint();
         }
 
         @Override
@@ -108,8 +108,8 @@ public abstract class Tool implements MouseListener, MouseMotionListener, KeyLis
         private int x;
         private int y;
 
-        public CameraRotation(BuildingEditor editor) {
-            super(editor);
+        public CameraRotation(SketchView view) {
+            super(view);
         }
 
         @Override
@@ -133,12 +133,12 @@ public abstract class Tool implements MouseListener, MouseMotionListener, KeyLis
             double angleX = ((double)(event.getX() - x) / 360) * Math.PI;
             double angleY = ((double)(event.getY() - y) / 360) * Math.PI;
 
-            editor.camera.rotateHorizontally(-angleX);
-            editor.camera.rotateVertically(angleY);
+            view.camera.rotateHorizontally(-angleX);
+            view.camera.rotateVertically(angleY);
 
             x = event.getX();
             y = event.getY();
-            editor.repaint();
+            view.repaint();
         }
 
         @Override
@@ -146,9 +146,9 @@ public abstract class Tool implements MouseListener, MouseMotionListener, KeyLis
         @Override
         public void keyPressed(KeyEvent event) {
             if (event.getKeyChar() == ' ') {
-                System.out.println("camera.eye " + editor.camera.getEye());
-                System.out.println("camera.center " + editor.camera.getCenter());
-                System.out.println("camera.up " + editor.camera.getUp());
+                System.out.println("camera.eye " + view.camera.getEye());
+                System.out.println("camera.center " + view.camera.getCenter());
+                System.out.println("camera.up " + view.camera.getUp());
             }
         }
         @Override
@@ -162,8 +162,8 @@ public abstract class Tool implements MouseListener, MouseMotionListener, KeyLis
     public static class CameraZoom extends Tool {
         private int y;
 
-        public CameraZoom(BuildingEditor editor) {
-            super(editor);
+        public CameraZoom(SketchView view) {
+            super(view);
         }
 
         @Override
@@ -198,14 +198,14 @@ public abstract class Tool implements MouseListener, MouseMotionListener, KeyLis
         public void mouseDragged(MouseEvent event) {
             int dy = event.getY() - y;
             if (dy > 8) {
-                editor.camera.zoomOut();
+                view.camera.zoomOut();
                 y = event.getY();
             }
             if (dy < -8) {
-                editor.camera.zoomIn();
+                view.camera.zoomIn();
                 y = event.getY();
             }
-            editor.repaint();
+            view.repaint();
         }
 
         @Override
@@ -217,8 +217,8 @@ public abstract class Tool implements MouseListener, MouseMotionListener, KeyLis
         @Override
         public void keyPressed(KeyEvent event) {
             if (event.getKeyChar() == ' ') {
-                editor.camera.focusOn(null);
-                editor.repaint();
+                view.camera.focusOn(null);
+                view.repaint();
             }
         }
 

@@ -13,7 +13,7 @@ import com.bprocessor.Edge;
 import com.bprocessor.Group;
 import com.bprocessor.Surface;
 import com.bprocessor.Vertex;
-import com.bprocessor.ui.BuildingEditor;
+import com.bprocessor.ui.SketchView;
 import com.bprocessor.ui.Tool;
 import com.bprocessor.util.Plane;
 
@@ -27,61 +27,61 @@ public class PencilTool extends Tool {
     private void makeSurface() {
         Surface surface = new Surface(edges);
         editing.clear();
-        editor.getSketch().getGroup().addAll(surface);
-        for (Surface exterior : editor.getSketch().getGroup().getSurfaces()) {
+        view.getSketch().getGroup().addAll(surface);
+        for (Surface exterior : view.getSketch().getGroup().getSurfaces()) {
             if (exterior != surface) {
                 if (exterior.surrounds(surface)) {
                     exterior.add(surface);
                 }
             }
         }
-        editor.checkpoint();
+        view.checkpoint();
         vertices = null;
         edges = null;
-        editor.repaint();
+        view.repaint();
     }
 
-    public PencilTool(BuildingEditor editor) {
-        super(editor);
+    public PencilTool(SketchView view) {
+        super(view);
     }
 
     public void evaluate(String value) {
         try {
             double length = Double.valueOf(value);
-            for (Surface current : editor.getSketch().getGroup().getSurfaces()) {
+            for (Surface current : view.getSketch().getGroup().getSurfaces()) {
                 if (current.getExterior() == null) {
                     List<Surface> sides = new LinkedList<Surface>();
                     List<Surface> tops = new LinkedList<Surface>();
                     current.extrudeAll(new Vertex(0, 0, 1), length, sides, tops);
                     for (Surface side: sides) {
-                    	editor.getSketch().getGroup().addAll(side);
+                    	view.getSketch().getGroup().addAll(side);
                     }
                     for (Surface surface : tops) {
-                    	editor.getSketch().getGroup().addAll(surface);
+                    	view.getSketch().getGroup().addAll(surface);
                     }
                 }
             }
         } catch (Exception error) {
 
         }
-        editor.repaint();
+        view.repaint();
     }
 
     public void prepare() {
-    	editor.setSelected(null);
+    	view.setSelected(null);
         editing = new Group("editing");
-        editor.addOverlay(editing);
-        editor.setRestriction(new Plane(0, 0, 1, 0));
+        view.addOverlay(editing);
+        view.setRestriction(new Plane(0, 0, 1, 0));
         constructors = new LinkedList<Constructor>();
         buffer = new StringBuffer();
-        editor.requestFocus();
-        editor.repaint();
+        view.requestFocus();
+        view.repaint();
     }
     public void finish() {
-        editor.setRestriction(null);
-        editor.repaint();
+        view.setRestriction(null);
+        view.repaint();
         setConstructors(Collections.<Constructor>emptyList());
-        editor.removeOverlay(editing);
+        view.removeOverlay(editing);
         constructors = null;
         editing = null;
         vertices = null;
@@ -98,11 +98,11 @@ public class PencilTool extends Tool {
 
     public void setConstructors(List<Constructor> objects) {
         for (Constructor current : constructors) {
-            editor.removeConstructor(current);
+            view.removeConstructor(current);
         }
         constructors.clear();
         for (Constructor current : objects) {
-            editor.addConstructor(current);
+            view.addConstructor(current);
             constructors.add(current);
         }
     }
@@ -131,11 +131,11 @@ public class PencilTool extends Tool {
             vertices = new LinkedList<Vertex>();
             edges = new LinkedList<Edge>();
         }
-        Plane plane = editor.getRestriction();
-        Vertex original = editor.getPlaneIntersection(event.getX(), event.getY(), plane);
+        Plane plane = view.getRestriction();
+        Vertex original = view.getPlaneIntersection(event.getX(), event.getY(), plane);
         roundIt(original);
 
-        Vertex existing = editor.selectVertex(event.getX(), event.getY(), plane, original);
+        Vertex existing = view.selectVertex(event.getX(), event.getY(), plane, original);
 
         Vertex vertex = null;
 
@@ -191,7 +191,7 @@ public class PencilTool extends Tool {
                 setConstructors(lst);
             }
         }
-        editor.repaint();
+        view.repaint();
     }
 
     @Override

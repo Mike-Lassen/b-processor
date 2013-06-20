@@ -5,39 +5,35 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 import com.bprocessor.Geometry;
-import com.bprocessor.ui.BuildingEditor;
+import com.bprocessor.ui.SketchView;
 import com.bprocessor.ui.Tool;
 
 public class SelectTool extends Tool {
 
-    public SelectTool(BuildingEditor editor) {
-        super(editor);
-        // TODO Auto-generated constructor stub
+    public SelectTool(SketchView view) {
+        super(view);
     }
 
     @Override
     public void mouseClicked(MouseEvent event) {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void mouseEntered(MouseEvent event) {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void mouseExited(MouseEvent event) {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void mousePressed(MouseEvent event) {
-        Geometry geometry = editor.selectObject(event.getX(), event.getY());
-        editor.setSelected(geometry);
-        editor.repaint();
+        Geometry geometry = view.selectObject(event.getX(), event.getY());
+        view.setSelected(geometry);
+        view.repaint();
     }
 
     @Override

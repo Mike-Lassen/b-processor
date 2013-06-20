@@ -18,7 +18,7 @@ import javax.swing.tree.TreeSelectionModel;
 import com.bprocessor.Sketch;
 
 @SuppressWarnings("serial")
-public class BuildingHierarchy extends JTree  implements TreeSelectionListener {
+public class SketchHierarchy extends JTree  implements TreeSelectionListener {
 
 	private SketchController controller;
 	private DefaultTreeModel model;
@@ -43,7 +43,7 @@ public class BuildingHierarchy extends JTree  implements TreeSelectionListener {
 		protected void paintComponent(Graphics g) {
 			if (selected) {
 				g.setColor(new Color(0.3f, 0.5f, 0.9f));
-				g.fillRect(0, 0, BuildingHierarchy.this.getWidth(), 32);
+				g.fillRect(0, 0, SketchHierarchy.this.getWidth(), 32);
 			}
 			super.paintComponent(g);
 		}
@@ -73,7 +73,7 @@ public class BuildingHierarchy extends JTree  implements TreeSelectionListener {
 	};  
 
 
-	public BuildingHierarchy(SketchController controller) {
+	public SketchHierarchy(SketchController controller) {
 		this.controller = controller;
 		setEditable(false);
 		Font font = new Font("Verdana", Font.PLAIN, 12);

@@ -52,7 +52,7 @@ import static javax.media.opengl.GL2.*; // GL2 constants
  * It also handles the OpenGL events to render graphics.
  */
 @SuppressWarnings("serial")
-public class BuildingEditor extends GLCanvas implements GLEventListener {
+public class SketchView extends GLCanvas implements GLEventListener {
     private static float[] babyblue = new float[] {224f / 255, 255f / 255, 255f / 255};
     private static float[] selected_color = new float[] {0.8f, 0.2f, 0.3f};
 
@@ -164,7 +164,7 @@ public class BuildingEditor extends GLCanvas implements GLEventListener {
     }
 
     /** Constructor to setup the GUI for this Component */
-    public BuildingEditor(SketchController controller, ToolBar toolbar, StatusBar statusbar) {
+    public SketchView(SketchController controller, ToolBar toolbar, StatusBar statusbar) {
     	this.controller = controller;
     	this.toolbar = toolbar;
     	this.statusbar = statusbar;

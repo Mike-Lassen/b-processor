@@ -19,8 +19,8 @@ public class MainFrame extends JFrame implements SketchObserver {
 	private GlobalMenuBar menubar;
 	private ToolBar toolbar;
 	private StatusBar statusbar;
-	private BuildingEditor editor;
-	private BuildingHierarchy hierarchy;
+	private SketchView view;
+	private SketchHierarchy hierarchy;
 	
 	
 	public class TreeArea extends JPanel {
@@ -31,7 +31,7 @@ public class MainFrame extends JFrame implements SketchObserver {
 			top.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.GRAY));
 			add(top, BorderLayout.NORTH);
 
-			hierarchy = new BuildingHierarchy(controller);
+			hierarchy = new SketchHierarchy(controller);
 			Color ligth = new Color(0xF9, 0xF9, 0xF9);
 			hierarchy.setBackground(ligth);
 			JScrollPane scroll = new JScrollPane(hierarchy);
@@ -39,15 +39,14 @@ public class MainFrame extends JFrame implements SketchObserver {
 			add(scroll, BorderLayout.CENTER);
 		}
 	}
-	public class EditorArea extends JPanel {
-		public EditorArea(SketchController controller, ToolBar toolbar, StatusBar statusbar) {
+	public class ViewArea extends JPanel {
+		public ViewArea(SketchView view) {
 			setLayout(new BorderLayout());
 			JPanel top = new JPanel();
 			top.setPreferredSize(new Dimension(320, 24));
 			top.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.GRAY));
 			add(top, BorderLayout.NORTH);
-			editor = new BuildingEditor(controller, toolbar, statusbar);
-			add(editor, BorderLayout.CENTER);
+			add(view, BorderLayout.CENTER);
 		}
 	}
 	public class AttributesArea extends JPanel {
@@ -67,17 +66,17 @@ public class MainFrame extends JFrame implements SketchObserver {
 	}
 
 	public class MainArea extends JPanel {
-		public MainArea(SketchController controller, ToolBar toolbar, StatusBar statusbar) {
+		public MainArea(SketchView view) {
 			setLayout(new BorderLayout());
 			JPanel treeArea = new TreeArea();
 			treeArea.setPreferredSize(new Dimension(320, 672));
 			treeArea.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.GRAY));
 			add(treeArea, BorderLayout.WEST);
 
-			JPanel editorArea = new EditorArea(controller, toolbar, statusbar);
-			editorArea.setPreferredSize(new Dimension(640, 672));
-			editorArea.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.GRAY));
-			add(editorArea, BorderLayout.CENTER);
+			JPanel viewArea = new ViewArea(view);
+			viewArea.setPreferredSize(new Dimension(640, 672));
+			viewArea.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.GRAY));
+			add(viewArea, BorderLayout.CENTER);
 
 			JPanel attributesArea = new AttributesArea();
 			attributesArea.setPreferredSize(new Dimension(320, 672));
@@ -101,6 +100,8 @@ public class MainFrame extends JFrame implements SketchObserver {
 		toolbar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 		add(toolbar, BorderLayout.NORTH);
 		
+		
+		
 		statusbar = new StatusBar();
 		statusbar.setPreferredSize(new Dimension(1280, 40));
 		statusbar.setBorder(new EtchedBorder() {
@@ -112,8 +113,11 @@ public class MainFrame extends JFrame implements SketchObserver {
 			}
 		});
 		add(statusbar, BorderLayout.SOUTH);
+		
+		view = new SketchView(controller, toolbar, statusbar);
+		
 
-		JPanel mainArea = new MainArea(controller, toolbar, statusbar);
+		JPanel mainArea = new MainArea(view);
 		mainArea.setPreferredSize(new Dimension(1280, 672));
 		mainArea.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.WHITE));
 		add(mainArea, BorderLayout.CENTER);
@@ -130,9 +134,9 @@ public class MainFrame extends JFrame implements SketchObserver {
 	@Override
 	public void sketchChanged(Object initiator) {
 		setTitle(controller.title());
-		editor.setSketch(controller.getActiveSketch());
+		view.setSketch(controller.getActiveSketch());
 		menubar.sketchChanged(initiator);
 		hierarchy.sketchChanged(initiator);
-		editor.repaint();
+		view.repaint();
 	}
 }

@@ -5,16 +5,16 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 import com.bprocessor.Surface;
-import com.bprocessor.ui.BuildingEditor;
+import com.bprocessor.ui.SketchView;
 import com.bprocessor.ui.Tool;
 
 public class EraserTool extends Tool {
-    public EraserTool(BuildingEditor editor) {
-        super(editor);
+    public EraserTool(SketchView view) {
+        super(view);
     }
 
     public void prepare() {
-    	editor.setSelected(null);
+    	view.setSelected(null);
     }
     public void finish() {
     }
@@ -30,14 +30,14 @@ public class EraserTool extends Tool {
 
     @Override
     public void mousePressed(MouseEvent event) {
-        Surface surface = editor.selectSurface(event.getX(), event.getY(), null, null);
+        Surface surface = view.selectSurface(event.getX(), event.getY(), null, null);
         if (surface != null) {
             if (surface.getExterior() != null) {
                 surface.setVisible(false);
             }
         }
-        editor.checkpoint();
-        editor.repaint();
+        view.checkpoint();
+        view.repaint();
     }
 
     @Override
