@@ -69,7 +69,6 @@ public class SketchController {
 		if (observer != null) {
 			observer.sketchChanged(initiator);
 		}
-		System.out.println("-- writing --");
 		SketchInfoList infos = new SketchInfoList("workspace");
 		for (Sketch current : sketches) {
 			if (current.getPath() != null) {
@@ -88,6 +87,12 @@ public class SketchController {
 	}
 	public void changed() {
 		changed(this);
+	}
+	public void checkpoint() {
+		if (activeSketch != null) {
+			activeSketch.setModified(true);
+		}
+		changed();
 	}
 
 	public String title() {

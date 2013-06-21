@@ -6,11 +6,12 @@ import java.awt.event.MouseWheelEvent;
 
 import com.bprocessor.Surface;
 import com.bprocessor.ui.SketchView;
-import com.bprocessor.ui.Tool;
+import com.bprocessor.ui.StandardTool;
+import com.bprocessor.ui.StatusBar;
 
-public class EraserTool extends Tool {
-    public EraserTool(SketchView view) {
-        super(view);
+public class EraserTool extends StandardTool {
+    public EraserTool(SketchView view, StatusBar statusbar) {
+        super(view, statusbar);
     }
 
     public void prepare() {

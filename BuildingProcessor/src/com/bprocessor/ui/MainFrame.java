@@ -12,6 +12,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
 
+import com.bprocessor.ui.tools.EraserTool;
+import com.bprocessor.ui.tools.PencilTool;
+import com.bprocessor.ui.tools.RulerTool;
+import com.bprocessor.ui.tools.SelectTool;
+
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame implements SketchObserver {
 	private SketchController controller;
@@ -21,8 +26,7 @@ public class MainFrame extends JFrame implements SketchObserver {
 	private StatusBar statusbar;
 	private SketchView view;
 	private SketchHierarchy hierarchy;
-	
-	
+
 	public class TreeArea extends JPanel {
 		public TreeArea() {
 			setLayout(new BorderLayout());
@@ -87,21 +91,25 @@ public class MainFrame extends JFrame implements SketchObserver {
 
 	public MainFrame() {
 		controller = new SketchController(this, "sketches.lst");
-		
+
 		setLayout(new BorderLayout());
 		setTitle("B-Processor");
-		
+
 		menubar = new GlobalMenuBar(controller, MainFrame.this);
 		setMenuBar(menubar);
-		
+
 
 		toolbar = new ToolBar();
 		toolbar.setPreferredSize(new Dimension(1280, 40));
 		toolbar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 		add(toolbar, BorderLayout.NORTH);
-		
-		
-		
+
+		view = new SketchView(controller);
+		JPanel mainArea = new MainArea(view);
+		mainArea.setPreferredSize(new Dimension(1280, 672));
+		mainArea.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.WHITE));
+		add(mainArea, BorderLayout.CENTER);
+
 		statusbar = new StatusBar();
 		statusbar.setPreferredSize(new Dimension(1280, 40));
 		statusbar.setBorder(new EtchedBorder() {
@@ -113,18 +121,43 @@ public class MainFrame extends JFrame implements SketchObserver {
 			}
 		});
 		add(statusbar, BorderLayout.SOUTH);
-		
-		view = new SketchView(controller, toolbar, statusbar);
-		
 
-		JPanel mainArea = new MainArea(view);
-		mainArea.setPreferredSize(new Dimension(1280, 672));
-		mainArea.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.WHITE));
-		add(mainArea, BorderLayout.CENTER);
+		
+		view.setDelegate(toolbar.getInputListener());
+		
+		registerTools();
+		toolbar.disableAll();
 
 		sketchChanged(this);
 		setVisible(true);
 		pack();
+	}
+
+	public void registerTools() {
+
+		Tool select = new SelectTool(view, statusbar);
+
+		Tool pencil = new PencilTool(view, statusbar);
+		Tool ruler = new RulerTool(view, statusbar);
+		Tool eraser = new EraserTool(view, statusbar);
+
+		Tool cameraDrag = new StandardTool.CameraDrag(view);
+		Tool cameraRotation = new StandardTool.CameraRotation(view);
+		Tool cameraZoom = new StandardTool.CameraZoom(view);
+
+		
+
+		toolbar.registerTool("select", "Biconselecttool.gif", select);
+		toolbar.addSeperator(20);
+
+		toolbar.registerTool("pencil", "Biconpentool.gif", pencil);
+		toolbar.registerTool("ruler", "ruler-icon.png", ruler);
+		toolbar.registerTool("eraser", "eraser-icon.png", eraser);
+		toolbar.addSeperator(20);
+
+		toolbar.registerTool("camera-drag", "Bicondrag.gif", cameraDrag);
+		toolbar.registerTool("camera-rotation", "Biconrotcam.png", cameraRotation);
+		toolbar.registerTool("camera-zoom", "Biconzomeinout.gif", cameraZoom);
 	}
 
 	public static void main(String[] args) {
@@ -134,7 +167,16 @@ public class MainFrame extends JFrame implements SketchObserver {
 	@Override
 	public void sketchChanged(Object initiator) {
 		setTitle(controller.title());
-		view.setSketch(controller.getActiveSketch());
+		if (view.getSketch() != controller.getActiveSketch()) {
+			view.setSketch(controller.getActiveSketch());
+			if (controller.getActiveSketch() != null) {
+				toolbar.enableAll();
+				toolbar.selectTool("select");
+			} else {
+				toolbar.disableAll();
+				toolbar.selectTool(null);
+			}
+		}
 		menubar.sketchChanged(initiator);
 		hierarchy.sketchChanged(initiator);
 		view.repaint();

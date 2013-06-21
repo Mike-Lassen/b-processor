@@ -13,10 +13,11 @@ import com.bprocessor.Edge;
 import com.bprocessor.Geometry;
 import com.bprocessor.Vertex;
 import com.bprocessor.ui.SketchView;
-import com.bprocessor.ui.Tool;
+import com.bprocessor.ui.StandardTool;
+import com.bprocessor.ui.StatusBar;
 import com.bprocessor.util.Plane;
 
-public class RulerTool extends Tool {
+public class RulerTool extends StandardTool {
     private int startx;
     private int starty;
     private boolean moving;
@@ -27,8 +28,8 @@ public class RulerTool extends Tool {
     private JLabel legendFld;
     private JLabel distanceFld;
 
-    public RulerTool(SketchView view) {
-        super(view);
+    public RulerTool(SketchView view, StatusBar statusbar) {
+        super(view, statusbar);
     }
 
 
@@ -72,10 +73,10 @@ public class RulerTool extends Tool {
         buffer = new StringBuffer();
         legendFld = new JLabel("Distance: ");
         legendFld.setFont(new Font("Dialog", Font.BOLD, 12));
-        view.statusbar().register(legendFld);
+        statusbar.register(legendFld);
         distanceFld = new JLabel("n/a");
         distanceFld.setFont(new Font("Dialog", Font.PLAIN, 12));
-        view.statusbar().register(distanceFld);
+        statusbar.register(distanceFld);
     }
     public void finish() {
         view.setRestriction(null);
@@ -83,9 +84,9 @@ public class RulerTool extends Tool {
         buffer = null;
         constructor = null;
         prototype = null;
-        view.statusbar().deregister(legendFld);
+        statusbar.deregister(legendFld);
         legendFld = null;
-        view.statusbar().deregister(distanceFld);
+        statusbar.deregister(distanceFld);
         distanceFld = null;
     }
 

@@ -14,10 +14,11 @@ import com.bprocessor.Group;
 import com.bprocessor.Surface;
 import com.bprocessor.Vertex;
 import com.bprocessor.ui.SketchView;
-import com.bprocessor.ui.Tool;
+import com.bprocessor.ui.StandardTool;
+import com.bprocessor.ui.StatusBar;
 import com.bprocessor.util.Plane;
 
-public class PencilTool extends Tool {
+public class PencilTool extends StandardTool {
     private LinkedList<Vertex> vertices;
     private LinkedList<Edge> edges;
     private List<Constructor> constructors;
@@ -41,8 +42,8 @@ public class PencilTool extends Tool {
         view.repaint();
     }
 
-    public PencilTool(SketchView view) {
-        super(view);
+    public PencilTool(SketchView view, StatusBar statusbar) {
+        super(view, statusbar);
     }
 
     public void evaluate(String value) {

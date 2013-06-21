@@ -37,10 +37,6 @@ import com.bprocessor.Sketch;
 import com.bprocessor.Surface;
 import com.bprocessor.Vertex;
 import com.bprocessor.io.ObjFileReader;
-import com.bprocessor.ui.tools.EraserTool;
-import com.bprocessor.ui.tools.PencilTool;
-import com.bprocessor.ui.tools.RulerTool;
-import com.bprocessor.ui.tools.SelectTool;
 import com.bprocessor.util.Plane;
 import com.jogamp.common.nio.Buffers;
 import static javax.media.opengl.GL.*;  // GL constants
@@ -53,13 +49,11 @@ import static javax.media.opengl.GL2.*; // GL2 constants
  */
 @SuppressWarnings("serial")
 public class SketchView extends GLCanvas implements GLEventListener {
+	private InputListener delegate;
     private static float[] babyblue = new float[] {224f / 255, 255f / 255, 255f / 255};
     private static float[] selected_color = new float[] {0.8f, 0.2f, 0.3f};
 
     private SketchController controller;
-    
-    protected ToolBar toolbar;
-    protected StatusBar statusbar;
     
     protected Sketch sketch;
     protected Group overlay;
@@ -67,8 +61,6 @@ public class SketchView extends GLCanvas implements GLEventListener {
     
     protected BasicComponent man;
     protected Camera camera;
-    protected List<Tool> tools;
-    protected Tool activeTool;
 
     protected double[] modelMatrix = new double[16];
     protected double[] projMatrix = new double[16];
@@ -83,6 +75,57 @@ public class SketchView extends GLCanvas implements GLEventListener {
     
     protected Geometry selected;
 
+    /** Constructor to setup the GUI for this Component */
+    public SketchView(SketchController controller) {
+    	this.controller = controller;
+    	
+        FileInputStream file = null;
+        try {
+            ObjFileReader input = new ObjFileReader();
+            man = input.readObject(new File("models/man.obj"));
+            man.scaleIt(1 / 100.0);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (file != null) {
+                try {
+                    file.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+        Vertex center = new Vertex(4, 2, 1.3);
+        Vertex eye = new Vertex(6, -9, 8);
+        Vertex up = new Vertex(0, 0, 1);
+        camera = new Camera(center, eye, up);
+        overlay = new Group("overlay");
+        overlay.add(man);
+        constructorLayer = new ConstructorLayer("Constructors");
+        overlay.add(constructorLayer);
+        this.addGLEventListener(this);
+    }
+
+    public void setDelegate(InputListener listener) {
+    	if (delegate != null) {
+    		removeMouseListener(delegate);
+    		removeMouseMotionListener(delegate);
+    		removeMouseWheelListener(delegate);
+    		removeKeyListener(delegate);
+    	}
+    	delegate = listener;
+    	if (delegate != null) {
+    		addMouseListener(delegate);
+    		addMouseMotionListener(delegate);
+    		addMouseWheelListener(delegate);
+    		addKeyListener(delegate);
+    	}
+    }
+    public InputListener getDelegate() {
+    	return delegate;
+    }
+    
     public void setSelected(Geometry selected) {
     	this.selected = selected;
     }
@@ -111,14 +154,7 @@ public class SketchView extends GLCanvas implements GLEventListener {
     public Plane getRestriction() {
     	return restriction;
     }
-    
-    public StatusBar statusbar() {
-    	return statusbar;
-    }
-    public ToolBar toolbar() {
-    	return toolbar;
-    }
-    
+        
     public class Picking {
         protected int x;
         protected int y;
@@ -163,85 +199,10 @@ public class SketchView extends GLCanvas implements GLEventListener {
         return tesselator;
     }
 
-    /** Constructor to setup the GUI for this Component */
-    public SketchView(SketchController controller, ToolBar toolbar, StatusBar statusbar) {
-    	this.controller = controller;
-    	this.toolbar = toolbar;
-    	this.statusbar = statusbar;
-    	
-        FileInputStream file = null;
-        try {
-            ObjFileReader input = new ObjFileReader();
-            man = input.readObject(new File("models/man.obj"));
-            man.scaleIt(1 / 100.0);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (file != null) {
-                try {
-                    file.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-        Vertex center = new Vertex(4, 2, 1.3);
-        Vertex eye = new Vertex(6, -9, 8);
-        Vertex up = new Vertex(0, 0, 1);
-        camera = new Camera(center, eye, up);
-        overlay = new Group("overlay");
-        overlay.add(man);
-        constructorLayer = new ConstructorLayer("Constructors");
-        overlay.add(constructorLayer);
-        this.addGLEventListener(this);
-        
-        registerTools();
-    }
-
-    public void registerTools() {
-    	
-        Tool select = new SelectTool(this);
-
-        Tool pencil = new PencilTool(this);
-        Tool ruler = new RulerTool(this);
-        Tool eraser = new EraserTool(this);
-
-        Tool cameraDrag = new Tool.CameraDrag(this);
-        Tool cameraRotation = new Tool.CameraRotation(this);
-        Tool cameraZoom = new Tool.CameraZoom(this);
-        
-        InputListener listener = toolbar.getInputListener();
-        this.addMouseListener(listener);
-        this.addMouseMotionListener(listener);
-        this.addMouseWheelListener(listener);
-        this.addKeyListener(listener);
-
-        toolbar.registerTool("select", "Biconselecttool.gif", select);
-        toolbar.addSeperator(20);
-
-        toolbar.registerTool("pencil", "Biconpentool.gif", pencil);
-        toolbar.registerTool("ruler", "ruler-icon.png", ruler);
-        toolbar.registerTool("eraser", "eraser-icon.png", eraser);
-        toolbar.addSeperator(20);
-
-        toolbar.registerTool("camera-drag", "Bicondrag.gif", cameraDrag);
-        toolbar.registerTool("camera-rotation", "Biconrotcam.png", cameraRotation);
-        toolbar.registerTool("camera-zoom", "Biconzomeinout.gif", cameraZoom);
-        
-        toolbar.disableAll();
-    }
     
     public void setSketch(Sketch sketch) {
     	if (sketch != this.sketch) {
     		this.sketch = sketch;
-    		if (sketch != null) {
-    			toolbar.enableAll();
-    			toolbar.selectTool("select");
-    		} else {
-    			toolbar.disableAll();
-    			toolbar.selectTool(null);
-    		}
     		repaint();
     	}
     }
@@ -250,10 +211,7 @@ public class SketchView extends GLCanvas implements GLEventListener {
     }
     
     public void checkpoint() {
-        if (sketch != null) {
-            sketch.setModified(true);
-            controller.changed();
-        }
+        controller.checkpoint();
     }
 
     private static class TesselatorCallback extends GLUtessellatorCallbackAdapter {

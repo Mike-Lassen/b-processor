@@ -21,48 +21,49 @@ import javax.swing.JToolBar;
 @SuppressWarnings("serial")
 public class ToolBar extends JPanel {
     private JToolBar toolBar;
-    private Map<String, JToggleButton> buttons;
+    private Map<Tool, JToggleButton> buttons;
     private Map<String, Tool> tools;
     private Tool activeTool;    
     private ButtonGroup group;
+    private InputListener listener;
 
     public ToolBar() {
         toolBar = new JToolBar();
         toolBar.setFloatable(false);
         add(toolBar);
-        buttons = new HashMap<String, JToggleButton>();
         tools = new HashMap<String, Tool>();
+        buttons = new HashMap<Tool, JToggleButton>();
         group = new ButtonGroup();
-
+        listener =  new ToolInputListener();
     }
     
     public InputListener getInputListener() {
-    	return new ToolInputListener();
+    	return listener;
     }
-
+    
     public void registerTool(String name, String iconName, Tool tool) {
         JToggleButton button = new JToggleButton(new ImageIcon(loadImage(iconName)));
         button.setFocusable(false);
         button.addActionListener(new  ToolAction(name));
         toolBar.add(button);
-        buttons.put(name, button);
         tools.put(name,  tool);
+        buttons.put(tool, button);
         group.add(button);
     }
 
     public void selectTool(String name) {
     	if(name != null) {
-    		JToggleButton button = buttons.get(name);
     		Tool tool = tools.get(name);
+    		JToggleButton button = buttons.get(tool);
     		button.setSelected(true);
-    		changeTool(tool);
+    		setTool(tool);
     	} else {
     		group.clearSelection();
-    		changeTool(null);
+    		setTool(null);
     	}
     }
     
-    public void changeTool(Tool tool) {
+    public void setTool(Tool tool) {
     	if (activeTool != null) {
     		activeTool.finish();
     	}
@@ -108,7 +109,7 @@ public class ToolBar extends JPanel {
         @Override
         public void actionPerformed(ActionEvent event) {
             Tool tool = tools.get(name);
-            changeTool(tool);
+            setTool(tool);
         }
     }
     

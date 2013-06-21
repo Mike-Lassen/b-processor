@@ -6,12 +6,13 @@ import java.awt.event.MouseWheelEvent;
 
 import com.bprocessor.Geometry;
 import com.bprocessor.ui.SketchView;
-import com.bprocessor.ui.Tool;
+import com.bprocessor.ui.StandardTool;
+import com.bprocessor.ui.StatusBar;
 
-public class SelectTool extends Tool {
+public class SelectTool extends StandardTool {
 
-    public SelectTool(SketchView view) {
-        super(view);
+    public SelectTool(SketchView view, StatusBar statusbar) {
+        super(view, statusbar);
     }
 
     @Override
