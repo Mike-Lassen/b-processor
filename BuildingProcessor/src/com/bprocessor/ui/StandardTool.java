@@ -9,7 +9,6 @@ import com.bprocessor.Vertex;
 import com.bprocessor.util.Plane;
 
 public abstract class StandardTool extends Tool {
-	protected SketchView view;
 	protected StatusBar statusbar;
 	
 	
@@ -53,11 +52,10 @@ public abstract class StandardTool extends Tool {
 	            dz *= 1 / sqr;
 	        }
 	        double d = -dx * center.getX() - dy * center.getY() - dz * center.getZ();
-	
-	        Vertex first = view.getPlaneIntersection(x, y, new Plane(dx, dy, dz, d));
-	        Vertex second = view.getPlaneIntersection(event.getX(),
-	                event.getY(), 
-	                new Plane(dx, dy, dz, d));
+	        
+	        Plane plane = new Plane(dx, dy, dz, d);
+	        Vertex first = plane.intersection(view.getRay(x, y));
+	        Vertex second = plane.intersection(view.getRay(event.getX(), event.getY()));
 	        Vertex vector = first.minus(second);
 	        camera.translate(vector);
 	

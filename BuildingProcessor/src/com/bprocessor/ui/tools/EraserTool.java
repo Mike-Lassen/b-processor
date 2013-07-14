@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
+import com.bprocessor.Geometry;
 import com.bprocessor.Surface;
 import com.bprocessor.ui.SketchView;
 import com.bprocessor.ui.StandardTool;
@@ -31,14 +32,15 @@ public class EraserTool extends StandardTool {
 
     @Override
     public void mousePressed(MouseEvent event) {
-        Surface surface = view.selectSurface(event.getX(), event.getY(), null, null);
-        if (surface != null) {
+    	Geometry geometry = view.pickObject(event.getX(), event.getY(), null);
+        if (geometry instanceof Surface) {
+        	Surface surface = (Surface) geometry;
             if (surface.getExterior() != null) {
                 surface.setVisible(false);
+                view.checkpoint();
+                view.repaint();
             }
         }
-        view.checkpoint();
-        view.repaint();
     }
 
     @Override

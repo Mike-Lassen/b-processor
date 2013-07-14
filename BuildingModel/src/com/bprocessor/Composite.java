@@ -29,9 +29,9 @@ public class Composite extends Item {
     }
 
     @Override
-    public void visit(ItemVisitor visitor) {
+    public void accept(ItemVisitor visitor) {
         for (Item current : items) {
-            current.visit(visitor);
+            current.accept(visitor);
         }
     }
 }

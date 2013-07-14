@@ -15,6 +15,6 @@ public abstract class Item extends Geometry {
     public void setName(String name) {
         this.name = name;
     }
-    public abstract void visit(ItemVisitor visitor);
+    public abstract void accept(ItemVisitor visitor);
 }
 

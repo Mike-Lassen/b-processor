@@ -74,7 +74,6 @@ public class SketchController {
 			if (current.getPath() != null) {
 				SketchInfo info = new SketchInfo(current.getId(), current.getName(), current.getPath());
 				infos.getInfos().add(info);
-				System.out.println("  " + info.getPath());
 			}
 		}
 		ObjectMapper mapper = new ObjectMapper();

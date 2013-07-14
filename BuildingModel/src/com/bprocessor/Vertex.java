@@ -1,6 +1,14 @@
 package com.bprocessor;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
+enum Coord {
+	X,
+	Y,
+	Z
+}
 
 public class Vertex extends Geometry {
     protected double x;
@@ -49,6 +57,17 @@ public class Vertex extends Geometry {
         x = vertex.x;
         y = vertex.y;
         z = vertex.z;
+    }
+    public double get(Coord coord) {
+    	switch(coord) {
+    	case X:
+    		return x;
+    	case Y:
+    		return y;
+    	case Z:
+    		return z;
+    	}
+    	return Double.NaN;
     }
     public Vertex copy() {
         return new Vertex(x, y, z);
@@ -112,7 +131,31 @@ public class Vertex extends Geometry {
         }
         return true;
     }
+    
+    public List<Edge> connectedEdges() {
+    	List<Edge> edges = new LinkedList<Edge>();
+    	if (owner instanceof Group) {
+    		Group group = (Group) owner;
+    		for (Edge current : group.edges) {
+    			if (current.contains(this)) {
+    				edges.add(current);
+    			}
+    		}
+    	}
+    	return edges;
+    }
 
+    public void delete() {
+    	if (owner instanceof Group) {
+    		List<Edge> edges = connectedEdges();
+    		Group group = (Group) owner;
+    		group.remove(this);
+    		for (Edge current : edges) {
+    			current.delete();
+    		}
+    	}
+    }
+    
     public String toString() {
         return "[" + x + " " + y + " " + z + "]";
     }

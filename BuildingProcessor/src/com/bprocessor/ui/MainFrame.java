@@ -13,6 +13,7 @@ import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
 
 import com.bprocessor.ui.tools.EraserTool;
+import com.bprocessor.ui.tools.OrientTool;
 import com.bprocessor.ui.tools.PencilTool;
 import com.bprocessor.ui.tools.RulerTool;
 import com.bprocessor.ui.tools.SelectTool;
@@ -95,8 +96,7 @@ public class MainFrame extends JFrame implements SketchObserver {
 		setLayout(new BorderLayout());
 		setTitle("B-Processor");
 
-		menubar = new GlobalMenuBar(controller, MainFrame.this);
-		setMenuBar(menubar);
+		
 
 
 		toolbar = new ToolBar();
@@ -127,20 +127,25 @@ public class MainFrame extends JFrame implements SketchObserver {
 		
 		registerTools();
 		toolbar.disableAll();
-
+		
+		
+		menubar = new GlobalMenuBar(controller, view, MainFrame.this);
+		setMenuBar(menubar);
+		
 		sketchChanged(this);
 		setVisible(true);
 		pack();
 	}
 
 	public void registerTools() {
-
 		Tool select = new SelectTool(view, statusbar);
-
+		
 		Tool pencil = new PencilTool(view, statusbar);
 		Tool ruler = new RulerTool(view, statusbar);
 		Tool eraser = new EraserTool(view, statusbar);
 
+		Tool orient = new OrientTool(view, statusbar);
+		
 		Tool cameraDrag = new StandardTool.CameraDrag(view);
 		Tool cameraRotation = new StandardTool.CameraRotation(view);
 		Tool cameraZoom = new StandardTool.CameraZoom(view);
@@ -153,7 +158,11 @@ public class MainFrame extends JFrame implements SketchObserver {
 		toolbar.registerTool("pencil", "Biconpentool.gif", pencil);
 		toolbar.registerTool("ruler", "ruler-icon.png", ruler);
 		toolbar.registerTool("eraser", "eraser-icon.png", eraser);
+		
 		toolbar.addSeperator(20);
+		toolbar.registerTool("orient", "constructor-icon.png", orient);
+		
+		toolbar.addSeperator(40);
 
 		toolbar.registerTool("camera-drag", "Bicondrag.gif", cameraDrag);
 		toolbar.registerTool("camera-rotation", "Biconrotcam.png", cameraRotation);

@@ -8,6 +8,7 @@ import com.bprocessor.Geometry;
 import com.bprocessor.ui.SketchView;
 import com.bprocessor.ui.StandardTool;
 import com.bprocessor.ui.StatusBar;
+import com.bprocessor.util.Filter;
 
 public class SelectTool extends StandardTool {
 
@@ -32,7 +33,12 @@ public class SelectTool extends StandardTool {
 
     @Override
     public void mousePressed(MouseEvent event) {
-        Geometry geometry = view.selectObject(event.getX(), event.getY());
+        Geometry geometry = view.pickObject(event.getX(), event.getY(), new Filter<Geometry>() {
+			@Override
+			public boolean evaluate(Geometry object) {
+				return object.getOwner() != null;
+			}
+		});
         view.setSelected(geometry);
         view.repaint();
     }

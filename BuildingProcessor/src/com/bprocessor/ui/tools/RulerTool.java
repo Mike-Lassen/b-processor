@@ -8,14 +8,13 @@ import java.awt.event.MouseWheelEvent;
 import javax.swing.JLabel;
 
 import com.bprocessor.Color;
-import com.bprocessor.Constructor;
+import com.bprocessor.Line;
 import com.bprocessor.Edge;
 import com.bprocessor.Geometry;
 import com.bprocessor.Vertex;
 import com.bprocessor.ui.SketchView;
 import com.bprocessor.ui.StandardTool;
 import com.bprocessor.ui.StatusBar;
-import com.bprocessor.util.Plane;
 
 public class RulerTool extends StandardTool {
     private int startx;
@@ -24,7 +23,7 @@ public class RulerTool extends StandardTool {
 
     StringBuffer buffer;
     private Edge prototype;
-    private Constructor constructor;
+    private Line line;
     private JLabel legendFld;
     private JLabel distanceFld;
 
@@ -37,8 +36,8 @@ public class RulerTool extends StandardTool {
         try {
             double length = Double.valueOf(value);
             if (prototype != null) {
-                Vertex from = constructor.getFrom();
-                Vertex to = constructor.getTo();
+                Vertex from = line.getFrom();
+                Vertex to = line.getTo();
                 Vertex v = to.minus(from);
                 Vertex p = prototype.intersection(from);
                 Vertex u = from.minus(p);
@@ -67,7 +66,6 @@ public class RulerTool extends StandardTool {
     
     public void prepare() {
     	view.setSelected(null);
-        view.setRestriction(new Plane(0, 0, 1, 0));
         view.repaint();
         view.requestFocus();
         buffer = new StringBuffer();
@@ -79,10 +77,9 @@ public class RulerTool extends StandardTool {
         statusbar.register(distanceFld);
     }
     public void finish() {
-        view.setRestriction(null);
         view.repaint();
         buffer = null;
-        constructor = null;
+        line = null;
         prototype = null;
         statusbar.deregister(legendFld);
         legendFld = null;
@@ -113,22 +110,15 @@ public class RulerTool extends StandardTool {
         startx = event.getX();
         starty = event.getY();
         moving = false;
-
-        Plane plane = view.getRestriction();
-        Vertex original = view.getPlaneIntersection(event.getX(), event.getY(), plane);
-        original.setX(round(original.getX()));
-        original.setY(round(original.getY()));
-        original.setZ(round(original.getZ()));
-
-        Geometry result = view.selectGeometry(event.getX(), event.getY(), plane, original);
+        Geometry result = view.pickObject(event.getX(), event.getY(), null);
         if (result instanceof Edge) {
             Edge edge = (Edge) result;
             Vertex from = edge.getFrom().copy();
             Vertex to = edge.getTo().copy();
             Color blue = new Color(0.3, 0.6, 1.0);
-            constructor = new Constructor(from, to, blue);
+            line = new Line(from, to, blue);
             prototype = edge;
-            view.addConstructor(constructor);
+            view.guideLayer().add(line);
             updateDistance(0.0);
             view.repaint();
         }
@@ -142,7 +132,7 @@ public class RulerTool extends StandardTool {
 
     @Override
     public void mouseDragged(MouseEvent event) {
-        if (constructor != null) {
+        if (line != null) {
             if (!moving) {
                 int dx = event.getX() - startx;
                 int dy = event.getY() - starty;
@@ -151,16 +141,15 @@ public class RulerTool extends StandardTool {
                 }
             }
             if (moving) {
-                Plane plane = view.getRestriction();
-                Vertex original = view.getPlaneIntersection(event.getX(), event.getY(), plane);
-                if (original != null) {
-                    original.setX(round(original.getX()));
-                    original.setY(round(original.getY()));
-                    original.setZ(round(original.getZ()));
-                    Vertex from = constructor.getFrom();
-                    Vertex to = constructor.getTo();
+                Vertex vertex = view.getIntersection(event.getX(), event.getY(), null);
+                if (vertex != null) {
+                    vertex.setX(round(vertex.getX()));
+                    vertex.setY(round(vertex.getY()));
+                    vertex.setZ(round(vertex.getZ()));
+                    Vertex from = line.getFrom();
+                    Vertex to = line.getTo();
                     Vertex v = to.minus(from);
-                    from.set(original);
+                    from.set(vertex);
                     to.set(from.add(v));
                     {
                         Vertex p = prototype.intersection(from);
@@ -188,8 +177,8 @@ public class RulerTool extends StandardTool {
             evaluate(buffer.toString());
             buffer = new StringBuffer();
         } else if (ch == KeyEvent.VK_SPACE) {
-            view.clearConstructors();
-            constructor = null;
+            view.guideLayer().clear();
+            line = null;
             prototype = null;
             buffer = new StringBuffer();
             updateDistance();

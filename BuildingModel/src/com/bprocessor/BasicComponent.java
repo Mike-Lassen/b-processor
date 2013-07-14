@@ -35,7 +35,7 @@ public class BasicComponent extends Item {
     }
 
     @Override
-    public void visit(ItemVisitor visitor) {
-        visitor.onBasicComponent(this);
+    public void accept(ItemVisitor visitor) {
+        visitor.visit(this);
     }
 }

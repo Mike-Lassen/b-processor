@@ -43,16 +43,34 @@ public class Group extends Composite {
             vertex.owner = this;
         }
     }
+    public void remove(Vertex vertex) {
+    	if (vertex.owner == this) {
+    		vertices.remove(vertex);
+    		vertex.owner = null;
+    	}
+    }
     public void add(Edge edge) {
         if (edge.owner == null) {
             edges.add(edge);
             edge.owner = this;
         }
     }
+    public void remove(Edge edge) {
+        if (edge.owner == this) {
+            edges.remove(edge);
+            edge.owner = null;
+        }
+    }
     public void add(Surface surface) {
         if (surface.owner == null) {
             surfaces.add(surface);
             surface.owner = this;
+        }
+    }
+    public void remove(Surface surface) {
+        if (surface.owner == this) {
+            surfaces.remove(surface);
+            surface.owner = null;
         }
     }
 
@@ -98,9 +116,9 @@ public class Group extends Composite {
     }
 
     @Override
-    public void visit(ItemVisitor visitor) {
-        visitor.onGroup(this);
-        super.visit(visitor);
+    public void accept(ItemVisitor visitor) {
+        visitor.visit(this);
+        super.accept(visitor);
     }
 
     public String toString() {

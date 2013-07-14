@@ -1,13 +1,13 @@
 package com.bprocessor;
 
-public class Constructor extends Edge {
+public class Line extends Edge {
     protected Color color;
 
-    public Constructor() {
+    public Line() {
 
     }
 
-    public Constructor(Vertex from, Vertex to, Color color) {
+    public Line(Vertex from, Vertex to, Color color) {
         super(from, to);
         this.color = color;
     }
@@ -18,7 +18,11 @@ public class Constructor extends Edge {
         color = value;
     }
     
+    public Vertex direction() {
+    	return to.minus(from);
+    }
+    
     public String toString() {
-        return "[constructor " + from + " - " + to + "]"; 
+        return "[line " + from + " - " + to + "]"; 
     }
 }
