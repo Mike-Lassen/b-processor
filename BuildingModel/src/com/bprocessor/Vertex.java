@@ -24,8 +24,11 @@ public class Vertex extends Geometry {
         return null;
     }
 
-    public Vertex() {
-
+    public Vertex() {}
+    public Vertex(Vertex prototype) {
+    	x = prototype.x;
+    	y = prototype.y;
+    	z = prototype.z;
     }
     public Vertex(double x, double y, double z) {
         this.x = x;
@@ -159,4 +162,26 @@ public class Vertex extends Geometry {
     public String toString() {
         return "[" + x + " " + y + " " + z + "]";
     }
+    protected void applyVertex(Vertex prototype) {
+    	super.applyGeometry(prototype);
+    	x = prototype.x;
+    	y = prototype.y;
+    	z = prototype.z;
+    }
+    
+    public Memento memento() {
+		return new VertexMemento(this);
+	}
+	
+	private static class VertexMemento implements Memento {
+		private Vertex vertex;
+		private Vertex copy;
+		public VertexMemento(Vertex vertex) {
+			this.vertex = vertex;
+			copy = new Vertex(vertex);
+		}
+		public void restore() {
+			vertex.applyVertex(copy);
+		}
+	}
 }

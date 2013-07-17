@@ -7,7 +7,11 @@ public class Sketch extends Geometry {
     private boolean modified;
     private String path;
 
-    public Sketch() {
+    public Sketch() {}
+    public Sketch(Sketch prototype) {
+    	super(prototype);
+    	name = prototype.name;
+    	group = prototype.group;
     }
     public Sketch(String name) {
         this.name = name;
@@ -44,4 +48,9 @@ public class Sketch extends Geometry {
     public void setPath(String path) {
         this.path = path;
     }
-}
+    protected void applySketch(Sketch prototype) {
+    	super.applyGeometry(prototype);
+    	name = prototype.name;
+    	group = prototype.group;
+    }
+  }

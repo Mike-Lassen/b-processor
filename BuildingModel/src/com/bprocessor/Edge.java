@@ -8,6 +8,11 @@ public class Edge  extends Geometry {
     protected Vertex to;
 
     public Edge() {}
+    public Edge(Edge prototype) {
+    	super(prototype);
+    	from = prototype.from;
+    	to = prototype.to;
+    }
     public Edge(Vertex from, Vertex to) {
         this.from = from;
         this.to = to;
@@ -197,4 +202,26 @@ public class Edge  extends Geometry {
     public String toString() {
         return "[edge " + from + " - " + to + "]"; 
     }
+    
+    protected void applyEdge(Edge prototype) {
+    	super.applyGeometry(prototype);
+    	from = prototype.from;
+    	to = prototype.to;
+    }
+    
+    public Memento memento() {
+		return new EdgeMemento(this);
+	}
+	
+	private static class EdgeMemento implements Memento {
+		private Edge edge;
+		private Edge copy;
+		public EdgeMemento(Edge edge) {
+			this.edge = edge;
+			copy = new Edge(edge);
+		}
+		public void restore() {
+			edge.applyEdge(copy);
+		}
+	}
 }

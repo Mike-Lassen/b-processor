@@ -12,6 +12,8 @@ import java.awt.event.ItemListener;
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
+import com.bprocessor.util.CommandManager;
+
 @SuppressWarnings("serial")
 public class GlobalMenuBar extends MenuBar {
 	private FileMenu fileMenu;
@@ -39,8 +41,20 @@ public class GlobalMenuBar extends MenuBar {
 		}
 	}
 	public void setup() {
-		editMenu.undoItem.setEnabled(false);
-		editMenu.redoItem.setEnabled(false);
+		CommandManager manager = CommandManager.instance();
+		
+		editMenu.undoItem.setEnabled(manager.canUndo());
+		if (manager.canUndo()) {
+			editMenu.undoItem.setLabel("Undo " + manager.undoStack().getLast().description());
+		} else {
+			editMenu.undoItem.setLabel("Undo");
+		}
+		editMenu.redoItem.setEnabled(manager.canRedo());
+		if (manager.canRedo()) {
+			editMenu.redoItem.setLabel("Redo " + manager.redoStack().getLast().description());
+		} else {
+			editMenu.redoItem.setLabel("Redo");
+		}
 		editMenu.cutItem.setEnabled(false);
 		editMenu.copyItem.setEnabled(false);
 		editMenu.pasteItem.setEnabled(false);
@@ -172,10 +186,22 @@ public class GlobalMenuBar extends MenuBar {
 			super(title);
 			{
 				undoItem = new MenuItem("Undo");
+				undoItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent event) {
+						CommandManager.instance().undo();
+						view.repaint();
+					}
+				});
 				add(undoItem);
 			}
 			{
 				redoItem = new MenuItem("Redo");
+				redoItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent event) {
+						CommandManager.instance().redo();
+						view.repaint();
+					}
+				});
 				add(redoItem);
 			}
 			addSeparator();

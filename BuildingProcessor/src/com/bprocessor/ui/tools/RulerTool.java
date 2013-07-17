@@ -15,6 +15,7 @@ import com.bprocessor.Vertex;
 import com.bprocessor.ui.SketchView;
 import com.bprocessor.ui.StandardTool;
 import com.bprocessor.ui.StatusBar;
+import com.bprocessor.util.Filter;
 
 public class RulerTool extends StandardTool {
     private int startx;
@@ -141,7 +142,11 @@ public class RulerTool extends StandardTool {
                 }
             }
             if (moving) {
-                Vertex vertex = view.getIntersection(event.getX(), event.getY(), null);
+                Vertex vertex = view.getIntersection(event.getX(), event.getY(), new Filter<Geometry>() {
+					public boolean evaluate(Geometry object) {
+						return object != line;
+					}
+				});
                 if (vertex != null) {
                     vertex.setX(round(vertex.getX()));
                     vertex.setY(round(vertex.getY()));

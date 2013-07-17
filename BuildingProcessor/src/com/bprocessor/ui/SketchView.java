@@ -39,6 +39,8 @@ import com.bprocessor.Sketch;
 import com.bprocessor.Surface;
 import com.bprocessor.Vertex;
 import com.bprocessor.io.ObjFileReader;
+import com.bprocessor.ui.commands.DeleteGeometry;
+import com.bprocessor.util.CommandManager;
 import com.bprocessor.util.CoordinateSystem;
 import com.bprocessor.util.Filter;
 import com.bprocessor.util.Plane;
@@ -203,7 +205,7 @@ public class SketchView extends GLCanvas implements GLEventListener {
 	}
 	public void deleteSelection() {
 		if (selected != null) {
-			selected.delete();
+			CommandManager.instance().apply(new DeleteGeometry(selected));
 			selected = null;
 			checkpoint();
 			repaint();

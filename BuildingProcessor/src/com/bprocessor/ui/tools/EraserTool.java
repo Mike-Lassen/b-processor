@@ -9,6 +9,8 @@ import com.bprocessor.Surface;
 import com.bprocessor.ui.SketchView;
 import com.bprocessor.ui.StandardTool;
 import com.bprocessor.ui.StatusBar;
+import com.bprocessor.ui.commands.EraseSurface;
+import com.bprocessor.util.CommandManager;
 
 public class EraserTool extends StandardTool {
     public EraserTool(SketchView view, StatusBar statusbar) {
@@ -36,7 +38,7 @@ public class EraserTool extends StandardTool {
         if (geometry instanceof Surface) {
         	Surface surface = (Surface) geometry;
             if (surface.getExterior() != null) {
-                surface.setVisible(false);
+                CommandManager.instance().apply(new EraseSurface(surface));
                 view.checkpoint();
                 view.repaint();
             }

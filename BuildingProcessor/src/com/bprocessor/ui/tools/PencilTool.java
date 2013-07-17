@@ -18,6 +18,9 @@ import com.bprocessor.Vertex;
 import com.bprocessor.ui.SketchView;
 import com.bprocessor.ui.StandardTool;
 import com.bprocessor.ui.StatusBar;
+import com.bprocessor.ui.commands.InsertSurface;
+import com.bprocessor.util.Command;
+import com.bprocessor.util.CommandManager;
 import com.bprocessor.util.CoordinateSystem;
 
 public class PencilTool extends StandardTool {
@@ -32,18 +35,13 @@ public class PencilTool extends StandardTool {
 	private Handle mark;
 
 	private StringBuffer buffer;
+	
 
 	private void makeSurface() {
 		Surface surface = new Surface(edges);
 		editing.clear();
-		view.getSketch().getGroup().addAll(surface);
-		for (Surface exterior : view.getSketch().getGroup().getSurfaces()) {
-			if (exterior != surface) {
-				if (exterior.surrounds(surface)) {
-					exterior.add(surface);
-				}
-			}
-		}
+		Command command = new InsertSurface(view.getSketch().getGroup(), surface);
+		CommandManager.instance().apply(command);
 		view.checkpoint();
 		vertices = null;
 		edges = null;
@@ -63,10 +61,10 @@ public class PencilTool extends StandardTool {
 					List<Surface> tops = new LinkedList<Surface>();
 					current.extrudeAll(new Vertex(0, 0, 1), length, sides, tops);
 					for (Surface side: sides) {
-						view.getSketch().getGroup().addAll(side);
+						view.getSketch().getGroup().insert(side);
 					}
 					for (Surface surface : tops) {
-						view.getSketch().getGroup().addAll(surface);
+						view.getSketch().getGroup().insert(surface);
 					}
 				}
 			}

@@ -3,13 +3,20 @@ package com.bprocessor;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.bprocessor.util.Function;
+import com.bprocessor.util.Util;
+
 public class Group extends Composite {
     protected List<Surface> surfaces;
     protected List<Edge> edges;
     protected List<Vertex> vertices;
 
-    public Group(){
-
+    public Group(){}
+    public Group(Group prototype) {
+    	super(prototype);
+    	surfaces = new LinkedList<Surface>(prototype.surfaces);
+    	edges = new LinkedList<Edge>(prototype.edges);
+    	vertices = new LinkedList<Vertex>(prototype.vertices);
     }
     public Group(String name) {
         super(name);
@@ -103,16 +110,23 @@ public class Group extends Composite {
         }
     }
 
-    public void addAll(Edge edge) {
+    public void insert(Edge edge) {
         add(edge);
         add(edge.from);
         add(edge.to);
     }
-    public void addAll(Surface surface) {
+    public void insert(Surface surface) {
         add(surface);
         for (Edge current : surface.edges) {
-            addAll(current);
+            insert(current);
         }
+        for (Surface exterior : surfaces) {
+			if (exterior != surface) {
+				if (exterior.surrounds(surface)) {
+					exterior.add(surface);
+				}
+			}
+		}
     }
 
     @Override
@@ -123,5 +137,54 @@ public class Group extends Composite {
 
     public String toString() {
         return "[group " + name + "]";
+    }
+    
+    public Memento memento() {
+    	return new GroupMemento(this);
+    }
+    
+    protected void applyGroup(Group prototype) {
+    	super.applyComposite(prototype);
+    	surfaces = prototype.surfaces;
+    	for (Surface current : surfaces) {
+    		current.owner = this;
+    	}
+    	edges = prototype.edges;
+    	for (Edge current : edges) {
+    		current.owner = this;
+    	}
+    	vertices = prototype.vertices;
+    	for (Vertex current : vertices) {
+    		current.owner = this;
+    	}
+    }
+    
+    
+    private static class GroupMemento implements Memento {
+    	protected Group group;
+    	protected Group copy;
+    	protected List<Memento> mementos;
+    	
+    	public GroupMemento(Group group) {
+    		this.group = group;
+    		copy = new Group(group);
+    		mementos = new LinkedList<Memento>();
+			List<Geometry> geometry = new LinkedList<Geometry>();
+			geometry.addAll(group.vertices);
+			geometry.addAll(group.edges);
+			geometry.addAll(group.surfaces);
+			Util.map(mementos, geometry, new Function<Memento, Geometry>() {
+				public Memento apply(Geometry value) {
+					return value.memento();
+				}
+			});
+    	}
+    	
+    	public void restore() {
+    		group.applyGroup(copy);
+    		for (Memento current : mementos) {
+    			current.restore();
+    		}
+    	}
     }
 }

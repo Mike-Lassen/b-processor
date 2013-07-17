@@ -6,9 +6,12 @@ public class BasicComponent extends Item {
     protected List<FaceGroup> groups;
     protected List<Vertex> vertices;
 
-    public BasicComponent() {
+    public BasicComponent() {}
+    public BasicComponent(BasicComponent prototype) {
+    	super(prototype);
+    	groups = prototype.groups;
+    	vertices = prototype.vertices;
     }
-
     public BasicComponent(String name, List<FaceGroup> groups, List<Vertex> vertices) {
         super(name);
         this.groups = groups;
@@ -37,5 +40,10 @@ public class BasicComponent extends Item {
     @Override
     public void accept(ItemVisitor visitor) {
         visitor.visit(this);
+    }
+    protected void applyBasicComponent(BasicComponent prototype) {
+    	super.applyItem(prototype);
+    	groups = prototype.groups;
+    	vertices = prototype.vertices;
     }
 }

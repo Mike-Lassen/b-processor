@@ -6,9 +6,11 @@ import java.util.List;
 public class Composite extends Item {
     protected List<Item> items;
 
-    public Composite() {		
+    public Composite() {}
+    public Composite(Composite prototype) {
+    	super(prototype);
+    	items = new LinkedList<Item>(prototype.items);
     }
-
     public Composite(String name) {
         super(name);
         items = new LinkedList<Item>();
@@ -16,9 +18,11 @@ public class Composite extends Item {
 
     public void add(Item child) {
         items.add(child);
+        child.owner = this;
     }
     public void remove(Item child) {
         items.remove(child);
+        child.owner = null;
     }
 
     public List<Item> getItems() {
@@ -33,5 +37,9 @@ public class Composite extends Item {
         for (Item current : items) {
             current.accept(visitor);
         }
+    }
+    protected void applyComposite(Composite prototype) {
+    	super.applyItem(prototype);
+    	items = prototype.items;
     }
 }

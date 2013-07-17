@@ -18,6 +18,15 @@ public class Surface extends Geometry {
 	protected boolean visible;
 
 	public Surface() {}
+	public Surface(Surface prototype) {
+		super(prototype);
+		edges = new LinkedList<Edge>(prototype.edges);
+		exterior = prototype.exterior;
+		if (prototype.holes != null) {
+			holes = new HashSet<Surface>(prototype.holes);
+		}
+		visible = prototype.visible;
+	}
 	public Surface(List<Edge> edges) {
 		this.edges = edges;
 		visible = true;
@@ -242,6 +251,29 @@ public class Surface extends Geometry {
 			}
 			Group group = (Group) owner;
 			group.remove(this);
+		}
+	}
+	protected void applySurface(Surface prototype) {
+		super.applyGeometry(prototype);
+		edges = new LinkedList<Edge>(prototype.edges);
+		exterior = prototype.exterior;
+		holes = prototype.holes;
+		visible = prototype.visible;
+	}
+	
+	public Memento memento() {
+		return new SurfaceMemento(this);
+	}
+	
+	private static class SurfaceMemento implements Memento {
+		private Surface surface;
+		private Surface copy;
+		public SurfaceMemento(Surface surface) {
+			this.surface = surface;
+			copy = new Surface(surface);
+		}
+		public void restore() {
+			surface.applySurface(copy);
 		}
 	}
 }
