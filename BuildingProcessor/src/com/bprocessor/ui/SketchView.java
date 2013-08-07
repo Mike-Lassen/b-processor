@@ -14,12 +14,7 @@ import java.util.Set;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLEventListener;
-import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
-import javax.media.opengl.glu.GLUtessellator;
-import javax.media.opengl.glu.GLUtessellatorCallback;
-import javax.media.opengl.glu.GLUtessellatorCallbackAdapter;
 
 import com.bprocessor.BasicComponent;
 import com.bprocessor.Camera;
@@ -49,40 +44,37 @@ import static javax.media.opengl.GL.*;  // GL constants
 import static javax.media.opengl.GL2.*; // GL2 constants
 
 @SuppressWarnings("serial")
-public class SketchView extends GLCanvas implements GLEventListener {
+public class SketchView extends View3d {
 	private InputListener delegate;
-	private static Color babyblue = new Color(224f / 255, 255f / 255, 255f / 255);
-	private static Color selected_color = new Color(0.8f, 0.2f, 0.3f);
-
-	private SketchController controller;
-
-	protected Sketch sketch;
-	protected Group overlay;
-	protected GuideLayer guideLayer;
-
-	protected BasicComponent man;
 	protected Camera camera;
 	protected CoordinateSystem system;
-
-
+	
 	protected double[] modelMatrix = new double[16];
 	protected double[] projMatrix = new double[16];
 	protected int[] screenport = new int[4];
-
-	private static GLU glu;
-	private static GL2 gl;
-	private static GLUtessellator tesselator;
-	private GLAutoDrawable drawable;
-	protected int width;
-	protected int height;
-
-	protected Geometry selected;
-
+	
+	
+	
+	
 	protected Picking picking;
+	
+	protected Sketch sketch;
+	protected Group overlay;
+	protected GuideLayer guideLayer;
+	protected BasicComponent man;
+
+	
 	private boolean restrictToPlane;
 	private boolean gridVisible;
 	private boolean snapToGrid;
 	private boolean coordinateSystemVisible;
+	
+	private static Color babyblue = new Color(224f / 255, 255f / 255, 255f / 255);
+	private static Color selected_color = new Color(0.8f, 0.2f, 0.3f);
+	
+	private SketchController controller;
+	protected Geometry selected;
+	
 
 
 	public SketchView(SketchController controller) {
@@ -249,40 +241,7 @@ public class SketchView extends GLCanvas implements GLEventListener {
 			this.surfaces = surfaces;
 		}
 	}
-
-
-
-	public static GLUtessellator tesselator() {
-		if (tesselator == null) {
-			tesselator = GLU.gluNewTess();
-			GLUtessellatorCallback callback = new TesselatorCallback();
-			GLU.gluTessCallback(tesselator, GLU.GLU_TESS_BEGIN, callback);
-			GLU.gluTessCallback(tesselator, GLU.GLU_TESS_END, callback);
-			GLU.gluTessCallback(tesselator, GLU.GLU_TESS_VERTEX, callback);
-			GLU.gluTessProperty(tesselator, GLU.GLU_TESS_WINDING_RULE, GLU.GLU_TESS_WINDING_ODD);
-		}
-		return tesselator;
-	}
-
-	private static class TesselatorCallback extends GLUtessellatorCallbackAdapter {
-		public void begin(int type) {
-			gl.glBegin(type);
-		}
-		public void end() {
-			gl.glEnd();
-		}
-		public void vertex(Object object) {
-			double[] vertex = (double[]) object;
-			if (vertex.length >= 6) {
-				gl.glNormal3dv(vertex, 3);
-			}
-			gl.glVertex3dv(vertex, 0);
-		}
-		public void error(int arg0) {
-			System.err.println(glu.gluErrorString(arg0));
-		}
-	}
-
+	
 	public void setSketch(Sketch sketch) {
 		if (sketch != this.sketch) {
 			this.sketch = sketch;
@@ -436,70 +395,19 @@ public class SketchView extends GLCanvas implements GLEventListener {
 	 */
 	@Override
 	public void init(GLAutoDrawable drawable) {
-		this.drawable = drawable;
-		GL2 gl = drawable.getGL().getGL2();      // get the OpenGL graphics context
-		glu = new GLU();                         // get GL Utilities
-		gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set background (clear) color
-		gl.glClearDepth(1.0f);      // set clear depth value to farthest
-		gl.glEnable(GL_DEPTH_TEST); // enables depth testing
-		gl.glDepthFunc(GL_LEQUAL);  // the type of depth test to do
-		gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // best perspective correction
-		gl.glShadeModel(GL_SMOOTH); // blends colors nicely, and smoothes out lighting
-
-		gl.glEnable(GL2.GL_LIGHT0);
-		gl.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, 1);
-		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, new float[] {0.3f, 0.3f, 0.3f, 1.0f}, 0);
-		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, new float[] {0.7f, 0.7f, 0.7f, 1.0f}, 0);
-		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, new float[] {0.0f, 0.0f, 0.0f, 1.0f}, 0);
-
-		gl.glEnable(GL2.GL_LINE_SMOOTH);
-		gl.glEnable(GL2.GL_POINT_SMOOTH);
-		gl.glEnable(GL2.GL_BLEND);
-		gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-		gl.glDepthMask(true);
-		gl.glDepthFunc(GL2.GL_LEQUAL);
-
-		gl.glEnable(GL2.GL_COLOR_MATERIAL);
-		gl.glColorMaterial(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE);
-		gl.glPointSize(7);
-		gl.glLineStipple(4, (short)0xAAAA);
+		super.init(drawable);
+		
 		tesselator();
 	}
-
-	/**
-	 * Call-back handler for window re-size event. Also called when the drawable is
-	 * first set to visible.
-	 */
-	@Override
-	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-		GL2 gl = drawable.getGL().getGL2();  // get the OpenGL 2 graphics context
-
-		if (height == 0) height = 1;   // prevent divide by zero
-		this.width = width;
-		this.height = height;
-		float aspect = (float)width / height;
-
-		// Set the view port (display area) to cover the entire window
-		gl.glViewport(0, 0, width, height);
-
-		// Setup perspective projection, with aspect ratio matches viewport
-		gl.glMatrixMode(GL_PROJECTION);  // choose projection matrix
-		gl.glLoadIdentity();             // reset projection matrix
-		glu.gluPerspective(45.0, aspect, 5, 500.0); // fovy, aspect, zNear, zFar
-
-		// Enable the model-view transform
-		gl.glMatrixMode(GL_MODELVIEW);
-		gl.glLoadIdentity(); // reset
-	}
-
+	
 	/**
 	 * Called back by the animator to perform rendering.
 	 */
 	@Override
 	public void display(GLAutoDrawable drawable) {
-
 		gl = drawable.getGL().getGL2();
-
+		callback.init(gl, glu);
+		
 		gl.glMatrixMode(GL_PROJECTION);
 		gl.glLoadIdentity();
 		float aspect = (float)width / height;
@@ -1058,10 +966,4 @@ public class SketchView extends GLCanvas implements GLEventListener {
 		public void visit(GuideLayer current) {			
 		}
 	}
-
-	/**
-	 * Called back before the OpenGL context is destroyed. Release resource such as buffers.
-	 */
-	@Override
-	public void dispose(GLAutoDrawable drawable) { }
 }
