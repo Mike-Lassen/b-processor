@@ -24,7 +24,7 @@ public class GlobalMenuBar extends MenuBar {
 	private SketchView view;
 	
 	private JFrame parent;
-	private final boolean SERVER_ITEMS = false;
+	private final boolean SERVER_ITEMS = true;
 
 	public void sketchChanged(Object initiator) {
 		fileMenu.newItem.setEnabled(controller.isNewEnabled());
