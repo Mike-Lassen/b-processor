@@ -583,17 +583,21 @@ public class SketchView extends View3d {
 		PickingResult record = pickObjects(x, y, filter);
 		return record.nearest;
 	}
-
-	public Vertex getIntersection(int x, int y, Filter<Geometry> filter) {
+	
+	
+	public Intersection getIntersection(int x, int y, Filter<Geometry> filter) {
 		Vertex result = null;
+		String type = null;
 		Edge ray = getRay(x, y);
 		PickingResult record = pickObjects(x, y, filter);
 		Plane plane = getPlane();
 		if (record.nearest == null) {
 			result = plane.intersection(ray);
+			type = Intersection.PLANE;
 		} else {
 			if (record.nearest instanceof Vertex) {
 				result = (Vertex) record.nearest;
+				type = Intersection.VERTEX;
 			} else if (record.nearest instanceof Edge) {
 				Edge edge = (Edge) record.nearest;
 				for (Edge current : record.edges) {
@@ -609,12 +613,18 @@ public class SketchView extends View3d {
 				if (result == null) {
 					result = edge.closest(ray);
 				}
+				type = Intersection.EDGE;
 			} else if (record.nearest instanceof Surface) {
 				Surface surface = (Surface) record.nearest;
 				result = surface.plane().intersection(ray);
+				type = Intersection.SURFACE;
 			}
 		}
-		return result;
+		if (result != null) {
+			return new Intersection(result, type);
+		} else {
+			return null;
+		}
 	}
 
 	private void applyCamera(Camera camera) {

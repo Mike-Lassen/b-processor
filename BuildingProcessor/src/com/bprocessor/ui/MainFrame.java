@@ -1,5 +1,8 @@
 package com.bprocessor.ui;
 
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -22,6 +25,9 @@ import com.bprocessor.ui.tools.SelectTool;
 public class MainFrame extends JFrame implements SketchObserver {
 	private SketchController controller;
 
+	private Binding binding;
+	private GroovyShell shell;
+	
 	private GlobalMenuBar menubar;
 	private ToolBar toolbar;
 	private StatusBar statusbar;
@@ -97,7 +103,9 @@ public class MainFrame extends JFrame implements SketchObserver {
 		setTitle("B-Processor");
 
 		
-
+		binding = new Binding();
+		binding.setVariable("controller", controller);
+		shell = new GroovyShell(binding);
 
 		toolbar = new ToolBar();
 		toolbar.setPreferredSize(new Dimension(1280, 40));
@@ -105,6 +113,8 @@ public class MainFrame extends JFrame implements SketchObserver {
 		add(toolbar, BorderLayout.NORTH);
 
 		view = new SketchView(controller);
+		binding.setVariable("view", view);
+		
 		JPanel mainArea = new MainArea(view);
 		mainArea.setPreferredSize(new Dimension(1280, 672));
 		mainArea.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.WHITE));
@@ -129,7 +139,7 @@ public class MainFrame extends JFrame implements SketchObserver {
 		toolbar.disableAll();
 		
 		
-		menubar = new GlobalMenuBar(controller, view, MainFrame.this);
+		menubar = new GlobalMenuBar(controller, view, shell, MainFrame.this);
 		setMenuBar(menubar);
 		
 		sketchChanged(this);

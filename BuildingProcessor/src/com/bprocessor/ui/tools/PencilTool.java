@@ -15,6 +15,7 @@ import com.bprocessor.Edge;
 import com.bprocessor.Group;
 import com.bprocessor.Surface;
 import com.bprocessor.Vertex;
+import com.bprocessor.ui.Intersection;
 import com.bprocessor.ui.SketchView;
 import com.bprocessor.ui.StandardTool;
 import com.bprocessor.ui.StatusBar;
@@ -123,9 +124,10 @@ public class PencilTool extends StandardTool {
 			mark = null;
 		}
 		Color color = null;    	
-
-		Vertex vertex = view.getIntersection(x, y, null);
-		if (vertex != null) {
+		Intersection intersection = view.getIntersection(x, y, null);
+		
+		if (intersection != null) {
+			Vertex vertex = intersection.getVertex();
 			if (vertex.getOwner() == null) {
 				roundIt(vertex);
 			}
@@ -135,7 +137,11 @@ public class PencilTool extends StandardTool {
 				color = new Color(0.7, 0.2, 0.1);
 			} else {
 				currentVertex = vertex;
-				color = new Color(0.1, 0.2, 0.7);
+				if (intersection.getType() == Intersection.EDGE) {
+					color = new Color(0.1, 0.2, 0.7);
+				} else if (intersection.getType() == Intersection.VERTEX) {
+					color = new Color(0.7, 0.2, 0.1);
+				}
 			}
 		}
 		if (currentVertex != null && color != null) {

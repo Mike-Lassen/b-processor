@@ -5,5 +5,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JOGL"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/BuildingModel"/>
 	<classpathentry kind="lib" path="src/images"/>
+	<classpathentry kind="lib" path="lib/groovy-all-2.3.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

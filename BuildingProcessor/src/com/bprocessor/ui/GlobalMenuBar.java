@@ -1,5 +1,8 @@
 package com.bprocessor.ui;
 
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+
 import java.awt.CheckboxMenuItem;
 import java.awt.Menu;
 import java.awt.MenuBar;
@@ -8,9 +11,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.Timer;
+
+import org.codehaus.groovy.control.CompilationFailedException;
 
 import com.bprocessor.util.CommandManager;
 
@@ -19,12 +26,15 @@ public class GlobalMenuBar extends MenuBar {
 	private FileMenu fileMenu;
 	private EditMenu editMenu;
 	private ViewMenu viewMenu;
+	private ScriptMenu scriptMenu;
 	
 	private SketchController controller;
 	private SketchView view;
 	
 	private JFrame parent;
+	private GroovyShell shell;
 	private final boolean SERVER_ITEMS = true;
+	
 
 	public void sketchChanged(Object initiator) {
 		fileMenu.newItem.setEnabled(controller.isNewEnabled());
@@ -310,16 +320,60 @@ public class GlobalMenuBar extends MenuBar {
 			}
 		}
 	}
-	public GlobalMenuBar(SketchController controller, SketchView view, JFrame parent) {
+	
+	public class ScriptMenu extends Menu {
+		
+		public ScriptMenu(String title) {
+			super(title);
+			File file = new File(".");
+			for (String current : file.list()) {
+				if (current.endsWith(".groovy")) {
+					ScriptItem item = new ScriptItem(current);
+					add(item);
+				}
+			}
+		}
+		public class ScriptItem extends MenuItem {
+			public String path;
+			public ScriptItem(String value) {
+				super(value);
+				this.path = value;
+				addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						try {
+							Binding binding = shell.getContext();
+							binding.setVariable("sketch", controller.getActiveSketch());
+							binding.setVariable("factory", new GeometryFactory());
+							shell.evaluate(new File(path));
+						} catch (CompilationFailedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+		}
+	}
+	
+	
+	
+	public GlobalMenuBar(SketchController controller, SketchView view, GroovyShell shell, JFrame parent) {
 		this.controller = controller;
 		this.view = view;
 		this.parent = parent;
+		this.shell = shell;
 		fileMenu = new FileMenu("File");
 		add(fileMenu);
 		editMenu = new EditMenu("Edit");
 		add(editMenu);
 		viewMenu = new ViewMenu("View");
 		add(viewMenu);
+		scriptMenu = new ScriptMenu("Script");
+		add(scriptMenu);
 		Timer timer = new Timer(100, new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				setup();

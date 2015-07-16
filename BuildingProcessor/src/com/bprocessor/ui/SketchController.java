@@ -35,8 +35,8 @@ public class SketchController {
 			SketchInfoList sketchInfoList = mapper.readValue(new File(path), SketchInfoList.class);
 			for (SketchInfo info : sketchInfoList.getInfos()) {
 				Sketch sketch = Persistence.load(new File(info.getPath()));
-				sketch.setPath(info.getPath());
 				if (sketch != null) {
+					sketch.setPath(info.getPath());
 					sketches.add(sketch);
 				}
 			}

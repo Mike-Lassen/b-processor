@@ -146,7 +146,7 @@ public class RulerTool extends StandardTool {
 					public boolean evaluate(Geometry object) {
 						return object != line;
 					}
-				});
+				}).getVertex();
                 if (vertex != null) {
                     vertex.setX(round(vertex.getX()));
                     vertex.setY(round(vertex.getY()));

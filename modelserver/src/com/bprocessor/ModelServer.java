@@ -30,6 +30,21 @@ public class ModelServer extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private SessionFactory factory;
 	
+	
+	public static class SketchSummary {
+		private int id;
+		public SketchSummary(int id) {
+			this.id = id;
+		}
+		public int getId() {
+			return id;
+		}
+		public void setId(int id) {
+			this.id = id;
+		}
+	}
+	
+	
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
@@ -45,9 +60,9 @@ public class ModelServer extends HttpServlet {
 		Session session = factory.openSession();
 		Query query = session.createQuery("from Sketch");
 		List<Sketch> sketches = query.list();
-		List<SketchInfo> infos = new LinkedList<SketchInfo>();
+		List<SketchSummary> infos = new LinkedList<SketchSummary>();
 		for (Sketch sketch : sketches) {
-			SketchInfo info = new SketchInfo(sketch.getId(), sketch.getName(), null);
+			SketchSummary info = new SketchSummary(sketch.getId());
 			infos.add(info);
 		}
 		session.close();

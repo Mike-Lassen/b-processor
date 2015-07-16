@@ -130,7 +130,7 @@ public class OrientTool extends StandardTool {
 			feedback.remove(mark);
 			mark = null;
 		}
-		Vertex vertex = view.getIntersection(event.getX(), event.getY(), null);
+		Vertex vertex = view.getIntersection(event.getX(), event.getY(), null).getVertex();
 		if (vertex != null) {
 			mark = new Handle(vertex.getX(), vertex.getY(), vertex.getZ(), new Color(0.7, 0.2, 0.1));
 			feedback.add(mark);

@@ -1,0 +1,20 @@
+package com.bprocessor.ui
+
+class Callee implements Plugin {
+  void hello() {
+     println "Message from Groovy"
+  }
+  
+  public void prepare() {
+     println "This is the Callee Plugin speaking"
+  }
+  
+  public String toString() {
+    "{Callee}";
+  }
+}
+
+
+
+def callee = new Callee();
+return { println "This is a Closure" }
