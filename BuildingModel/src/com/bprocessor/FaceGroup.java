@@ -3,8 +3,7 @@ package com.bprocessor;
 import java.util.LinkedList;
 import java.util.List;
 
-public class FaceGroup {
-    protected String name;
+public class FaceGroup extends Item {
     protected List<Face> faces;
     protected Material material;
 
@@ -12,7 +11,7 @@ public class FaceGroup {
 
     }
     public FaceGroup(String name) {
-        this.name = name;
+    	super(name);
         faces = new LinkedList<Face>();
     }
     public FaceGroup(List<Face> faces) {
@@ -44,4 +43,7 @@ public class FaceGroup {
     public void setMaterial(Material material) {
         this.material = material;
     }
+	@Override
+	public void accept(ItemVisitor visitor) {
+	}
 }
