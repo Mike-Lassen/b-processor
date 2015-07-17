@@ -19,6 +19,7 @@ import javax.media.opengl.glu.GLU;
 import com.bprocessor.BasicComponent;
 import com.bprocessor.Camera;
 import com.bprocessor.Color;
+import com.bprocessor.Composite;
 import com.bprocessor.Handle;
 import com.bprocessor.Item;
 import com.bprocessor.Line;
@@ -59,7 +60,8 @@ public class SketchView extends View3d {
 	protected Picking picking;
 	
 	protected Sketch sketch;
-	protected Group overlay;
+	protected Composite overlay;
+	
 	protected GuideLayer guideLayer;
 	protected BasicComponent man;
 
@@ -104,7 +106,7 @@ public class SketchView extends View3d {
 		Vertex eye = new Vertex(6, -9, 8);
 		Vertex up = new Vertex(0, 0, 1);
 		camera = new Camera(center, eye, up);
-		overlay = new Group("overlay");
+		overlay = new Composite("overlay");
 		overlay.add(man);
 		guideLayer = new GuideLayer("guides");
 		overlay.add(guideLayer);
