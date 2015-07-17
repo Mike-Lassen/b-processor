@@ -2,7 +2,7 @@ package com.bprocessor;
 
 import java.util.List;
 
-public class Face {
+public class Face extends Geometry {
     protected List<Vertex> vertices;
     protected List<Vertex> normals;
 
