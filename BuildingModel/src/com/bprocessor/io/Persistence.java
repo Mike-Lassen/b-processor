@@ -391,7 +391,6 @@ public class Persistence {
             }
             group.setVertices(vertices);
         }
-        group.setItems(new LinkedList<Item>());
         return group;
     }
     private static Surface internalize(PSurface psurface,  Map<Integer, Geometry> map) {

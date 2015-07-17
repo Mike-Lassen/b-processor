@@ -6,7 +6,7 @@ import java.util.List;
 import com.bprocessor.util.Function;
 import com.bprocessor.util.Util;
 
-public class Group extends Composite {
+public class Group extends Item {
     protected List<Surface> surfaces;
     protected List<Edge> edges;
     protected List<Vertex> vertices;
@@ -132,7 +132,6 @@ public class Group extends Composite {
     @Override
     public void accept(ItemVisitor visitor) {
         visitor.visit(this);
-        super.accept(visitor);
     }
 
     public String toString() {
@@ -144,7 +143,7 @@ public class Group extends Composite {
     }
     
     protected void applyGroup(Group prototype) {
-    	super.applyComposite(prototype);
+    	super.applyItem(prototype);
     	surfaces = prototype.surfaces;
     	for (Surface current : surfaces) {
     		current.owner = this;
