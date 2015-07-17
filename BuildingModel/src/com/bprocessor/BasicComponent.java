@@ -24,12 +24,6 @@ public class BasicComponent extends Item {
     public void setGroup(List<PolyFace> groups) {
         this.groups = groups;
     }
-    public List<Vertex> getVertices() {
-        return vertices;
-    }
-    public void setVertices(List<Vertex> vertices) {
-        this.vertices = vertices;
-    }
 
     public void scaleIt(double factor) {
         for (Vertex vertex : vertices) {
