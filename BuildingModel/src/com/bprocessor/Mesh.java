@@ -1,14 +1,14 @@
 package com.bprocessor;
 
-public abstract class Item extends Geometry {
+public abstract class Mesh extends Geometry {
     protected String name;
 
-    public Item() {}
-    public Item(Item prototype) {
+    public Mesh() {}
+    public Mesh(Mesh prototype) {
     	super(prototype);
     	name = prototype.name;
     }
-    public Item(String name) {
+    public Mesh(String name) {
         this.name = name;
     }
 
@@ -26,7 +26,7 @@ public abstract class Item extends Geometry {
     		composite.remove(this);
     	}
     }
-    protected void applyItem(Item prototype) {
+    protected void applyItem(Mesh prototype) {
     	super.applyGeometry(prototype);
     	name = prototype.name;
     }

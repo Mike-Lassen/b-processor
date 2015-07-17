@@ -6,19 +6,19 @@ import java.util.List;
 import com.bprocessor.util.Function;
 import com.bprocessor.util.Util;
 
-public class Group extends Item {
+public class Polyhedron extends Mesh {
     protected List<Surface> surfaces;
     protected List<Edge> edges;
     protected List<Vertex> vertices;
 
-    public Group(){}
-    public Group(Group prototype) {
+    public Polyhedron(){}
+    public Polyhedron(Polyhedron prototype) {
     	super(prototype);
     	surfaces = new LinkedList<Surface>(prototype.surfaces);
     	edges = new LinkedList<Edge>(prototype.edges);
     	vertices = new LinkedList<Vertex>(prototype.vertices);
     }
-    public Group(String name) {
+    public Polyhedron(String name) {
         super(name);
         this.surfaces = new LinkedList<Surface>();
         this.edges = new LinkedList<Edge>();
@@ -142,7 +142,7 @@ public class Group extends Item {
     	return new GroupMemento(this);
     }
     
-    protected void applyGroup(Group prototype) {
+    protected void applyGroup(Polyhedron prototype) {
     	super.applyItem(prototype);
     	surfaces = prototype.surfaces;
     	for (Surface current : surfaces) {
@@ -160,13 +160,13 @@ public class Group extends Item {
     
     
     private static class GroupMemento implements Memento {
-    	protected Group group;
-    	protected Group copy;
+    	protected Polyhedron group;
+    	protected Polyhedron copy;
     	protected List<Memento> mementos;
     	
-    	public GroupMemento(Group group) {
+    	public GroupMemento(Polyhedron group) {
     		this.group = group;
-    		copy = new Group(group);
+    		copy = new Polyhedron(group);
     		mementos = new LinkedList<Memento>();
 			List<Geometry> geometry = new LinkedList<Geometry>();
 			geometry.addAll(group.vertices);

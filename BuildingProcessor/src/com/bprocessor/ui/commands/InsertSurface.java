@@ -1,12 +1,12 @@
 package com.bprocessor.ui.commands;
 
-import com.bprocessor.Group;
+import com.bprocessor.Polyhedron;
 import com.bprocessor.Surface;
 import com.bprocessor.util.ModifyGeometry;
 
-public class InsertSurface extends ModifyGeometry<Group> {
+public class InsertSurface extends ModifyGeometry<Polyhedron> {
 	private Surface surface;
-	public InsertSurface(Group group, Surface surface) {
+	public InsertSurface(Polyhedron group, Surface surface) {
 		super(group);
 		this.surface = surface;
 	}

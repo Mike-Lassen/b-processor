@@ -1,14 +1,14 @@
 package com.bprocessor.ui.commands;
 
 import com.bprocessor.Geometry;
-import com.bprocessor.Group;
+import com.bprocessor.Polyhedron;
 import com.bprocessor.util.ModifyGeometry;
 
-public class DeleteGeometry extends ModifyGeometry<Group> {
+public class DeleteGeometry extends ModifyGeometry<Polyhedron> {
 	private Geometry target;
 	
 	public DeleteGeometry(Geometry target) {
-		super((Group)target.getOwner());
+		super((Polyhedron)target.getOwner());
 		this.target = target;
 	}
 	public void apply() {

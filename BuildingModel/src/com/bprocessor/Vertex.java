@@ -137,8 +137,8 @@ public class Vertex extends Geometry {
     
     public List<Edge> connectedEdges() {
     	List<Edge> edges = new LinkedList<Edge>();
-    	if (owner instanceof Group) {
-    		Group group = (Group) owner;
+    	if (owner instanceof Polyhedron) {
+    		Polyhedron group = (Polyhedron) owner;
     		for (Edge current : group.edges) {
     			if (current.contains(this)) {
     				edges.add(current);
@@ -149,9 +149,9 @@ public class Vertex extends Geometry {
     }
 
     public void delete() {
-    	if (owner instanceof Group) {
+    	if (owner instanceof Polyhedron) {
     		List<Edge> edges = connectedEdges();
-    		Group group = (Group) owner;
+    		Polyhedron group = (Polyhedron) owner;
     		group.remove(this);
     		for (Edge current : edges) {
     			current.delete();

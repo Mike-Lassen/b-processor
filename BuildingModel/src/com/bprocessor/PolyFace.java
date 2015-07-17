@@ -3,7 +3,7 @@ package com.bprocessor;
 import java.util.LinkedList;
 import java.util.List;
 
-public class PolyFace extends Item {
+public class PolyFace extends Mesh {
     protected List<Face> faces;
     protected Material material;
 

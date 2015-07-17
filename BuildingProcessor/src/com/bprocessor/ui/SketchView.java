@@ -21,14 +21,14 @@ import com.bprocessor.Camera;
 import com.bprocessor.Color;
 import com.bprocessor.Composite;
 import com.bprocessor.Handle;
-import com.bprocessor.Item;
+import com.bprocessor.Mesh;
 import com.bprocessor.Line;
-import com.bprocessor.GuideLayer;
+import com.bprocessor.Grid;
 import com.bprocessor.Edge;
 import com.bprocessor.Face;
 import com.bprocessor.PolyFace;
 import com.bprocessor.Geometry;
-import com.bprocessor.Group;
+import com.bprocessor.Polyhedron;
 import com.bprocessor.ItemVisitor;
 import com.bprocessor.Material;
 import com.bprocessor.Sketch;
@@ -62,7 +62,7 @@ public class SketchView extends View3d {
 	protected Sketch sketch;
 	protected Composite overlay;
 	
-	protected GuideLayer guideLayer;
+	protected Grid guideLayer;
 	protected BasicComponent man;
 
 	
@@ -108,7 +108,7 @@ public class SketchView extends View3d {
 		camera = new Camera(center, eye, up);
 		overlay = new Composite("overlay");
 		overlay.add(man);
-		guideLayer = new GuideLayer("guides");
+		guideLayer = new Grid("guides");
 		overlay.add(guideLayer);
 		this.addGLEventListener(this);
 	}
@@ -132,7 +132,7 @@ public class SketchView extends View3d {
 		return delegate;
 	}
 
-	public GuideLayer guideLayer() {
+	public Grid guideLayer() {
 		return guideLayer;
 	}
 	public void setSelected(Geometry selected) {
@@ -141,10 +141,10 @@ public class SketchView extends View3d {
 	public Geometry getSelected() {
 		return selected;
 	}
-	public void addOverlay(Item geometry) {
+	public void addOverlay(Mesh geometry) {
 		overlay.add(geometry);
 	}
-	public void removeOverlay(Item geometry) {
+	public void removeOverlay(Mesh geometry) {
 		overlay.remove(geometry);
 	}
 	public void setRestrictToPlane(boolean value) {
@@ -807,7 +807,7 @@ public class SketchView extends View3d {
 
 		}
 		@Override
-		public void visit(Group current) {
+		public void visit(Polyhedron current) {
 			gl.glColor3f(0.0f, 0.0f, 0.0f);
 			drawEdges(current.getEdges());
 			if (selected instanceof Line) {
@@ -851,7 +851,7 @@ public class SketchView extends View3d {
 		}
 
 		@Override
-		public void visit(GuideLayer current) {
+		public void visit(Grid current) {
 			gl.glLineWidth(1.0f);
 			gl.glEnable(GL_LINE_STIPPLE);
 			for (Line line : current.getLines()) {
@@ -916,14 +916,14 @@ public class SketchView extends View3d {
 			}
 		}
 
-		public void visit(Group current) {
+		public void visit(Polyhedron current) {
 			drawEdgesForPicking(current.getEdges());
 			drawSurfacesForPicking(current.getSurfaces());
 			drawVerticesForPicking(current.getVertices());
 		}
 		public void visit(BasicComponent current) {
 		}
-		public void visit(GuideLayer current) {
+		public void visit(Grid current) {
 			for (Line line : current.getLines()) {
 				gl.glPushName(picking.register(line));
 				drawLine(line);
@@ -941,7 +941,7 @@ public class SketchView extends View3d {
 		public WireFramePainter(Plane restriction) {
 			super(restriction);
 		}
-		public void visit(Group current) {
+		public void visit(Polyhedron current) {
 			gl.glColor4f(0.7f, 0.7f, 7.0f, 0.3f);
 			for (Edge edge : current.getEdges()) {
 				drawEdge(edge);
@@ -975,7 +975,7 @@ public class SketchView extends View3d {
 			gl.glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 			gl.glColor4f(0.9f, 0.9f, 1.0f, 1.0f);;
 		}
-		public void visit(GuideLayer current) {			
+		public void visit(Grid current) {			
 		}
 	}
 }

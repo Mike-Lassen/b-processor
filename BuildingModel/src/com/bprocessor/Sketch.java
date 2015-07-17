@@ -3,7 +3,7 @@ package com.bprocessor;
 public class Sketch extends Geometry {
     private int uid;
     private String name;
-    private Group group;
+    private Polyhedron group;
     private boolean modified;
     private String path;
 
@@ -15,7 +15,7 @@ public class Sketch extends Geometry {
     }
     public Sketch(String name) {
         this.name = name;
-        this.group = new Group("group");
+        this.group = new Polyhedron("group");
     }
 
     public int getUid() {
@@ -30,10 +30,10 @@ public class Sketch extends Geometry {
     public void setName(String name) {
         this.name = name;
     }
-    public Group getGroup() {
+    public Polyhedron getGroup() {
         return group;
     }
-    public void setGroup(Group group) {
+    public void setGroup(Polyhedron group) {
         this.group = group;
     }
     public boolean isModified() {

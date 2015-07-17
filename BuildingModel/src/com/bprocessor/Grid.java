@@ -3,17 +3,17 @@ package com.bprocessor;
 import java.util.LinkedList;
 import java.util.List;
 
-public class GuideLayer extends Item {
+public class Grid extends Mesh {
 	protected List<Line> lines;
 	protected List<Handle> handles;
 
-	public GuideLayer() {}
-	public GuideLayer(GuideLayer prototype) {
+	public Grid() {}
+	public Grid(Grid prototype) {
 		super(prototype);
 		lines = new LinkedList<Line>(prototype.lines);
 		handles = new LinkedList<Handle>(prototype.handles);
 	}
-	public GuideLayer(String name) {
+	public Grid(String name) {
 		super(name);
 		lines = new LinkedList<Line>();
 		handles = new LinkedList<Handle>();
@@ -66,7 +66,7 @@ public class GuideLayer extends Item {
 	public void accept(ItemVisitor visitor) {
 		visitor.visit(this);
 	}
-	protected void applyGuideLayer(GuideLayer prototype) {
+	protected void applyGuideLayer(Grid prototype) {
 		super.applyItem(prototype);
 		lines = prototype.lines;
 		handles = prototype.handles;

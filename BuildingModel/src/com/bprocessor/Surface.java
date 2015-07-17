@@ -242,14 +242,14 @@ public class Surface extends Geometry {
 	}
 	
 	public void delete() {
-		if (owner instanceof Group) {
+		if (owner instanceof Polyhedron) {
 			if (exterior != null) {
 				exterior.remove(this);
 			}
 			for (Surface current : getHoles()) {
 				remove(current);
 			}
-			Group group = (Group) owner;
+			Polyhedron group = (Polyhedron) owner;
 			group.remove(this);
 		}
 	}

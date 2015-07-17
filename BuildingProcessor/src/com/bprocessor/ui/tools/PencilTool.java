@@ -8,11 +8,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.bprocessor.Color;
-import com.bprocessor.GuideLayer;
+import com.bprocessor.Grid;
 import com.bprocessor.Handle;
 import com.bprocessor.Line;
 import com.bprocessor.Edge;
-import com.bprocessor.Group;
+import com.bprocessor.Polyhedron;
 import com.bprocessor.Surface;
 import com.bprocessor.Vertex;
 import com.bprocessor.ui.Intersection;
@@ -29,9 +29,9 @@ public class PencilTool extends StandardTool {
 	private LinkedList<Edge> edges;
 	private List<Line> lines;
 
-	private Group editing;
+	private Polyhedron editing;
 
-	private GuideLayer feedback;
+	private Grid feedback;
 	private Vertex currentVertex;
 	private Handle mark;
 
@@ -77,9 +77,9 @@ public class PencilTool extends StandardTool {
 
 	public void prepare() {
 		view.setSelected(null);
-		editing = new Group("editing");
+		editing = new Polyhedron("editing");
 		view.addOverlay(editing);
-		feedback = new GuideLayer("guides");
+		feedback = new Grid("guides");
 		view.addOverlay(feedback);
 		lines = new LinkedList<Line>();
 		buffer = new StringBuffer();

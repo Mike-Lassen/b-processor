@@ -13,8 +13,8 @@ import java.util.Set;
 
 import com.bprocessor.Edge;
 import com.bprocessor.Geometry;
-import com.bprocessor.Group;
-import com.bprocessor.Item;
+import com.bprocessor.Polyhedron;
+import com.bprocessor.Mesh;
 import com.bprocessor.Sketch;
 import com.bprocessor.Surface;
 import com.bprocessor.Vertex;
@@ -250,7 +250,7 @@ public class Persistence {
         externalizeReferenes(psketch);
         return psketch;
     }
-    private static PGroup externalize(Group group) {
+    private static PGroup externalize(Polyhedron group) {
         PGroup pgroup = new PGroup();
         pgroup.original = group;
         pgroup.setId(current_id++);
@@ -311,7 +311,7 @@ public class Persistence {
     }
 
     private static void externalizeReferenes(PGroup pgroup) {
-        Group group = (Group) pgroup.original;
+        Polyhedron group = (Polyhedron) pgroup.original;
         if (group.getOwner() != null) {
             pgroup.setOwner(group.getOwner().getId());
         }
@@ -365,8 +365,8 @@ public class Persistence {
         sketch.setGroup(internalize(psketch.getGroup(), map));
         return sketch;
     }
-    private static Group internalize(PGroup pgroup, Map<Integer, Geometry> map) {
-        Group group = new Group();
+    private static Polyhedron internalize(PGroup pgroup, Map<Integer, Geometry> map) {
+        Polyhedron group = new Polyhedron();
         map.put(pgroup.getId(), group);
         group.setName(pgroup.getName());
         pgroup.original = group;
@@ -432,7 +432,7 @@ public class Persistence {
     }
     private static void internalizeReferences(PSurface psurface, Map<Integer, Geometry> map) {
         Surface surface = (Surface) psurface.original;
-        surface.setOwner((Item) map.get(psurface.getOwner()));
+        surface.setOwner((Mesh) map.get(psurface.getOwner()));
         List<Edge> edges = new LinkedList<Edge>();
         for (Integer id : psurface.getEdges()) {
             edges.add((Edge) map.get(id));
@@ -451,12 +451,12 @@ public class Persistence {
     }
     private static void internalizeReferences(PEdge pedge, Map<Integer, Geometry> map) {
         Edge edge = (Edge) pedge.original;
-        edge.setOwner((Item) map.get(pedge.getOwner()));
+        edge.setOwner((Mesh) map.get(pedge.getOwner()));
         edge.setFrom((Vertex) map.get(pedge.getFrom()));
         edge.setTo((Vertex) map.get(pedge.getTo()));
     }
     private static void internalizeReferences(PVertex pvertex, Map<Integer, Geometry> map) {
         Vertex vertex = (Vertex) pvertex.original;
-        vertex.setOwner((Item) map.get(pvertex.getOwner()));
+        vertex.setOwner((Mesh) map.get(pvertex.getOwner()));
     }
 }

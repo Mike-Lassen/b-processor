@@ -3,7 +3,7 @@ package com.bprocessor;
 public abstract class Geometry {
 	public static final double EPSILON = 0.0000001;
     protected int id;
-    protected Item owner;
+    protected Mesh owner;
 
     public Geometry() { }
     public Geometry(Geometry prototype) {
@@ -15,10 +15,10 @@ public abstract class Geometry {
     public void setId(int id) {
         this.id = id;
     }
-    public Item getOwner() {
+    public Mesh getOwner() {
         return owner;
     }
-    public void setOwner(Item owner) {
+    public void setOwner(Mesh owner) {
         this.owner = owner;
     }
     public void delete() {

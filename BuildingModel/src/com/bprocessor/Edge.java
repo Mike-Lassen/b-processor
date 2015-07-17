@@ -177,8 +177,8 @@ public class Edge  extends Geometry {
 
     public List<Surface> connectedSurfaces() {
     	List<Surface> surfaces = new LinkedList<Surface>();
-    	if (owner instanceof Group) {
-    		Group group = (Group) owner;
+    	if (owner instanceof Polyhedron) {
+    		Polyhedron group = (Polyhedron) owner;
     		for (Surface current : group.surfaces) {
     			if (current.contains(this)) {
     				surfaces.add(current);
@@ -189,9 +189,9 @@ public class Edge  extends Geometry {
     }
     
     public void delete() {
-    	if (owner instanceof Group) {
+    	if (owner instanceof Polyhedron) {
     		List<Surface> surfaces = connectedSurfaces();
-    		Group group = (Group) owner;
+    		Polyhedron group = (Polyhedron) owner;
     		group.remove(this);
     		for (Surface current : surfaces) {
     			current.delete();

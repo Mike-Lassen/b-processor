@@ -2,7 +2,7 @@ package com.bprocessor;
 
 import java.util.List;
 
-public class BasicComponent extends Item {
+public class BasicComponent extends Mesh {
     protected List<PolyFace> groups;
     protected List<Vertex> vertices;
 
