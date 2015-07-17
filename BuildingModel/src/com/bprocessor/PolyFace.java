@@ -3,18 +3,18 @@ package com.bprocessor;
 import java.util.LinkedList;
 import java.util.List;
 
-public class FaceGroup extends Item {
+public class PolyFace extends Item {
     protected List<Face> faces;
     protected Material material;
 
-    public FaceGroup() {
+    public PolyFace() {
 
     }
-    public FaceGroup(String name) {
+    public PolyFace(String name) {
     	super(name);
         faces = new LinkedList<Face>();
     }
-    public FaceGroup(List<Face> faces) {
+    public PolyFace(List<Face> faces) {
         this.faces = faces;
     }
 

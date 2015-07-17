@@ -26,7 +26,7 @@ import com.bprocessor.Line;
 import com.bprocessor.GuideLayer;
 import com.bprocessor.Edge;
 import com.bprocessor.Face;
-import com.bprocessor.FaceGroup;
+import com.bprocessor.PolyFace;
 import com.bprocessor.Geometry;
 import com.bprocessor.Group;
 import com.bprocessor.ItemVisitor;
@@ -658,7 +658,7 @@ public class SketchView extends View3d {
 	private void drawComponentForDisplay(BasicComponent component) {
 		gl.glColor3f(0.9f, 0.9f, 1.0f);
 		gl.glEnable(GL2.GL_LIGHTING);
-		for (FaceGroup group : component.getGroups()) {
+		for (PolyFace group : component.getGroups()) {
 			Material material = group.getMaterial();
 			if (material != null) {
 				//apply(material);
@@ -951,7 +951,7 @@ public class SketchView extends View3d {
 		public void visit(BasicComponent current) {
 			gl.glColor4f(0.9f, 0.9f, 1.0f, 0.1f);
 			gl.glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-			for (FaceGroup group : current.getGroups()) {
+			for (PolyFace group : current.getGroups()) {
 				gl.glBegin(GL_TRIANGLES);
 				for (Face face : group.getFaces()) {
 					List<Vertex> vertices = face.getVertices();

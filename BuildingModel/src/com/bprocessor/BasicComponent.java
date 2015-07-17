@@ -3,7 +3,7 @@ package com.bprocessor;
 import java.util.List;
 
 public class BasicComponent extends Item {
-    protected List<FaceGroup> groups;
+    protected List<PolyFace> groups;
     protected List<Vertex> vertices;
 
     public BasicComponent() {}
@@ -12,16 +12,16 @@ public class BasicComponent extends Item {
     	groups = prototype.groups;
     	vertices = prototype.vertices;
     }
-    public BasicComponent(String name, List<FaceGroup> groups, List<Vertex> vertices) {
+    public BasicComponent(String name, List<PolyFace> groups, List<Vertex> vertices) {
         super(name);
         this.groups = groups;
         this.vertices = vertices;
     }
 
-    public List<FaceGroup> getGroups() {
+    public List<PolyFace> getGroups() {
         return groups;
     }
-    public void setGroup(List<FaceGroup> groups) {
+    public void setGroup(List<PolyFace> groups) {
         this.groups = groups;
     }
     public List<Vertex> getVertices() {

@@ -12,7 +12,7 @@ import java.util.List;
 import com.bprocessor.BasicComponent;
 import com.bprocessor.Color;
 import com.bprocessor.Face;
-import com.bprocessor.FaceGroup;
+import com.bprocessor.PolyFace;
 import com.bprocessor.Material;
 import com.bprocessor.MaterialLibrary;
 import com.bprocessor.Vertex;
@@ -59,8 +59,8 @@ public class ObjFileReader {
         Material material = null;
         List<Vertex> vertices = new ArrayList<Vertex>();
         List<Vertex> normals = new ArrayList<Vertex>();
-        List<FaceGroup> groups = new LinkedList<FaceGroup>();
-        FaceGroup group = new FaceGroup("wavefront");
+        List<PolyFace> groups = new LinkedList<PolyFace>();
+        PolyFace group = new PolyFace("wavefront");
         groups.add(group);
         while (input.ready()) {
             String line = input.readLine();
@@ -92,7 +92,7 @@ public class ObjFileReader {
                     Face face = new Face(vlist, nlist);
                     group.add(face);
                 } else if (op.equals("g")) { 
-                    group = new FaceGroup(parts[1]);
+                    group = new PolyFace(parts[1]);
                     group.setMaterial(material);
                     groups.add(group);
                 } else if (op.equals("mtllib")) { 
