@@ -16,7 +16,6 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.glu.GLU;
 
-import com.bprocessor.BasicComponent;
 import com.bprocessor.Camera;
 import com.bprocessor.Color;
 import com.bprocessor.Composite;
@@ -63,7 +62,7 @@ public class SketchView extends View3d {
 	protected Composite overlay;
 
 	protected Grid guideLayer;
-	protected BasicComponent man;
+	protected Composite man;
 
 
 	private boolean restrictToPlane;
@@ -655,36 +654,6 @@ public class SketchView extends View3d {
 		gl.glColor3f(diffuse.getRed(), diffuse.getGreen(), diffuse.getBlue());
 	}
 
-	private void drawComponentForDisplay(BasicComponent component) {
-		gl.glColor3f(0.9f, 0.9f, 1.0f);
-		gl.glEnable(GL2.GL_LIGHTING);
-		for (PolyFace group : component.getGroups()) {
-			Material material = group.getMaterial();
-			if (material != null) {
-				//apply(material);
-			}
-			gl.glBegin(GL2.GL_TRIANGLES);
-			for (Face face : group.getFaces()) {
-				List<Vertex> vertices = face.getVertices();
-				List<Vertex> normals = face.getNormals();
-				if (normals != null && normals.size() == vertices.size()) {
-					int n = vertices.size();
-					for (int i = 0; i < n; i++) {
-						Vertex vertex = vertices.get(i);
-						Vertex normal = normals.get(i);
-						gl.glNormal3d(normal.getX(), normal.getY(), normal.getZ());
-						gl.glVertex3d(vertex.getX(), vertex.getY(), vertex.getZ());
-					}
-				} else {
-					for (Vertex vertex : face.getVertices()) {
-						gl.glVertex3d(vertex.getX(), vertex.getY(), vertex.getZ());
-					}
-				}
-			}
-			gl.glEnd();
-		}
-		gl.glDisable(GL2.GL_LIGHTING);
-	}
 	private void drawPolyFaceForDisplay(PolyFace mesh) {
 		gl.glColor3f(0.9f, 0.9f, 1.0f);
 		gl.glEnable(GL2.GL_LIGHTING);
@@ -872,13 +841,6 @@ public class SketchView extends View3d {
 			gl.glEnable(GL_DEPTH_TEST);
 		}
 		@Override
-		public void visit(BasicComponent current) {
-			if (restriction == null) {
-				drawComponentForDisplay(current);
-			}
-		}
-
-		@Override
 		public void visit(Grid current) {
 			gl.glLineWidth(1.0f);
 			gl.glEnable(GL_LINE_STIPPLE);
@@ -955,8 +917,6 @@ public class SketchView extends View3d {
 			drawSurfacesForPicking(current.getSurfaces());
 			drawVerticesForPicking(current.getVertices());
 		}
-		public void visit(BasicComponent current) {
-		}
 		public void visit(Grid current) {
 			for (Line line : current.getLines()) {
 				gl.glPushName(picking.register(line));
@@ -984,33 +944,6 @@ public class SketchView extends View3d {
 				drawEdge(edge);
 			}
 			gl.glColor4f(0.7f, 0.7f, 7.0f, 1.0f);
-		}
-		public void visit(BasicComponent current) {
-			gl.glColor4f(0.9f, 0.9f, 1.0f, 0.1f);
-			gl.glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-			for (PolyFace group : current.getGroups()) {
-				gl.glBegin(GL_TRIANGLES);
-				for (Face face : group.getFaces()) {
-					List<Vertex> vertices = face.getVertices();
-					List<Vertex> normals = face.getNormals();
-					if (normals != null && normals.size() == vertices.size()) {
-						int n = vertices.size();
-						for (int i = 0; i < n; i++) {
-							Vertex vertex = vertices.get(i);
-							Vertex normal = normals.get(i);
-							gl.glNormal3d(normal.getX(), normal.getY(), normal.getZ());
-							gl.glVertex3d(vertex.getX(), vertex.getY(), vertex.getZ());
-						}
-					} else {
-						for (Vertex vertex : face.getVertices()) {
-							gl.glVertex3d(vertex.getX(), vertex.getY(), vertex.getZ());
-						}
-					}
-				}
-				gl.glEnd();
-			}
-			gl.glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-			gl.glColor4f(0.9f, 0.9f, 1.0f, 1.0f);
 		}
 		public void visit(Grid current) {			
 		}

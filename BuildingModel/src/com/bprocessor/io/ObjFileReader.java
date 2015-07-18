@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.bprocessor.BasicComponent;
 import com.bprocessor.Color;
+import com.bprocessor.Composite;
 import com.bprocessor.Face;
 import com.bprocessor.PolyFace;
 import com.bprocessor.Material;
@@ -49,19 +49,19 @@ public class ObjFileReader {
     }
 
 
-    public BasicComponent readObject(File file) throws IOException {
+    public Composite readObject(File file) throws IOException {
         path = file.getParent();
         return readObject(new FileReader(file));
     }
-    public BasicComponent readObject(Reader reader) throws IOException {
+    public Composite readObject(Reader reader) throws IOException {
         BufferedReader input = new BufferedReader(reader);
         MaterialLibrary library = null;
         Material material = null;
         List<Vertex> vertices = new ArrayList<Vertex>();
         List<Vertex> normals = new ArrayList<Vertex>();
-        List<PolyFace> groups = new LinkedList<PolyFace>();
-        PolyFace group = new PolyFace("wavefront");
-        groups.add(group);
+        Composite object = new Composite("wavefront");
+        PolyFace mesh = new PolyFace("wavefront");
+        object.add(mesh);
         while (input.ready()) {
             String line = input.readLine();
             String[] parts = line.split("\\s");
@@ -90,11 +90,11 @@ public class ObjFileReader {
                         nlist.add(normal);
                     }
                     Face face = new Face(vlist, nlist);
-                    group.add(face);
+                    mesh.add(face);
                 } else if (op.equals("g")) { 
-                    group = new PolyFace(parts[1]);
-                    group.setMaterial(material);
-                    groups.add(group);
+                    mesh = new PolyFace(parts[1]);
+                    mesh.setMaterial(material);
+                    object.add(mesh);
                 } else if (op.equals("mtllib")) { 
                     String name = parts[1];
                     File mtlfile = new File(path, name);
@@ -108,7 +108,7 @@ public class ObjFileReader {
 
             }
         }
-        return new BasicComponent("wavefront", groups, vertices);
+        return object;
     }
     public MaterialLibrary readMaterialLibrary(File file) throws IOException {
         MaterialLibrary library = new MaterialLibrary(file.getName());
