@@ -2,6 +2,7 @@ package com.bprocessor;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class Composite extends Mesh {
     protected List<Mesh> items;
@@ -41,5 +42,11 @@ public class Composite extends Mesh {
     protected void applyComposite(Composite prototype) {
     	super.applyItem(prototype);
     	items = prototype.items;
+    }
+    
+    public void collectVertices(Set<Vertex> vertices) {
+    	for (Mesh current : items) {
+    		current.collectVertices(vertices);
+    	}
     }
 }

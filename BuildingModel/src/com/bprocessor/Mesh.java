@@ -1,5 +1,8 @@
 package com.bprocessor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public abstract class Mesh extends Geometry {
     protected String name;
 
@@ -30,5 +33,18 @@ public abstract class Mesh extends Geometry {
     	super.applyGeometry(prototype);
     	name = prototype.name;
     }
+    
+    public void collectVertices(Set<Vertex> vertices) {
+    	
+    }
+    
+    public void scaleIt(double factor) {
+    	Set<Vertex> vertices = new HashSet<Vertex>();
+    	collectVertices(vertices);
+        for (Vertex vertex : vertices) {
+            vertex.scaleIt(factor);
+        }
+    }
+    
 }
 

@@ -2,6 +2,7 @@ package com.bprocessor;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class PolyFace extends Mesh {
     protected List<Face> faces;
@@ -46,4 +47,10 @@ public class PolyFace extends Mesh {
 	@Override
 	public void accept(ItemVisitor visitor) {
 	}
+	
+	public void collectVertices(Set<Vertex> vertices) {
+    	for (Face current : faces) {
+    		vertices.addAll(current.getVertices());
+    	}
+    }
 }
