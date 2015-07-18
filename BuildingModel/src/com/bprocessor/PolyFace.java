@@ -46,6 +46,7 @@ public class PolyFace extends Mesh {
     }
 	@Override
 	public void accept(ItemVisitor visitor) {
+		visitor.visit(this);
 	}
 	
 	public void collectVertices(Set<Vertex> vertices) {

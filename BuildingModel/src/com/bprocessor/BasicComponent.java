@@ -33,7 +33,10 @@ public class BasicComponent extends Mesh {
 
     @Override
     public void accept(ItemVisitor visitor) {
-        visitor.visit(this);
+        //visitor.visit(this);
+    	for (Mesh current : groups) {
+    		current.accept(visitor);
+    	}
     }
     protected void applyBasicComponent(BasicComponent prototype) {
     	super.applyItem(prototype);

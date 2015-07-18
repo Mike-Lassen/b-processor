@@ -49,34 +49,34 @@ public class SketchView extends View3d {
 	private InputListener delegate;
 	protected Camera camera;
 	protected CoordinateSystem system;
-	
+
 	protected double[] modelMatrix = new double[16];
 	protected double[] projMatrix = new double[16];
 	protected int[] screenport = new int[4];
-	
-	
-	
-	
+
+
+
+
 	protected Picking picking;
-	
+
 	protected Sketch sketch;
 	protected Composite overlay;
-	
+
 	protected Grid guideLayer;
 	protected BasicComponent man;
 
-	
+
 	private boolean restrictToPlane;
 	private boolean gridVisible;
 	private boolean snapToGrid;
 	private boolean coordinateSystemVisible;
-	
+
 	private static Color babyblue = new Color(224f / 255, 255f / 255, 255f / 255);
 	private static Color selected_color = new Color(0.8f, 0.2f, 0.3f);
-	
+
 	private SketchController controller;
 	protected Geometry selected;
-	
+
 
 
 	public SketchView(SketchController controller) {
@@ -193,7 +193,7 @@ public class SketchView extends View3d {
 		}
 	}
 
-	
+
 	public boolean canDeleteSelection() {
 		return selected != null;
 	}
@@ -205,7 +205,7 @@ public class SketchView extends View3d {
 			repaint();
 		}
 	}
-	
+
 	public class Picking {
 		protected int x;
 		protected int y;
@@ -243,7 +243,7 @@ public class SketchView extends View3d {
 			this.surfaces = surfaces;
 		}
 	}
-	
+
 	public void setSketch(Sketch sketch) {
 		if (sketch != this.sketch) {
 			this.sketch = sketch;
@@ -259,7 +259,7 @@ public class SketchView extends View3d {
 	}
 
 	public class CoordinateSystemView {
-		
+
 		public void paintAxis(Line line) {
 			apply(line.getColor(), 1.0f);
 			drawAxis(line);
@@ -277,7 +277,7 @@ public class SketchView extends View3d {
 			gl.glVertex3d(from.getX(), from.getY(), from.getZ());
 			gl.glEnd();
 		}
-		
+
 		public void displayNormal(GL2 gl) {
 			CoordinateSystem system = getCoordinateSystem();
 			Vertex i = system.getI();
@@ -398,10 +398,10 @@ public class SketchView extends View3d {
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		super.init(drawable);
-		
+
 		tesselator();
 	}
-	
+
 	/**
 	 * Called back by the animator to perform rendering.
 	 */
@@ -409,7 +409,7 @@ public class SketchView extends View3d {
 	public void display(GLAutoDrawable drawable) {
 		gl = drawable.getGL().getGL2();
 		callback.init(gl, glu);
-		
+
 		gl.glMatrixMode(GL_PROJECTION);
 		gl.glLoadIdentity();
 		float aspect = (float)width / height;
@@ -438,7 +438,7 @@ public class SketchView extends View3d {
 			applyCamera(camera);
 			GridView grid = new GridView();
 			CoordinateSystemView systemView = new CoordinateSystemView();
-			
+
 			if (picking != null) {
 				Plane restriction = getRestriction();
 				PickingPainter pickingPainter = new PickingPainter(restriction);
@@ -585,8 +585,8 @@ public class SketchView extends View3d {
 		PickingResult record = pickObjects(x, y, filter);
 		return record.nearest;
 	}
-	
-	
+
+
 	public Intersection getIntersection(int x, int y, Filter<Geometry> filter) {
 		Vertex result = null;
 		String type = null;
@@ -683,6 +683,34 @@ public class SketchView extends View3d {
 			}
 			gl.glEnd();
 		}
+		gl.glDisable(GL2.GL_LIGHTING);
+	}
+	private void drawPolyFaceForDisplay(PolyFace mesh) {
+		gl.glColor3f(0.9f, 0.9f, 1.0f);
+		gl.glEnable(GL2.GL_LIGHTING);
+		Material material = mesh.getMaterial();
+		if (material != null) {
+			apply(material);
+		}
+		gl.glBegin(GL2.GL_TRIANGLES);
+		for (Face face : mesh.getFaces()) {
+			List<Vertex> vertices = face.getVertices();
+			List<Vertex> normals = face.getNormals();
+			if (normals != null && normals.size() == vertices.size()) {
+				int n = vertices.size();
+				for (int i = 0; i < n; i++) {
+					Vertex vertex = vertices.get(i);
+					Vertex normal = normals.get(i);
+					gl.glNormal3d(normal.getX(), normal.getY(), normal.getZ());
+					gl.glVertex3d(vertex.getX(), vertex.getY(), vertex.getZ());
+				}
+			} else {
+				for (Vertex vertex : face.getVertices()) {
+					gl.glVertex3d(vertex.getX(), vertex.getY(), vertex.getZ());
+				}
+			}
+		}
+		gl.glEnd();
 		gl.glDisable(GL2.GL_LIGHTING);
 	}
 
@@ -881,6 +909,12 @@ public class SketchView extends View3d {
 			}
 			gl.glEnable(GL_DEPTH_TEST);
 		}
+		@Override
+		public void visit(PolyFace current) {
+			if (restriction == null) {
+				drawPolyFaceForDisplay(current);
+			}
+		}
 	}
 
 	public class PickingPainter extends Painter {
@@ -935,6 +969,9 @@ public class SketchView extends View3d {
 				gl.glPopName();
 			}
 		}
+		@Override
+		public void visit(PolyFace current) {
+		}
 	}
 
 	public class WireFramePainter extends Painter {
@@ -973,9 +1010,35 @@ public class SketchView extends View3d {
 				gl.glEnd();
 			}
 			gl.glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-			gl.glColor4f(0.9f, 0.9f, 1.0f, 1.0f);;
+			gl.glColor4f(0.9f, 0.9f, 1.0f, 1.0f);
 		}
 		public void visit(Grid current) {			
+		}
+		@Override
+		public void visit(PolyFace current) {
+			gl.glColor4f(0.9f, 0.9f, 1.0f, 0.1f);
+			gl.glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+			gl.glBegin(GL_TRIANGLES);
+			for (Face face : current.getFaces()) {
+				List<Vertex> vertices = face.getVertices();
+				List<Vertex> normals = face.getNormals();
+				if (normals != null && normals.size() == vertices.size()) {
+					int n = vertices.size();
+					for (int i = 0; i < n; i++) {
+						Vertex vertex = vertices.get(i);
+						Vertex normal = normals.get(i);
+						gl.glNormal3d(normal.getX(), normal.getY(), normal.getZ());
+						gl.glVertex3d(vertex.getX(), vertex.getY(), vertex.getZ());
+					}
+				} else {
+					for (Vertex vertex : face.getVertices()) {
+						gl.glVertex3d(vertex.getX(), vertex.getY(), vertex.getZ());
+					}
+				}
+			}
+			gl.glEnd();
+			gl.glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+			gl.glColor4f(0.9f, 0.9f, 1.0f, 1.0f);
 		}
 	}
 }
