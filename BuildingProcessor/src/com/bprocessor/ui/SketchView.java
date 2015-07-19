@@ -115,6 +115,7 @@ public class SketchView extends View3d {
 
 	public void setAttributePanel(AttributePanel panel) {
 		attributePanel = panel;
+		attributePanel.setSketchView(this);
 	}
 	
 	public void setDelegate(InputListener listener) {

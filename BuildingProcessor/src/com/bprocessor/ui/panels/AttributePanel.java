@@ -3,17 +3,22 @@ package com.bprocessor.ui.panels;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
 
 import javax.swing.Box;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.bprocessor.Attribute;
 import com.bprocessor.Geometry;
+import com.bprocessor.ui.SketchView;
 
 @SuppressWarnings("serial")
 public class AttributePanel extends JPanel {
+	private SketchView view;
 	private Geometry target;
 	private Font headerFont;
 	private Font labelFont;
@@ -25,6 +30,10 @@ public class AttributePanel extends JPanel {
 		valueFont = new Font("Verdana", Font.PLAIN, 12);
 		setLayout(new BorderLayout());
 	}
+	
+	public void setSketchView(SketchView view) {
+		this.view = view;
+	}
 
 	public void setTarget(Geometry value) {
 		if (target != value) {
@@ -34,7 +43,7 @@ public class AttributePanel extends JPanel {
 				List<Attribute> attributes = target.getAttributes();
 				Box column = renderList(attributes, 5);
 				this.add(column, BorderLayout.NORTH);
-			}
+			}	
 			this.invalidate();
 			this.revalidate();
 			this.repaint();
@@ -93,9 +102,19 @@ public class AttributePanel extends JPanel {
 		return label;
 	}
 
-	JLabel renderValue(Object value) {
+	JComponent renderValue(Object value) {
+		if (value instanceof Geometry) {
+			return renderGeometry((Geometry) value);
+		} else {
+			JLabel label = new JLabel("" + value);
+			label.setFont(valueFont);
+			return label;
+		}
+	}
+	JComponent renderGeometry(Geometry value) {
 		JLabel label = new JLabel("" + value);
 		label.setFont(valueFont);
+		label.addMouseListener(new FollowReference(value));
 		return label;
 	}
 
@@ -105,4 +124,42 @@ public class AttributePanel extends JPanel {
 		return label;
 	}
 
+	class FollowReference implements MouseListener {
+		private Geometry target;
+		
+		public FollowReference(Geometry target) {
+			this.target = target;
+		}
+		
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			view.setSelected(target);
+			view.repaint();
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
 }
