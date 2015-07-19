@@ -135,7 +135,7 @@ public class Polyhedron extends Mesh {
     }
 
     public String toString() {
-        return "[group " + name + "]";
+        return "[Polyhedron " + name + "]";
     }
     
     public Memento memento() {

@@ -162,6 +162,17 @@ public class Vertex extends Geometry {
     public String toString() {
         return "[" + x + " " + y + " " + z + "]";
     }
+    
+    public List<Attribute> getAttributes() {
+    	List<Attribute> attributes = super.getAttributes();
+    	List<Attribute> section = new LinkedList<Attribute>();
+    	section.add(new Attribute("X", x));
+    	section.add(new Attribute("Y", y));
+    	section.add(new Attribute("Z", z));
+    	attributes.add(new Attribute("Vertex", section));
+    	return attributes;
+    }
+    
     protected void applyVertex(Vertex prototype) {
     	super.applyGeometry(prototype);
     	x = prototype.x;

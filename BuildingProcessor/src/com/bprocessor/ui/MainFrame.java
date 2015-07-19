@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
 
+import com.bprocessor.ui.panels.AttributePanel;
 import com.bprocessor.ui.tools.EraserTool;
 import com.bprocessor.ui.tools.OrientTool;
 import com.bprocessor.ui.tools.PencilTool;
@@ -33,7 +34,9 @@ public class MainFrame extends JFrame implements SketchObserver {
 	private StatusBar statusbar;
 	private SketchView view;
 	private SketchHierarchy hierarchy;
-
+	private AttributesArea attributesArea;
+	private AttributePanel attributesPanel;
+	
 	public class TreeArea extends JPanel {
 		public TreeArea() {
 			setLayout(new BorderLayout());
@@ -61,6 +64,19 @@ public class MainFrame extends JFrame implements SketchObserver {
 		}
 	}
 	public class AttributesArea extends JPanel {
+		private JPanel center;
+		
+		public void register(JPanel panel) {
+			center.add(panel, BorderLayout.CENTER);
+			center.invalidate();
+			center.revalidate();
+		}
+		public void deregister(JPanel panel) {
+			center.remove(panel);
+			center.invalidate();
+			center.revalidate();
+		}
+		
 		public AttributesArea() {
 			setLayout(new BorderLayout());
 			JPanel top = new JPanel();
@@ -68,10 +84,11 @@ public class MainFrame extends JFrame implements SketchObserver {
 			top.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 0, Color.GRAY));
 			add(top, BorderLayout.NORTH);
 
-			JPanel center = new JPanel();
+			center = new JPanel();
 			center.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, Color.LIGHT_GRAY));
 			Color ligth = new Color(0xF9, 0xF9, 0xF9);
 			center.setBackground(ligth);
+			center.setLayout(new BorderLayout());
 			add(center, BorderLayout.CENTER);
 		}
 	}
@@ -89,7 +106,7 @@ public class MainFrame extends JFrame implements SketchObserver {
 			viewArea.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.GRAY));
 			add(viewArea, BorderLayout.CENTER);
 
-			JPanel attributesArea = new AttributesArea();
+			attributesArea = new AttributesArea();
 			attributesArea.setPreferredSize(new Dimension(320, 672));
 			attributesArea.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.GRAY));
 			add(attributesArea, BorderLayout.EAST);
@@ -142,6 +159,8 @@ public class MainFrame extends JFrame implements SketchObserver {
 		menubar = new GlobalMenuBar(controller, view, shell, MainFrame.this);
 		setMenuBar(menubar);
 		
+		registerPanels();
+		
 		sketchChanged(this);
 		setVisible(true);
 		pack();
@@ -179,6 +198,12 @@ public class MainFrame extends JFrame implements SketchObserver {
 		toolbar.registerTool("camera-zoom", "Biconzomeinout.gif", cameraZoom);
 	}
 
+	public void registerPanels() {
+		attributesPanel = new AttributePanel();
+		attributesArea.register(attributesPanel);
+		view.setAttributePanel(attributesPanel);
+	}
+	
 	public static void main(String[] args) {
 		new MainFrame();
 	}

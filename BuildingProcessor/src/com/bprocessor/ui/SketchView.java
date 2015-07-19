@@ -35,6 +35,7 @@ import com.bprocessor.Surface;
 import com.bprocessor.Vertex;
 import com.bprocessor.io.ObjFileReader;
 import com.bprocessor.ui.commands.DeleteGeometry;
+import com.bprocessor.ui.panels.AttributePanel;
 import com.bprocessor.util.CommandManager;
 import com.bprocessor.util.CoordinateSystem;
 import com.bprocessor.util.Filter;
@@ -74,13 +75,13 @@ public class SketchView extends View3d {
 	private static Color selected_color = new Color(0.8f, 0.2f, 0.3f);
 
 	private SketchController controller;
+	private AttributePanel attributePanel;
 	protected Geometry selected;
 
 
 
 	public SketchView(SketchController controller) {
 		this.controller = controller;
-
 		FileInputStream file = null;
 		try {
 			ObjFileReader input = new ObjFileReader();
@@ -112,6 +113,10 @@ public class SketchView extends View3d {
 		this.addGLEventListener(this);
 	}
 
+	public void setAttributePanel(AttributePanel panel) {
+		attributePanel = panel;
+	}
+	
 	public void setDelegate(InputListener listener) {
 		if (delegate != null) {
 			removeMouseListener(delegate);
@@ -136,6 +141,7 @@ public class SketchView extends View3d {
 	}
 	public void setSelected(Geometry selected) {
 		this.selected = selected;
+		attributePanel.setTarget(selected);
 	}
 	public Geometry getSelected() {
 		return selected;
@@ -648,7 +654,6 @@ public class SketchView extends View3d {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	private void apply(Material material) {
 		Color diffuse = material.getDiffuse();
 		gl.glColor3f(diffuse.getRed(), diffuse.getGreen(), diffuse.getBlue());

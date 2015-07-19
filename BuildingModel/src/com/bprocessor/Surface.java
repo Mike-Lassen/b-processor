@@ -253,6 +253,23 @@ public class Surface extends Geometry {
 			group.remove(this);
 		}
 	}
+	
+	public List<Attribute> getAttributes() {
+    	List<Attribute> attributes = super.getAttributes();
+    	List<Attribute> section = new LinkedList<Attribute>();
+    	section.add(new Attribute("Visible", visible));
+    	section.add(new Attribute("Edges", edges));
+    	section.add(new Attribute("Exterior", exterior));
+    	
+    	List<Surface> list = new LinkedList<Surface>();
+    	if (holes != null) {
+    		list.addAll(holes);
+    	}
+    	section.add(new Attribute("Holes", list));
+    	attributes.add(new Attribute("Surface", section));
+    	return attributes;
+    }
+	
 	protected void applySurface(Surface prototype) {
 		super.applyGeometry(prototype);
 		edges = new LinkedList<Edge>(prototype.edges);

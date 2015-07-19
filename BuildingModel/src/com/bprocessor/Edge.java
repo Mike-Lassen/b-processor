@@ -200,7 +200,16 @@ public class Edge  extends Geometry {
     }
     
     public String toString() {
-        return "[edge " + from + " - " + to + "]"; 
+        return "[Edge " + from + " - " + to + "]"; 
+    }
+    
+    public List<Attribute> getAttributes() {
+    	List<Attribute> attributes = super.getAttributes();
+    	List<Attribute> section = new LinkedList<Attribute>();
+    	section.add(new Attribute("From", from));
+    	section.add(new Attribute("To", to));
+    	attributes.add(new Attribute("Edge", section));
+    	return attributes;
     }
     
     protected void applyEdge(Edge prototype) {

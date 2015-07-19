@@ -15,7 +15,7 @@ public class Sketch extends Geometry {
     }
     public Sketch(String name) {
         this.name = name;
-        this.group = new Polyhedron("group");
+        this.group = new Polyhedron("Top");
     }
 
     public int getUid() {
