@@ -41,7 +41,7 @@ public class PencilTool extends StandardTool {
 	private void makeSurface() {
 		Surface surface = new Surface(edges);
 		editing.clear();
-		Command command = new InsertSurface(view.getSketch().getGroup(), surface);
+		Command command = new InsertSurface(view.getSketch().getPolyhedron(), surface);
 		CommandManager.instance().apply(command);
 		view.checkpoint();
 		vertices = null;
@@ -56,16 +56,16 @@ public class PencilTool extends StandardTool {
 	public void evaluate(String value) {
 		try {
 			double length = Double.valueOf(value);
-			for (Surface current : view.getSketch().getGroup().getSurfaces()) {
+			for (Surface current : view.getSketch().getPolyhedron().getSurfaces()) {
 				if (current.getExterior() == null) {
 					List<Surface> sides = new LinkedList<Surface>();
 					List<Surface> tops = new LinkedList<Surface>();
 					current.extrudeAll(new Vertex(0, 0, 1), length, sides, tops);
 					for (Surface side: sides) {
-						view.getSketch().getGroup().insert(side);
+						view.getSketch().getPolyhedron().insert(side);
 					}
 					for (Surface surface : tops) {
-						view.getSketch().getGroup().insert(surface);
+						view.getSketch().getPolyhedron().insert(surface);
 					}
 				}
 			}

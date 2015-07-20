@@ -246,7 +246,7 @@ public class Persistence {
         sketch.setId(id);
         psketch.setUid(sketch.getUid());
         psketch.setName(sketch.getName());
-        psketch.setGroup(externalize(sketch.getGroup()));
+        psketch.setGroup(externalize(sketch.getPolyhedron()));
         externalizeReferenes(psketch);
         return psketch;
     }
@@ -362,7 +362,7 @@ public class Persistence {
         psketch.original = sketch;
         sketch.setUid(psketch.getUid());
         sketch.setName(psketch.getName());
-        sketch.setGroup(internalize(psketch.getGroup(), map));
+        sketch.setPolyhedron(internalize(psketch.getGroup(), map));
         return sketch;
     }
     private static Polyhedron internalize(PGroup pgroup, Map<Integer, Geometry> map) {

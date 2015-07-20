@@ -410,7 +410,7 @@ public class SketchView extends View3d {
 	
 	public List<Mesh> getMeshes() {
 		LinkedList<Mesh> meshes = new LinkedList<Mesh>();
-		meshes.add(sketch.getGroup());
+		meshes.add(sketch.getPolyhedron());
 		meshes.addAll(overlay);
 		return meshes;
 	}

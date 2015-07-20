@@ -2,19 +2,19 @@ package com.bprocessor;
 
 public class Sketch extends Mesh {
     private int uid;
-    private Polyhedron group;
+    private Polyhedron polyhedron;
     private boolean modified;
     private String path;
 
     public Sketch() {}
     public Sketch(Sketch prototype) {
     	super(prototype);
-    	group = prototype.group;
+    	polyhedron = prototype.polyhedron;
     }
     public Sketch(String name) {
         super(name);
-        this.group = new Polyhedron("Top");
-        this.group.owner = this;
+        this.polyhedron = new Polyhedron("Top");
+        this.polyhedron.owner = this;
     }
 
     public int getUid() {
@@ -23,11 +23,11 @@ public class Sketch extends Mesh {
     public void setUid(int uid) {
         this.uid = uid;
     }
-    public Polyhedron getGroup() {
-        return group;
+    public Polyhedron getPolyhedron() {
+        return polyhedron;
     }
-    public void setGroup(Polyhedron group) {
-        this.group = group;
+    public void setPolyhedron(Polyhedron value) {
+        this.polyhedron = value;
     }
     public boolean isModified() {
         return modified;
@@ -43,7 +43,7 @@ public class Sketch extends Mesh {
     }
     protected void applySketch(Sketch prototype) {
     	super.applyItem(prototype);
-    	group = prototype.group;
+    	polyhedron = prototype.polyhedron;
     }
 	@Override
 	public void accept(ItemVisitor visitor) {

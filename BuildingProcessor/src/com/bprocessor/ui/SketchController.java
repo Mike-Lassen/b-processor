@@ -272,7 +272,7 @@ public class SketchController {
 		try {
 			Sketch sketch = client.get(activeSketch.getUid());
 			if (sketch != null) {
-				activeSketch.setGroup(sketch.getGroup());
+				activeSketch.setPolyhedron(sketch.getPolyhedron());
 				activeSketch.setModified(true);
 				changed();
 			}
@@ -293,7 +293,7 @@ public class SketchController {
 					System.out.println("checking " + current.getUid());
 					Sketch sketch = findById(current.getUid());
 					if (sketch != null) {
-						sketch.setGroup(current.getGroup());
+						sketch.setPolyhedron(current.getPolyhedron());
 						sketch.setUid(current.getUid());
 					} else {
 						current.setPath("sketches/" + current.getName() + "-" + current.getUid() + ".bps");
