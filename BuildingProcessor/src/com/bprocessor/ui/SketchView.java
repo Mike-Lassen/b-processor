@@ -60,7 +60,7 @@ public class SketchView extends View3d {
 	protected Picking picking;
 
 	protected Sketch sketch;
-	protected Composite overlay;
+	protected List<Mesh> overlay;
 
 	protected Grid guideLayer;
 	protected Composite man;
@@ -106,10 +106,10 @@ public class SketchView extends View3d {
 		Vertex eye = new Vertex(6, -9, 8);
 		Vertex up = new Vertex(0, 0, 1);
 		camera = new Camera(center, eye, up);
-		overlay = new Composite("overlay");
-		overlay.add(man);
+		overlay = new LinkedList<Mesh>();
+		addOverlay(man);
 		guideLayer = new Grid("guides");
-		overlay.add(guideLayer);
+		addOverlay(guideLayer);
 		this.addGLEventListener(this);
 	}
 
@@ -407,6 +407,13 @@ public class SketchView extends View3d {
 
 		tesselator();
 	}
+	
+	public List<Mesh> getMeshes() {
+		LinkedList<Mesh> meshes = new LinkedList<Mesh>();
+		meshes.add(sketch.getGroup());
+		meshes.addAll(overlay);
+		return meshes;
+	}
 
 	/**
 	 * Called back by the animator to perform rendering.
@@ -444,12 +451,14 @@ public class SketchView extends View3d {
 			applyCamera(camera);
 			GridView grid = new GridView();
 			CoordinateSystemView systemView = new CoordinateSystemView();
-
+			List<Mesh> meshes = getMeshes();
+			
 			if (picking != null) {
 				Plane restriction = getRestriction();
 				PickingPainter pickingPainter = new PickingPainter(restriction);
-				sketch.getGroup().accept(pickingPainter);
-				overlay.accept(pickingPainter);
+				for (Mesh current : meshes) {
+					current.accept(pickingPainter);
+				}
 				if (isGridVisible() && getSnapToGrid()) {
 					grid.displayPicking(gl);
 				}
@@ -465,14 +474,16 @@ public class SketchView extends View3d {
 				}
 				Plane restriction = getRestriction();
 				BasicPainter basicPainter = new BasicPainter(restriction);
-				sketch.getGroup().accept(basicPainter);
-				overlay.accept(basicPainter);
+				
+				for (Mesh current : meshes) {
+					current.accept(basicPainter);
+				}
 				if (restriction != null) {
 					WireFramePainter wireFramePainter = new WireFramePainter(null);
-					sketch.getGroup().accept(wireFramePainter);
-					overlay.accept(wireFramePainter);
+					for (Mesh current : meshes) {
+						current.accept(wireFramePainter);
+					}
 				}
-
 			}
 			if (picking != null) {
 				gl.glFlush();

@@ -1,6 +1,8 @@
 package com.bprocessor;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 public abstract class Mesh extends Geometry {
@@ -45,6 +47,15 @@ public abstract class Mesh extends Geometry {
             vertex.scaleIt(factor);
         }
     }
+    
+    public List<Attribute> getAttributes() {
+    	List<Attribute> attributes = super.getAttributes();
+    	List<Attribute> section = new LinkedList<Attribute>();
+    	section.add(new Attribute("Name", name));
+    	attributes.add(new Attribute("Mesh", section));
+    	return attributes;
+    }
+    
     
 }
 

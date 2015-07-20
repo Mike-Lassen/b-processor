@@ -420,6 +420,8 @@ public class Persistence {
         internalizeReferences(psketch.getGroup(), map);
     }
     private static void internalizeReferences(PGroup pgroup, Map<Integer, Geometry> map) {
+    	Polyhedron poly = (Polyhedron) pgroup.original;
+    	poly.setOwner((Mesh) map.get(pgroup.getOwner()));
         for (PSurface psurface : pgroup.getSurfaces()) {
             internalizeReferences(psurface, map);
         }
