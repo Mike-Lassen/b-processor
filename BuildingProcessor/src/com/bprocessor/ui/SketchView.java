@@ -126,7 +126,7 @@ public class SketchView extends View3d {
 		attributePanel = panel;
 		attributePanel.setSketchView(this);
 	}
-	
+
 	public void setDelegate(InputListener listener) {
 		if (delegate != null) {
 			removeMouseListener(delegate);
@@ -334,77 +334,6 @@ public class SketchView extends View3d {
 			}
 		}
 	}
-	public class GridView {
-		public void displayNormal(GL2 gl) {
-			gl.glLineWidth(1.5f);
-			gl.glColor4f(221.0f/255, 234.0f/255, 254.0f/ 255, 1.0f);
-			CoordinateSystem system = getCoordinateSystem();
-			Vertex i = system.getI();
-			Vertex j = system.getJ();
-			Vertex origin = system.getOrigin();
-			{
-				Vertex from = origin;
-				Vertex v = i.scale(20);
-				gl.glBegin(GL_LINES);
-				for (int k = 0; k < 21; k++) {
-					Vertex to = from.add(v);
-					gl.glVertex3d(from.getX(), from.getY(), from.getZ());
-					gl.glVertex3d(to.getX(), to.getY(), to.getZ());
-					from = from.add(j);
-				}
-				gl.glEnd();
-			}
-			{
-				Vertex from = origin;
-				Vertex v = j.scale(20);
-				gl.glBegin(GL_LINES);
-				for (int k = 0; k < 21; k++) {
-					Vertex to = from.add(v);
-					gl.glVertex3d(from.getX(), from.getY(), from.getZ());
-					gl.glVertex3d(to.getX(), to.getY(), to.getZ());
-					from = from.add(i);
-				}
-				gl.glEnd();
-			}
-		}
-		public void displayPicking(GL2 gl) {
-			CoordinateSystem system = getCoordinateSystem();
-			Vertex i = system.getI();
-			Vertex j = system.getJ();
-			Vertex origin = system.getOrigin();
-			{
-				Vertex from = origin;
-				Vertex v = i.scale(40);
-				for (int k = 0; k < 41; k++) {
-					Vertex to = from.add(v);
-					Edge edge = new Edge(from, to);
-					gl.glPushName(picking.register(edge));
-					gl.glBegin(GL_LINES);
-					gl.glVertex3d(from.getX(), from.getY(), from.getZ());
-					gl.glVertex3d(to.getX(), to.getY(), to.getZ());
-					gl.glEnd();
-					gl.glPopName();
-					from = from.add(j);
-				}
-			}
-			{
-				Vertex from = origin;
-				Vertex v = j.scale(40);
-				for (int k = 0; k < 41; k++) {
-					Vertex to = from.add(v);
-					Edge edge = new Edge(from, to);
-					gl.glPushName(picking.register(edge));
-					gl.glBegin(GL_LINES);
-					gl.glVertex3d(from.getX(), from.getY(), from.getZ());
-					gl.glVertex3d(to.getX(), to.getY(), to.getZ());
-					gl.glEnd();
-					gl.glPopName();
-					from = from.add(i);
-				}
-			}
-
-		}
-	}
 
 	/**
 	 * Called back immediately after the OpenGL context is initialized. Can be used
@@ -416,12 +345,20 @@ public class SketchView extends View3d {
 
 		tesselator();
 	}
-	
-	public List<Mesh> getMeshes() {
+
+	public List<Mesh> getMeshes(boolean picking) {
 		LinkedList<Mesh> meshes = new LinkedList<Mesh>();
+		if (isGridVisible()) {
+			if (picking) {
+				if (getSnapToGrid()) {
+					meshes.add(sketch.getGrid());
+				}
+			} else {
+				meshes.add(sketch.getGrid());
+			}
+		}
 		meshes.add(sketch.getPolyhedron());
 		meshes.addAll(overlay);
-		meshes.add(sketch.getGrid());
 		return meshes;
 	}
 
@@ -459,39 +396,34 @@ public class SketchView extends View3d {
 
 		if (sketch != null) {
 			applyCamera(camera);
-			GridView grid = new GridView();
 			CoordinateSystemView systemView = new CoordinateSystemView();
-			List<Mesh> meshes = getMeshes();
-			
+			List<Mesh> meshes = getMeshes(picking != null);
+
 			if (picking != null) {
 				Plane restriction = getRestriction();
 				PickingPainter pickingPainter = new PickingPainter(restriction);
 				for (Mesh current : meshes) {
 					current.accept(pickingPainter);
 				}
-				if (isGridVisible() && getSnapToGrid()) {
-					grid.displayPicking(gl);
-				}
 				if (isCoordinateSystemVisible()) {
 					systemView.displayPicking(gl);
 				}
 			} else {
-				if (isGridVisible()) {
-					grid.displayNormal(gl);
-				}
 				if (isCoordinateSystemVisible()) {
 					systemView.displayNormal(gl);
 				}
 				Plane restriction = getRestriction();
 				BasicPainter basicPainter = new BasicPainter(restriction);
-				
+
 				for (Mesh current : meshes) {
 					current.accept(basicPainter);
 				}
 				if (restriction != null) {
 					WireFramePainter wireFramePainter = new WireFramePainter(null);
 					for (Mesh current : meshes) {
-						current.accept(wireFramePainter);
+						if (!(current instanceof Grid)) {
+							current.accept(wireFramePainter);
+						}
 					}
 				}
 			}
@@ -805,7 +737,7 @@ public class SketchView extends View3d {
 		public void drawSurfaces(List<Surface> surfaces) {
 			gl.glEnable(GL2.GL_POLYGON_OFFSET_FILL);
 			gl.glPolygonOffset(1.0f, 1.0f);
-			gl.glEnable(GL2.GL_LIGHTING);
+			//gl.glEnable(GL2.GL_LIGHTING);
 			for (Surface current : surfaces) {
 				if (current.isVisible()) {
 					if (current != selected) {
@@ -814,7 +746,7 @@ public class SketchView extends View3d {
 				}
 			}
 			gl.glDisable(GL2.GL_POLYGON_OFFSET_FILL);
-			gl.glDisable(GL2.GL_LIGHTING);
+			//gl.glDisable(GL2.GL_LIGHTING);
 
 		}
 		@Override
@@ -853,8 +785,6 @@ public class SketchView extends View3d {
 		}
 		@Override
 		public void visit(Grid current) {
-			gl.glLineWidth(1.0f);
-			gl.glEnable(GL_LINE_STIPPLE);
 			for (Line line : current.getLines()) {
 				if (restriction != null) {
 					if (!restriction.contains(line)) {
@@ -866,6 +796,12 @@ public class SketchView extends View3d {
 					gl.glColor3fv(color.values(), 0);
 				} else {
 					gl.glColor3f(0.1f, 0.2f, 0.5f);
+				}
+				gl.glLineWidth(line.getWidth());
+				if (line.getStippled()) {
+					gl.glEnable(GL_LINE_STIPPLE);
+				} else {
+					gl.glDisable(GL_LINE_STIPPLE);
 				}
 				drawEdge(line);
 			}

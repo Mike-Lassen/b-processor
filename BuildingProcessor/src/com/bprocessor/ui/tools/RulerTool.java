@@ -195,13 +195,6 @@ public class RulerTool extends StandardTool {
         } else if (ch == KeyEvent.VK_ENTER) {
             evaluate(buffer.toString());
             buffer = new StringBuffer();
-        } else if (ch == KeyEvent.VK_SPACE) {
-            view.guideLayer().clear();
-            line = null;
-            prototype = null;
-            buffer = new StringBuffer();
-            updateDistance();
-            view.repaint();
         } else {
             buffer.append(ch);
             updateDistance();

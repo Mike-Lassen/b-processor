@@ -77,9 +77,11 @@ public class PencilTool extends StandardTool {
 
 	public void prepare() {
 		view.setSelected(null);
+		view.setRestrictToPlane(true);
 		editing = new Polyhedron("editing");
 		view.addOverlay(editing);
 		feedback = new Grid("guides");
+		feedback.clear();
 		view.addOverlay(feedback);
 		lines = new LinkedList<Line>();
 		buffer = new StringBuffer();
@@ -87,6 +89,7 @@ public class PencilTool extends StandardTool {
 		view.repaint();
 	}
 	public void finish() {
+		view.setRestrictToPlane(false);
 		view.repaint();
 		setLines(Collections.<Line>emptyList());
 		view.removeOverlay(editing);
@@ -103,6 +106,7 @@ public class PencilTool extends StandardTool {
 		Vertex from = origin.copy();
 		Vertex to = from.add(direction.scale(20));
 		Line line = new Line(from, to, color);
+		line.setStippled(true);
 		return line;
 	}
 
