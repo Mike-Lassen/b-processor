@@ -3,6 +3,7 @@ package com.bprocessor;
 public class Sketch extends Mesh {
     private int uid;
     private Polyhedron polyhedron;
+    private Grid grid;
     private boolean modified;
     private String path;
 
@@ -15,6 +16,8 @@ public class Sketch extends Mesh {
         super(name);
         this.polyhedron = new Polyhedron("Top");
         this.polyhedron.owner = this;
+        this.grid = new Grid("Main");
+        this.grid.owner = this;
     }
 
     public int getUid() {
@@ -28,6 +31,13 @@ public class Sketch extends Mesh {
     }
     public void setPolyhedron(Polyhedron value) {
         this.polyhedron = value;
+    }
+    public Grid getGrid() {
+    	return grid;
+    }
+    public void setGrid(Grid value) {
+    	grid = value;
+    	grid.owner = this;
     }
     public boolean isModified() {
         return modified;

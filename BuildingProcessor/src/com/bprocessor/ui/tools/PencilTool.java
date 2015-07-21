@@ -101,7 +101,7 @@ public class PencilTool extends StandardTool {
 
 	public Line createLine(Vertex origin, Vertex direction, Color color) {
 		Vertex from = origin.copy();
-		Vertex to = from.add(direction);
+		Vertex to = from.add(direction.scale(20));
 		Line line = new Line(from, to, color);
 		return line;
 	}

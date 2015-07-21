@@ -87,6 +87,17 @@ public class SketchView extends View3d {
 			ObjFileReader input = new ObjFileReader();
 			man = input.readObject(new File("models/man.obj"));
 			man.scaleIt(1 / 100.0);
+			man.moveIt(0.5, 0.5, 0);
+			man.accept(new ItemVisitor() {
+				@Override
+				public void visit(PolyFace current) {
+					current.setMaterial(null);
+				}
+				@Override
+				public void visit(Grid current) {}
+				@Override
+				public void visit(Polyhedron current) {}
+			});
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -108,8 +119,6 @@ public class SketchView extends View3d {
 		camera = new Camera(center, eye, up);
 		overlay = new LinkedList<Mesh>();
 		addOverlay(man);
-		guideLayer = new Grid("guides");
-		addOverlay(guideLayer);
 		this.addGLEventListener(this);
 	}
 
@@ -138,7 +147,7 @@ public class SketchView extends View3d {
 	}
 
 	public Grid guideLayer() {
-		return guideLayer;
+		return sketch.getGrid();
 	}
 	public void setSelected(Geometry selected) {
 		this.selected = selected;
@@ -335,9 +344,9 @@ public class SketchView extends View3d {
 			Vertex origin = system.getOrigin();
 			{
 				Vertex from = origin;
-				Vertex v = i.scale(40);
+				Vertex v = i.scale(20);
 				gl.glBegin(GL_LINES);
-				for (int k = 0; k < 41; k++) {
+				for (int k = 0; k < 21; k++) {
 					Vertex to = from.add(v);
 					gl.glVertex3d(from.getX(), from.getY(), from.getZ());
 					gl.glVertex3d(to.getX(), to.getY(), to.getZ());
@@ -347,9 +356,9 @@ public class SketchView extends View3d {
 			}
 			{
 				Vertex from = origin;
-				Vertex v = j.scale(40);
+				Vertex v = j.scale(20);
 				gl.glBegin(GL_LINES);
-				for (int k = 0; k < 41; k++) {
+				for (int k = 0; k < 21; k++) {
 					Vertex to = from.add(v);
 					gl.glVertex3d(from.getX(), from.getY(), from.getZ());
 					gl.glVertex3d(to.getX(), to.getY(), to.getZ());
@@ -412,6 +421,7 @@ public class SketchView extends View3d {
 		LinkedList<Mesh> meshes = new LinkedList<Mesh>();
 		meshes.add(sketch.getPolyhedron());
 		meshes.addAll(overlay);
+		meshes.add(sketch.getGrid());
 		return meshes;
 	}
 
@@ -769,19 +779,6 @@ public class SketchView extends View3d {
 			gl.glVertex3d(from.getX(), from.getY(), from.getZ());
 			gl.glEnd();
 		}
-		public void drawLine(Line line) {
-			Vertex to = line.getTo();
-			Vertex from = line.getFrom();
-			Vertex direction = from.minus(to);
-			direction.normalize();
-			direction.scaleIt(50);
-			to = from.add(direction);
-			from = from.minus(direction);
-			gl.glBegin(GL2.GL_LINE_STRIP);
-			gl.glVertex3d(to.getX(), to.getY(), to.getZ());
-			gl.glVertex3d(from.getX(), from.getY(), from.getZ());
-			gl.glEnd();
-		}
 		public void drawVertex(Vertex vertex) {
 			gl.glBegin(GL2.GL_POINTS);
 			gl.glVertex3d(vertex.getX(), vertex.getY(), vertex.getZ());
@@ -824,10 +821,7 @@ public class SketchView extends View3d {
 		public void visit(Polyhedron current) {
 			gl.glColor3f(0.0f, 0.0f, 0.0f);
 			drawEdges(current.getEdges());
-			if (selected instanceof Line) {
-				apply(selected_color, 1.0f);
-				drawLine((Line) selected);
-			} else if (selected instanceof Edge) {
+			if (selected instanceof Edge) {
 				apply(selected_color, 1.0f);
 				drawEdge((Edge) selected);
 			}
@@ -873,7 +867,7 @@ public class SketchView extends View3d {
 				} else {
 					gl.glColor3f(0.1f, 0.2f, 0.5f);
 				}
-				drawLine(line);
+				drawEdge(line);
 			}
 			gl.glDisable(GL_LINE_STIPPLE);
 			gl.glDisable(GL_DEPTH_TEST);
@@ -937,7 +931,7 @@ public class SketchView extends View3d {
 		public void visit(Grid current) {
 			for (Line line : current.getLines()) {
 				gl.glPushName(picking.register(line));
-				drawLine(line);
+				drawEdge(line);
 				gl.glPopName();
 			}
 			for (Handle handle : current.getHandles()) {

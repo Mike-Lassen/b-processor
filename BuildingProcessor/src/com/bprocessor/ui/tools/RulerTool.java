@@ -118,11 +118,24 @@ public class RulerTool extends StandardTool {
             Vertex to = edge.getTo().copy();
             Color blue = new Color(0.3, 0.6, 1.0);
             line = new Line(from, to, blue);
+            
+            adjust(line);
+			
             prototype = edge;
             view.guideLayer().add(line);
             updateDistance(0.0);
             view.repaint();
         }
+    }
+    
+    private void adjust(Line line) {
+    	Vertex from = line.getFrom();
+    	Vertex to = line.getTo();
+    	Vertex direction = line.direction();
+        direction.normalize();
+		direction.scaleIt(50);
+		to.set(from.add(direction));
+		from.set(from.minus(direction));
     }
 
     @Override
@@ -160,6 +173,7 @@ public class RulerTool extends StandardTool {
                         Vertex p = prototype.intersection(from);
                         updateDistance(p.distance(from));
                     }
+                    adjust(line);
                     view.repaint();
                 }
             }

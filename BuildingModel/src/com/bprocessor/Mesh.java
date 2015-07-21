@@ -47,6 +47,15 @@ public abstract class Mesh extends Geometry {
             vertex.scaleIt(factor);
         }
     }
+    public void moveIt(double x, double y, double z) {
+    	Set<Vertex> vertices = new HashSet<Vertex>();
+    	collectVertices(vertices);
+        for (Vertex vertex : vertices) {
+            vertex.setX(vertex.x + x);
+            vertex.setY(vertex.y + y);
+            vertex.setZ(vertex.z + z);
+        }
+    }
     
     public List<Attribute> getAttributes() {
     	List<Attribute> attributes = super.getAttributes();
