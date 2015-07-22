@@ -1,6 +1,6 @@
 package com.bprocessor;
 
-public class Sketch extends Mesh {
+public class Sketch extends Component {
     private int uid;
     private Polyhedron polyhedron;
     private Net grid;
@@ -13,7 +13,7 @@ public class Sketch extends Mesh {
     	polyhedron = prototype.polyhedron;
     }
     public Sketch(String name) {
-        super(name);
+    	super(name);
         this.polyhedron = new Polyhedron("Top");
         this.grid = new Net("Main");
     }
@@ -49,11 +49,15 @@ public class Sketch extends Mesh {
         this.path = path;
     }
     protected void applySketch(Sketch prototype) {
-    	super.applyItem(prototype);
+    	super.applyComponent(prototype);
     	polyhedron = prototype.polyhedron;
     }
+    
 	@Override
-	public void accept(ItemVisitor visitor) {
-		
+	public Mesh display() {
+		Composite mesh = new Composite("Constructed");
+		mesh.add(grid);
+		mesh.add(polyhedron);
+		return mesh;
 	}
   }

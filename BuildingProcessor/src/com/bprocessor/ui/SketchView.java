@@ -352,16 +352,7 @@ public class SketchView extends View3d {
 
 	public List<Mesh> getMeshes(boolean picking) {
 		LinkedList<Mesh> meshes = new LinkedList<Mesh>();
-		if (isGridVisible()) {
-			if (picking) {
-				if (getSnapToGrid()) {
-					meshes.add(sketch.getGrid());
-				}
-			} else {
-				meshes.add(sketch.getGrid());
-			}
-		}
-		meshes.add(sketch.getPolyhedron());
+		meshes.add(sketch.display());
 		meshes.addAll(overlay);
 		return meshes;
 	}
