@@ -139,10 +139,10 @@ public class Polyhedron extends Mesh {
     }
     
     public Memento memento() {
-    	return new GroupMemento(this);
+    	return new PolyhedronMemento(this);
     }
     
-    protected void applyGroup(Polyhedron prototype) {
+    protected void applyPolyhedron(Polyhedron prototype) {
     	super.applyItem(prototype);
     	surfaces = prototype.surfaces;
     	for (Surface current : surfaces) {
@@ -159,19 +159,19 @@ public class Polyhedron extends Mesh {
     }
     
     
-    private static class GroupMemento implements Memento {
-    	protected Polyhedron group;
+    private static class PolyhedronMemento implements Memento {
+    	protected Polyhedron poly;
     	protected Polyhedron copy;
     	protected List<Memento> mementos;
     	
-    	public GroupMemento(Polyhedron group) {
-    		this.group = group;
-    		copy = new Polyhedron(group);
+    	public PolyhedronMemento(Polyhedron poly) {
+    		this.poly = poly;
+    		copy = new Polyhedron(poly);
     		mementos = new LinkedList<Memento>();
 			List<Geometry> geometry = new LinkedList<Geometry>();
-			geometry.addAll(group.vertices);
-			geometry.addAll(group.edges);
-			geometry.addAll(group.surfaces);
+			geometry.addAll(poly.vertices);
+			geometry.addAll(poly.edges);
+			geometry.addAll(poly.surfaces);
 			Util.map(mementos, geometry, new Function<Memento, Geometry>() {
 				public Memento apply(Geometry value) {
 					return value.memento();
@@ -180,7 +180,7 @@ public class Polyhedron extends Mesh {
     	}
     	
     	public void restore() {
-    		group.applyGroup(copy);
+    		poly.applyPolyhedron(copy);
     		for (Memento current : mementos) {
     			current.restore();
     		}

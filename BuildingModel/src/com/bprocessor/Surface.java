@@ -249,8 +249,8 @@ public class Surface extends Geometry {
 			for (Surface current : getHoles()) {
 				remove(current);
 			}
-			Polyhedron group = (Polyhedron) owner;
-			group.remove(this);
+			Polyhedron poly = (Polyhedron) owner;
+			poly.remove(this);
 		}
 	}
 	
