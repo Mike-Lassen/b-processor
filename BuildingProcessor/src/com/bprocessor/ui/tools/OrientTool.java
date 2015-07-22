@@ -5,7 +5,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 import com.bprocessor.Color;
-import com.bprocessor.Grid;
+import com.bprocessor.Net;
 import com.bprocessor.Handle;
 import com.bprocessor.Line;
 import com.bprocessor.Vertex;
@@ -23,7 +23,7 @@ public class OrientTool extends StandardTool {
 		PLACE_Y
 	}
 
-	private Grid feedback;
+	private Net feedback;
 	private Handle mark;
 	private Mode mode;
 	private Vertex origin;
@@ -36,7 +36,7 @@ public class OrientTool extends StandardTool {
 	}
 
 	public void prepare() {
-		feedback = new Grid("orient");
+		feedback = new Net("orient");
 		view.addOverlay(feedback);
 		mode = Mode.PLACE_ORIGIN;
 	}

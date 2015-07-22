@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.bprocessor.Color;
-import com.bprocessor.Grid;
+import com.bprocessor.Net;
 import com.bprocessor.Handle;
 import com.bprocessor.Line;
 import com.bprocessor.Edge;
@@ -31,7 +31,7 @@ public class PencilTool extends StandardTool {
 
 	private Polyhedron editing;
 
-	private Grid feedback;
+	private Net feedback;
 	private Vertex currentVertex;
 	private Handle mark;
 
@@ -80,7 +80,7 @@ public class PencilTool extends StandardTool {
 		view.setRestrictToPlane(true);
 		editing = new Polyhedron("editing");
 		view.addOverlay(editing);
-		feedback = new Grid("guides");
+		feedback = new Net("guides");
 		feedback.clear();
 		view.addOverlay(feedback);
 		lines = new LinkedList<Line>();

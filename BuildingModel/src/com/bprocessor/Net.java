@@ -5,19 +5,19 @@ import java.util.List;
 
 import com.bprocessor.util.CoordinateSystem;
 
-public class Grid extends Mesh {
+public class Net extends Mesh {
 	protected List<Line> lines;
 	protected List<Handle> handles;
 	
 	
 
-	public Grid() {}
-	public Grid(Grid prototype) {
+	public Net() {}
+	public Net(Net prototype) {
 		super(prototype);
 		lines = new LinkedList<Line>(prototype.lines);
 		handles = new LinkedList<Handle>(prototype.handles);
 	}
-	public Grid(String name) {
+	public Net(String name) {
 		super(name);
 		lines = new LinkedList<Line>();
 		handles = new LinkedList<Handle>();
@@ -106,7 +106,7 @@ public class Grid extends Mesh {
 	public void accept(ItemVisitor visitor) {
 		visitor.visit(this);
 	}
-	protected void applyGuideLayer(Grid prototype) {
+	protected void applyGuideLayer(Net prototype) {
 		super.applyItem(prototype);
 		lines = prototype.lines;
 		handles = prototype.handles;

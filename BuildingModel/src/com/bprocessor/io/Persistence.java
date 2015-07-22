@@ -14,7 +14,7 @@ import java.util.Set;
 import com.bprocessor.Edge;
 import com.bprocessor.Entity;
 import com.bprocessor.Geometry;
-import com.bprocessor.Grid;
+import com.bprocessor.Net;
 import com.bprocessor.Polyhedron;
 import com.bprocessor.Mesh;
 import com.bprocessor.Sketch;
@@ -361,7 +361,7 @@ public class Persistence {
         sketch.setUid(psketch.getUid());
         sketch.setName(psketch.getName());
         sketch.setPolyhedron(internalize(psketch.getGroup(), map));
-        sketch.setGrid(new Grid("Main"));
+        sketch.setGrid(new Net("Main"));
         return sketch;
     }
     private static Polyhedron internalize(PGroup pgroup, Map<Integer, Entity> map) {

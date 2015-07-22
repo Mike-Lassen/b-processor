@@ -23,7 +23,7 @@ import com.bprocessor.Entity;
 import com.bprocessor.Handle;
 import com.bprocessor.Mesh;
 import com.bprocessor.Line;
-import com.bprocessor.Grid;
+import com.bprocessor.Net;
 import com.bprocessor.Edge;
 import com.bprocessor.Face;
 import com.bprocessor.PolyFace;
@@ -63,7 +63,7 @@ public class SketchView extends View3d {
 	protected Sketch sketch;
 	protected List<Mesh> overlay;
 
-	protected Grid guideLayer;
+	protected Net guideLayer;
 	protected Composite man;
 
 
@@ -95,7 +95,7 @@ public class SketchView extends View3d {
 					current.setMaterial(null);
 				}
 				@Override
-				public void visit(Grid current) {}
+				public void visit(Net current) {}
 				@Override
 				public void visit(Polyhedron current) {}
 			});
@@ -147,7 +147,7 @@ public class SketchView extends View3d {
 		return delegate;
 	}
 
-	public Grid guideLayer() {
+	public Net guideLayer() {
 		return sketch.getGrid();
 	}
 	public void setSelected(Entity selected) {
@@ -425,7 +425,7 @@ public class SketchView extends View3d {
 				if (restriction != null) {
 					WireFramePainter wireFramePainter = new WireFramePainter(null);
 					for (Mesh current : meshes) {
-						if (!(current instanceof Grid)) {
+						if (!(current instanceof Net)) {
 							current.accept(wireFramePainter);
 						}
 					}
@@ -788,7 +788,7 @@ public class SketchView extends View3d {
 			gl.glEnable(GL_DEPTH_TEST);
 		}
 		@Override
-		public void visit(Grid current) {
+		public void visit(Net current) {
 			for (Line line : current.getLines()) {
 				if (restriction != null) {
 					if (!restriction.contains(line)) {
@@ -868,7 +868,7 @@ public class SketchView extends View3d {
 			drawSurfacesForPicking(current.getSurfaces());
 			drawVerticesForPicking(current.getVertices());
 		}
-		public void visit(Grid current) {
+		public void visit(Net current) {
 			for (Line line : current.getLines()) {
 				gl.glPushName(picking.register(line));
 				drawEdge(line);
@@ -896,7 +896,7 @@ public class SketchView extends View3d {
 			}
 			gl.glColor4f(0.7f, 0.7f, 7.0f, 1.0f);
 		}
-		public void visit(Grid current) {			
+		public void visit(Net current) {			
 		}
 		@Override
 		public void visit(PolyFace current) {
