@@ -26,10 +26,6 @@ public abstract class Mesh extends Geometry {
     public abstract void accept(ItemVisitor visitor);
     
     public void delete() {
-    	if (owner instanceof Composite) {
-    		Composite composite = (Composite) owner;
-    		composite.remove(this);
-    	}
     }
     protected void applyItem(Mesh prototype) {
     	super.applyGeometry(prototype);
