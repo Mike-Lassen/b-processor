@@ -1,9 +1,10 @@
 package com.bprocessor.util;
 
+import com.bprocessor.Entity;
 import com.bprocessor.Geometry;
 import com.bprocessor.Memento;
 
-public abstract class ModifyGeometry<T extends Geometry> implements Command {
+public abstract class ModifyGeometry<T extends Entity> implements Command {
 	protected T geometry;
 	private Memento memento;
 	

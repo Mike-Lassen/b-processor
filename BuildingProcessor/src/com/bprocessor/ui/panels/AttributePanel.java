@@ -13,13 +13,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.bprocessor.Attribute;
+import com.bprocessor.Entity;
 import com.bprocessor.Geometry;
 import com.bprocessor.ui.SketchView;
 
 @SuppressWarnings("serial")
 public class AttributePanel extends JPanel {
 	private SketchView view;
-	private Geometry target;
+	private Entity target;
 	private Font headerFont;
 	private Font labelFont;
 	private Font valueFont;
@@ -35,7 +36,7 @@ public class AttributePanel extends JPanel {
 		this.view = view;
 	}
 
-	public void setTarget(Geometry value) {
+	public void setTarget(Entity value) {
 		if (target != value) {
 			this.removeAll();
 			target = value;
@@ -103,15 +104,15 @@ public class AttributePanel extends JPanel {
 	}
 
 	JComponent renderValue(Object value) {
-		if (value instanceof Geometry) {
-			return renderGeometry((Geometry) value);
+		if (value instanceof Entity) {
+			return renderGeometry((Entity) value);
 		} else {
 			JLabel label = new JLabel("" + value);
 			label.setFont(valueFont);
 			return label;
 		}
 	}
-	JComponent renderGeometry(Geometry value) {
+	JComponent renderGeometry(Entity value) {
 		JLabel label = new JLabel("" + value);
 		label.setFont(valueFont);
 		label.addMouseListener(new FollowReference(value));
@@ -125,9 +126,9 @@ public class AttributePanel extends JPanel {
 	}
 
 	class FollowReference implements MouseListener {
-		private Geometry target;
+		private Entity target;
 		
-		public FollowReference(Geometry target) {
+		public FollowReference(Entity target) {
 			this.target = target;
 		}
 		

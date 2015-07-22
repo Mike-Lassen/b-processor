@@ -19,6 +19,7 @@ import javax.media.opengl.glu.GLU;
 import com.bprocessor.Camera;
 import com.bprocessor.Color;
 import com.bprocessor.Composite;
+import com.bprocessor.Entity;
 import com.bprocessor.Handle;
 import com.bprocessor.Mesh;
 import com.bprocessor.Line;
@@ -76,7 +77,7 @@ public class SketchView extends View3d {
 
 	private SketchController controller;
 	private AttributePanel attributePanel;
-	protected Geometry selected;
+	protected Entity selected;
 
 
 
@@ -149,11 +150,11 @@ public class SketchView extends View3d {
 	public Grid guideLayer() {
 		return sketch.getGrid();
 	}
-	public void setSelected(Geometry selected) {
+	public void setSelected(Entity selected) {
 		this.selected = selected;
 		attributePanel.setTarget(selected);
 	}
-	public Geometry getSelected() {
+	public Entity getSelected() {
 		return selected;
 	}
 	public void addOverlay(Mesh geometry) {
@@ -214,10 +215,13 @@ public class SketchView extends View3d {
 	}
 	public void deleteSelection() {
 		if (selected != null) {
-			CommandManager.instance().apply(new DeleteGeometry(selected));
-			selected = null;
-			checkpoint();
-			repaint();
+			if (selected instanceof Geometry) {
+				CommandManager.instance().apply(new DeleteGeometry((Geometry) selected));
+			
+				selected = null;
+				checkpoint();
+				repaint();
+			}
 		}
 	}
 

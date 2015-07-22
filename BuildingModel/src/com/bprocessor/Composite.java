@@ -19,11 +19,9 @@ public class Composite extends Mesh {
 
     public void add(Mesh child) {
         items.add(child);
-        child.owner = this;
     }
     public void remove(Mesh child) {
         items.remove(child);
-        child.owner = null;
     }
 
     public List<Mesh> getItems() {

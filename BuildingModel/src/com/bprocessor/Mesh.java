@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public abstract class Mesh extends Geometry {
+public abstract class Mesh extends Entity {
     protected String name;
 
     public Mesh() {}
@@ -28,7 +28,7 @@ public abstract class Mesh extends Geometry {
     public void delete() {
     }
     protected void applyItem(Mesh prototype) {
-    	super.applyGeometry(prototype);
+    	super.applyEntity(prototype);
     	name = prototype.name;
     }
     

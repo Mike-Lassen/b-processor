@@ -28,4 +28,6 @@ public class Entity {
     	List<Attribute> attributes = new LinkedList<Attribute>();
     	return attributes;
     }
+	public void delete() {
+	}
 }

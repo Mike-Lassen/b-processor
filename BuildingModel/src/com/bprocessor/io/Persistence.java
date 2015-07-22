@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.bprocessor.Edge;
+import com.bprocessor.Entity;
 import com.bprocessor.Geometry;
 import com.bprocessor.Grid;
 import com.bprocessor.Polyhedron;
@@ -27,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Persistence {
     public static class PGeometry {
-        protected Geometry original;
+        protected Entity original;
         private int id;
         private int owner;
         public PGeometry() {}
@@ -45,7 +46,7 @@ public class Persistence {
         }
     }
     public static class PSketch extends PGeometry {
-        protected Geometry original;
+        protected Entity original;
         private int uid;
         private String name;
         private PGroup group;
@@ -209,7 +210,7 @@ public class Persistence {
     	PSketch psketch;
 		try {
 			psketch = mapper.readValue(input, PSketch.class);
-			Map<Integer, Geometry> map = new HashMap<Integer, Geometry>();
+			Map<Integer, Entity> map = new HashMap<Integer, Entity>();
 	        sketch = internalize(psketch, map);
 	        internalizeReferences(psketch, map);
 		} catch (JsonParseException e) {
@@ -227,7 +228,7 @@ public class Persistence {
         Sketch sketch = null;
         try {
             PSketch psketch = mapper.readValue(file, PSketch.class);
-            Map<Integer, Geometry> map = new HashMap<Integer, Geometry>();
+            Map<Integer, Entity> map = new HashMap<Integer, Entity>();
             sketch = internalize(psketch, map);
             internalizeReferences(psketch, map);
         } catch (JsonParseException e) {
@@ -312,10 +313,6 @@ public class Persistence {
     }
 
     private static void externalizeReferenes(PGroup pgroup) {
-        Polyhedron group = (Polyhedron) pgroup.original;
-        if (group.getOwner() != null) {
-            pgroup.setOwner(group.getOwner().getId());
-        }
         for (PSurface psurface : pgroup.getSurfaces()) {
             externalizeReferences(psurface);
         }
@@ -357,7 +354,7 @@ public class Persistence {
         pvertex.setOwner(vertex.getOwner().getId());
     }
 
-    private static Sketch internalize(PSketch psketch, Map<Integer, Geometry> map) {
+    private static Sketch internalize(PSketch psketch, Map<Integer, Entity> map) {
         Sketch sketch = new Sketch();
         map.put(psketch.getId(), sketch);
         psketch.original = sketch;
@@ -367,7 +364,7 @@ public class Persistence {
         sketch.setGrid(new Grid("Main"));
         return sketch;
     }
-    private static Polyhedron internalize(PGroup pgroup, Map<Integer, Geometry> map) {
+    private static Polyhedron internalize(PGroup pgroup, Map<Integer, Entity> map) {
         Polyhedron group = new Polyhedron();
         map.put(pgroup.getId(), group);
         group.setName(pgroup.getName());
@@ -395,20 +392,20 @@ public class Persistence {
         }
         return group;
     }
-    private static Surface internalize(PSurface psurface,  Map<Integer, Geometry> map) {
+    private static Surface internalize(PSurface psurface,  Map<Integer, Entity> map) {
         Surface surface = new Surface();
         map.put(psurface.getId(), surface);
         psurface.original = surface;
         surface.setVisible(psurface.isVisible());
         return surface;
     }
-    private static Edge internalize(PEdge pedge, Map<Integer, Geometry> map) {
+    private static Edge internalize(PEdge pedge, Map<Integer, Entity> map) {
         Edge edge = new Edge();
         map.put(pedge.getId(), edge);
         pedge.original = edge;
         return edge;
     }
-    private static Vertex internalize(PVertex pvertex, Map<Integer, Geometry> map) {
+    private static Vertex internalize(PVertex pvertex, Map<Integer, Entity> map) {
         Vertex vertex = new Vertex();
         map.put(pvertex.getId(), vertex);
         pvertex.original = vertex;
@@ -418,12 +415,11 @@ public class Persistence {
         return vertex;
     }
 
-    private static void internalizeReferences(PSketch psketch, Map<Integer, Geometry> map) {
+    private static void internalizeReferences(PSketch psketch, Map<Integer, Entity> map) {
         internalizeReferences(psketch.getGroup(), map);
     }
-    private static void internalizeReferences(PGroup pgroup, Map<Integer, Geometry> map) {
+    private static void internalizeReferences(PGroup pgroup, Map<Integer, Entity> map) {
     	Polyhedron poly = (Polyhedron) pgroup.original;
-    	poly.setOwner((Mesh) map.get(pgroup.getOwner()));
         for (PSurface psurface : pgroup.getSurfaces()) {
             internalizeReferences(psurface, map);
         }
@@ -434,7 +430,7 @@ public class Persistence {
             internalizeReferences(pvertex, map);
         }
     }
-    private static void internalizeReferences(PSurface psurface, Map<Integer, Geometry> map) {
+    private static void internalizeReferences(PSurface psurface, Map<Integer, Entity> map) {
         Surface surface = (Surface) psurface.original;
         surface.setOwner((Mesh) map.get(psurface.getOwner()));
         List<Edge> edges = new LinkedList<Edge>();
@@ -453,13 +449,13 @@ public class Persistence {
             surface.setExterior((Surface) map.get(psurface.getExterior()));
         }
     }
-    private static void internalizeReferences(PEdge pedge, Map<Integer, Geometry> map) {
+    private static void internalizeReferences(PEdge pedge, Map<Integer, Entity> map) {
         Edge edge = (Edge) pedge.original;
         edge.setOwner((Mesh) map.get(pedge.getOwner()));
         edge.setFrom((Vertex) map.get(pedge.getFrom()));
         edge.setTo((Vertex) map.get(pedge.getTo()));
     }
-    private static void internalizeReferences(PVertex pvertex, Map<Integer, Geometry> map) {
+    private static void internalizeReferences(PVertex pvertex, Map<Integer, Entity> map) {
         Vertex vertex = (Vertex) pvertex.original;
         vertex.setOwner((Mesh) map.get(pvertex.getOwner()));
     }
