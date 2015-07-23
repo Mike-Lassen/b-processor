@@ -36,7 +36,7 @@ public class SelectTool extends StandardTool {
         Geometry geometry = view.pickObject(event.getX(), event.getY(), new Filter<Geometry>() {
 			@Override
 			public boolean evaluate(Geometry object) {
-				return object.getOwner() != null;
+				return object.getOwner() != null && object.getOwner().isSelectable();
 			}
 		});
         view.setSelected(geometry);

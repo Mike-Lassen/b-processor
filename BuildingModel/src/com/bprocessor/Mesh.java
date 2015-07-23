@@ -7,7 +7,8 @@ import java.util.Set;
 
 public abstract class Mesh extends Entity {
     protected String name;
-
+    protected boolean selectable;
+    
     public Mesh() {}
     public Mesh(Mesh prototype) {
     	super(prototype);
@@ -15,6 +16,7 @@ public abstract class Mesh extends Entity {
     }
     public Mesh(String name) {
         this.name = name;
+        this.selectable = true;
     }
 
     public String getName() {
@@ -22,6 +24,12 @@ public abstract class Mesh extends Entity {
     }
     public void setName(String name) {
         this.name = name;
+    }
+    public boolean isSelectable() {
+    	return selectable;
+    }
+    public void setSelectable(boolean value) {
+    	selectable = value;
     }
     public abstract void accept(ItemVisitor visitor);
     
@@ -57,6 +65,7 @@ public abstract class Mesh extends Entity {
     	List<Attribute> attributes = super.getAttributes();
     	List<Attribute> section = new LinkedList<Attribute>();
     	section.add(new Attribute("Name", name));
+    	section.add(new Attribute("Selectable", selectable));
     	attributes.add(new Attribute("Mesh", section));
     	return attributes;
     }

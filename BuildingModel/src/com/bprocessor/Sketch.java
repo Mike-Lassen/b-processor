@@ -1,5 +1,8 @@
 package com.bprocessor;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class Sketch extends Component {
     private int uid;
     private Polyhedron polyhedron;
@@ -60,4 +63,14 @@ public class Sketch extends Component {
 		mesh.add(polyhedron);
 		return mesh;
 	}
+	
+	public List<Attribute> getAttributes() {
+    	List<Attribute> attributes = super.getAttributes();
+    	List<Attribute> section = new LinkedList<Attribute>();
+    	section.add(new Attribute("Polyhedron", polyhedron));
+    	section.add(new Attribute("Grid", grid));
+    	
+    	attributes.add(new Attribute("Sketch", section));
+    	return attributes;
+    }
   }

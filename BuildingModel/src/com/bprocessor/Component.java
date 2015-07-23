@@ -1,5 +1,8 @@
 package com.bprocessor;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public abstract class Component extends Entity {
 	protected String name;
 	public Component() {}
@@ -24,4 +27,13 @@ public abstract class Component extends Entity {
 	public void applyComponent(Component prototype) {
 		name = prototype.name;
 	}
+	
+	
+	public List<Attribute> getAttributes() {
+    	List<Attribute> attributes = super.getAttributes();
+    	List<Attribute> section = new LinkedList<Attribute>();
+    	section.add(new Attribute("Name", name));
+    	attributes.add(new Attribute("Component", section));
+    	return attributes;
+    }
 }

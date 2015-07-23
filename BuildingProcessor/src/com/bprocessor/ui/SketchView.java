@@ -152,7 +152,11 @@ public class SketchView extends View3d {
 	}
 	public void setSelected(Entity selected) {
 		this.selected = selected;
-		attributePanel.setTarget(selected);
+		if (selected != null) {
+			attributePanel.setTarget(selected);
+		} else{
+			attributePanel.setTarget(sketch);
+		}
 	}
 	public Entity getSelected() {
 		return selected;
@@ -266,6 +270,7 @@ public class SketchView extends View3d {
 	public void setSketch(Sketch sketch) {
 		if (sketch != this.sketch) {
 			this.sketch = sketch;
+			attributePanel.setTarget(sketch);
 			repaint();
 		}
 	}

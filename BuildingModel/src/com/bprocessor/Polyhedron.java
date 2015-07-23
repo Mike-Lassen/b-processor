@@ -186,4 +186,12 @@ public class Polyhedron extends Mesh {
     		}
     	}
     }
+    
+    public List<Attribute> getAttributes() {
+    	List<Attribute> attributes = super.getAttributes();
+    	List<Attribute> section = new LinkedList<Attribute>();
+    	section.add(new Attribute("Surfaces", surfaces));    	
+    	attributes.add(new Attribute("Polyhedron", section));
+    	return attributes;
+    }
 }
