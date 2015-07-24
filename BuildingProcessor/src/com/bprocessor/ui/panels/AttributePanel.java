@@ -11,10 +11,11 @@ import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import com.bprocessor.Attribute;
 import com.bprocessor.Entity;
-import com.bprocessor.Geometry;
+import com.bprocessor.Format;
 import com.bprocessor.ui.SketchView;
 
 @SuppressWarnings("serial")
@@ -31,7 +32,7 @@ public class AttributePanel extends JPanel {
 		valueFont = new Font("Verdana", Font.PLAIN, 12);
 		setLayout(new BorderLayout());
 	}
-	
+
 	public void setSketchView(SketchView view) {
 		this.view = view;
 	}
@@ -89,6 +90,7 @@ public class AttributePanel extends JPanel {
 		} else {
 			row.add(Box.createHorizontalStrut(indent));
 			row.add(renderName(name + ":"));
+			row.add(Box.createHorizontalStrut(5));
 			row.add(Box.createHorizontalGlue());
 			row.add(renderValue(value));
 			row.add(Box.createHorizontalStrut(5));
@@ -106,6 +108,8 @@ public class AttributePanel extends JPanel {
 	JComponent renderValue(Object value) {
 		if (value instanceof Entity) {
 			return renderGeometry((Entity) value);
+		} else if (value instanceof Format) {
+			return renderFormat((Format) value);
 		} else {
 			JLabel label = new JLabel("" + value);
 			label.setFont(valueFont);
@@ -118,20 +122,28 @@ public class AttributePanel extends JPanel {
 		label.addMouseListener(new FollowReference(value));
 		return label;
 	}
+	
+	JComponent renderFormat(Format value) {
+		JTextField field = new JTextField(value.format());
+		field.setFont(valueFont);
+		return field;
+	}
 
 	JLabel renderHeader(Object value) {
 		JLabel label = new JLabel("" + value);
 		label.setFont(headerFont);
 		return label;
 	}
+	
+	
 
 	class FollowReference implements MouseListener {
 		private Entity target;
-		
+
 		public FollowReference(Entity target) {
 			this.target = target;
 		}
-		
+
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			view.setSelected(target);
@@ -141,26 +153,26 @@ public class AttributePanel extends JPanel {
 		@Override
 		public void mouseEntered(MouseEvent e) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void mousePressed(MouseEvent e) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			// TODO Auto-generated method stub
-			
+
 		}
-		
+
 	}
 }
