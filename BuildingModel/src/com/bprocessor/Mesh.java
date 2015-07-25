@@ -69,7 +69,6 @@ public abstract class Mesh extends Entity {
 			public String format() {
 				return name;
 			}
-			
 			@Override
 			public void apply(String value) {
 				name = value;

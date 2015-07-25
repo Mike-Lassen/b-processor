@@ -10,33 +10,26 @@ import java.util.List;
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.bprocessor.Attribute;
 import com.bprocessor.Entity;
 import com.bprocessor.Format;
-import com.bprocessor.ui.SketchView;
 
 @SuppressWarnings("serial")
-public class AttributePanel extends JPanel {
-	private SketchView view;
+public class BoxAttributePanel extends AttributePanel {
 	private Entity target;
 	private Font headerFont;
 	private Font labelFont;
 	private Font valueFont;
 
-	public AttributePanel() {
+	public BoxAttributePanel() {
 		headerFont = new Font("Arial", Font.BOLD, 16);
 		labelFont = new Font("Verdana", Font.BOLD, 12);
 		valueFont = new Font("Verdana", Font.PLAIN, 12);
 		setLayout(new BorderLayout());
 	}
-
-	public void setSketchView(SketchView view) {
-		this.view = view;
-	}
-
+	
 	public void setTarget(Entity value) {
 		if (target != value) {
 			this.removeAll();

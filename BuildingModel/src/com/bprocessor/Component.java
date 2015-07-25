@@ -32,7 +32,16 @@ public abstract class Component extends Entity {
 	public List<Attribute> getAttributes() {
     	List<Attribute> attributes = super.getAttributes();
     	List<Attribute> section = new LinkedList<Attribute>();
-    	section.add(new Attribute("Name", name));
+    	section.add(new Attribute("Name", new Format() {
+			@Override
+			public String format() {
+				return name;
+			}
+			@Override
+			public void apply(String value) {
+				name = value;
+			}
+		}));
     	attributes.add(new Attribute("Component", section));
     	return attributes;
     }
