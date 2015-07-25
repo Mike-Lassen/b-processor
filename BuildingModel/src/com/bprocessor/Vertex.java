@@ -11,6 +11,11 @@ enum Coord {
 }
 
 public class Vertex extends Geometry {
+	private static int maxID;
+	public static int nextID() {
+		return ++maxID;
+	}
+	
     protected double x;
     protected double y;
     protected double z;
@@ -31,11 +36,10 @@ public class Vertex extends Geometry {
     	z = prototype.z;
     }
     public Vertex(double x, double y, double z) {
-        this.x = x;
+    	this.x = x;
         this.y = y;
         this.z = z;
     }
-
 
     public void setX(double value) {
         x = value;

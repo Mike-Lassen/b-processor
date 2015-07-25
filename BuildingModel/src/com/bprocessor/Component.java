@@ -41,8 +41,16 @@ public abstract class Component extends Entity {
 			public void apply(String value) {
 				name = value;
 			}
+			@Override
+			public List<String> values() {
+				return null;
+			}
 		}));
     	attributes.add(new Attribute("Component", section));
     	return attributes;
     }
+	
+	public String label() {
+		return name;
+	}
 }

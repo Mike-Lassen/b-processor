@@ -73,12 +73,32 @@ public abstract class Mesh extends Entity {
 			public void apply(String value) {
 				name = value;
 			}
+			@Override
+			public List<String> values() {
+				return null;
+			}
 		}));
-    	section.add(new Attribute("Selectable", selectable));
+    	section.add(new Attribute("Selectable", new Format() {
+			@Override
+			public List<String> values() {
+				return null;
+			}
+			@Override
+			public String format() {
+				return String.valueOf(selectable);
+			}
+			
+			@Override
+			public void apply(String value) {
+				selectable = Boolean.valueOf(value);
+			}
+		}));
     	attributes.add(new Attribute("Mesh", section));
     	return attributes;
     }
     
-    
+    public String label() {
+    	return name;
+    }
 }
 

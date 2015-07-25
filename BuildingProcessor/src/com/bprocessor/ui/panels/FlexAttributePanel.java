@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -60,6 +61,7 @@ public class FlexAttributePanel extends AttributePanel {
 	public JComponent renderSections(List<Attribute> list, int x, int y) {
 		JPanel body = new JPanel();
 		body.setLayout(null);
+		Collections.reverse(list);
 		for (Attribute attribute : list) {
 			int height = renderSection(body, attribute, x, y);
 			y = y + height; 
@@ -88,7 +90,7 @@ public class FlexAttributePanel extends AttributePanel {
 	
 	public int renderHeader(JComponent body, String name, int x, int y) {
 		JLabel label = new JLabel(name, SwingConstants.LEFT);
-		label.setBounds(x, y, 120, 24);
+		label.setBounds(x, y, 300, 24);
 		label.setFont(headingFont);
 		label.setVerticalAlignment(SwingConstants.CENTER);
 		body.add(label);
@@ -133,7 +135,13 @@ public class FlexAttributePanel extends AttributePanel {
 	}
 	
 	public int renderEntity(JComponent body, Entity entity, int x, int y) {
-		JLabel label = new JLabel(entity + "");
+		String name;
+		if (entity == null) {
+			name = "NONE";
+		} else {
+			name = entity.label();
+		}
+ 		JLabel label = new JLabel(name);
 		label.setFont(labelFont);
 		Dimension size = label.getPreferredSize();
 		label.setBounds(x, y, size.width, 24);

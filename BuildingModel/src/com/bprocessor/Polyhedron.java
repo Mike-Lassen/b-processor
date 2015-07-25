@@ -48,6 +48,9 @@ public class Polyhedron extends Mesh {
         if (vertex.owner == null) {
             vertices.add(vertex);
             vertex.owner = this;
+            if (vertex.getId() == 0) {
+            	vertex.setId(Vertex.nextID());
+            }
         }
     }
     public void remove(Vertex vertex) {

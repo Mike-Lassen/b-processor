@@ -30,4 +30,8 @@ public class Entity {
     }
 	public void delete() {
 	}
+	
+	public String label() {
+		return this.getClass().getSimpleName() + " " + id;
+	}
 }

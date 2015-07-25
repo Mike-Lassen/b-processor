@@ -11,6 +11,7 @@ import com.bprocessor.ui.StandardTool;
 import com.bprocessor.ui.StatusBar;
 import com.bprocessor.ui.commands.EraseSurface;
 import com.bprocessor.util.CommandManager;
+import com.bprocessor.util.Filter;
 
 public class EraserTool extends StandardTool {
     public EraserTool(SketchView view, StatusBar statusbar) {
@@ -34,7 +35,12 @@ public class EraserTool extends StandardTool {
 
     @Override
     public void mousePressed(MouseEvent event) {
-    	Geometry geometry = view.pickObject(event.getX(), event.getY(), null);
+    	Geometry geometry = view.pickObject(event.getX(), event.getY(), new Filter<Geometry>() {
+			@Override
+			public boolean evaluate(Geometry object) {
+				return object.getOwner() != null && object.getOwner().isSelectable();
+			}
+		});
         if (geometry instanceof Surface) {
         	Surface surface = (Surface) geometry;
             if (surface.getExterior() != null) {

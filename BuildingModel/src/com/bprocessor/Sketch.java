@@ -6,18 +6,16 @@ import java.util.List;
 public class Sketch extends Component {
     private int uid;
     private Polyhedron polyhedron;
+    private Group group;
     private Net grid;
     private boolean modified;
     private String path;
 
     public Sketch() {}
-    public Sketch(Sketch prototype) {
-    	super(prototype);
-    	polyhedron = prototype.polyhedron;
-    }
     public Sketch(String name) {
     	super(name);
-        this.polyhedron = new Polyhedron("Top");
+        this.polyhedron = new Polyhedron("Main");
+        this.group = new Group("Top", this.polyhedron);
         this.grid = new Net("Main");
     }
 
@@ -60,14 +58,14 @@ public class Sketch extends Component {
 	public Mesh display() {
 		Composite mesh = new Composite("Constructed");
 		mesh.add(grid);
-		mesh.add(polyhedron);
+		mesh.add(group.display());
 		return mesh;
 	}
 	
 	public List<Attribute> getAttributes() {
     	List<Attribute> attributes = super.getAttributes();
     	List<Attribute> section = new LinkedList<Attribute>();
-    	section.add(new Attribute("Polyhedron", polyhedron));
+    	section.add(new Attribute("Content", group));
     	section.add(new Attribute("Grid", grid));
     	
     	attributes.add(new Attribute("Sketch", section));

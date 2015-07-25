@@ -28,6 +28,7 @@ public abstract class Geometry extends Entity {
     	List<Attribute> attributes = super.getAttributes();
     	List<Attribute> section = new LinkedList<Attribute>();
     	section.add(new Attribute("Owner", owner));
+    	section.add(new Attribute("ID", id));
     	attributes.add(new Attribute("Geometry", section));
     	return attributes;
     }
