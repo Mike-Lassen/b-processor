@@ -16,7 +16,6 @@ import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
 
 import com.bprocessor.ui.panels.AttributePanel;
-import com.bprocessor.ui.panels.BoxAttributePanel;
 import com.bprocessor.ui.panels.FlexAttributePanel;
 import com.bprocessor.ui.tools.EraserTool;
 import com.bprocessor.ui.tools.OrientTool;

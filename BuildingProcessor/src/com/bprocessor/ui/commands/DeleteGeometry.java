@@ -15,6 +15,6 @@ public class DeleteGeometry extends ModifyEntity<Polyhedron> {
 		target.delete();
 	}
 	public String description() {
-		return "Delete " + target.getClass().getName();
+		return "Delete " + target.getClass().getSimpleName();
 	}
 }

@@ -19,6 +19,7 @@ import com.bprocessor.ui.Intersection;
 import com.bprocessor.ui.SketchView;
 import com.bprocessor.ui.StandardTool;
 import com.bprocessor.ui.StatusBar;
+import com.bprocessor.ui.commands.ExtrudeSurface;
 import com.bprocessor.ui.commands.InsertSurface;
 import com.bprocessor.util.Command;
 import com.bprocessor.util.CommandManager;
@@ -58,15 +59,8 @@ public class PencilTool extends StandardTool {
 			double length = Double.valueOf(value);
 			for (Surface current : view.getSketch().getPolyhedron().getSurfaces()) {
 				if (current.getExterior() == null) {
-					List<Surface> sides = new LinkedList<Surface>();
-					List<Surface> tops = new LinkedList<Surface>();
-					current.extrudeAll(new Vertex(0, 0, 1), length, sides, tops);
-					for (Surface side: sides) {
-						view.getSketch().getPolyhedron().insert(side);
-					}
-					for (Surface surface : tops) {
-						view.getSketch().getPolyhedron().insert(surface);
-					}
+					Command command = new ExtrudeSurface(current, new Vertex(0, 0, 1), length);
+					CommandManager.instance().apply(command);
 				}
 			}
 		} catch (Exception error) {
