@@ -1,22 +1,21 @@
 package com.bprocessor.util;
 
 import com.bprocessor.Entity;
-import com.bprocessor.Geometry;
 import com.bprocessor.Memento;
 
-public abstract class ModifyGeometry<T extends Entity> implements Command {
-	protected T geometry;
+public abstract class ModifyEntity<T extends Entity> implements Command {
+	protected T entity;
 	private Memento memento;
 	
-	public ModifyGeometry(T geometry) {
-		this.geometry = geometry;
+	public ModifyEntity(T entity) {
+		this.entity = entity;
 	}
 	public void prepare() {
-		memento = geometry.memento();
+		memento = entity.memento();
 	}
 	public void finish() { }
 	private void revert() {
-		Memento next = geometry.memento();
+		Memento next = entity.memento();
 		memento.restore();
 		memento = next;
 	}

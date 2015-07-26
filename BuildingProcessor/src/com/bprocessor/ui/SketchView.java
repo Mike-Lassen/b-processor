@@ -764,7 +764,7 @@ public class SketchView extends View3d {
 				mark.addAll(surface.getVertices());
 			}
 			if (selected instanceof Surface) {
-				apply(selected_color, 1.0f);
+				apply(selected_color, 0.2f);
 				drawSurface((Surface) selected);
 			}
 			gl.glColor3f(0.0f, 0.0f, 0.0f);

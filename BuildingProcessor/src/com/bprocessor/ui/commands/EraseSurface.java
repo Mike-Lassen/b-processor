@@ -1,14 +1,14 @@
 package com.bprocessor.ui.commands;
 
 import com.bprocessor.Surface;
-import com.bprocessor.util.ModifyGeometry;
+import com.bprocessor.util.ModifyEntity;
 
-public class EraseSurface extends ModifyGeometry<Surface> {
+public class EraseSurface extends ModifyEntity<Surface> {
 	public EraseSurface(Surface geometry) {
 		super(geometry);
 	}
 	public void apply() {
-		geometry.setVisible(false);
+		entity.setVisible(false);
 	}
 	public String description() {
 		return "Erase Surface";

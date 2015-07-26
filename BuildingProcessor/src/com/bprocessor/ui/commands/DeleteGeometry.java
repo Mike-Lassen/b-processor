@@ -2,9 +2,9 @@ package com.bprocessor.ui.commands;
 
 import com.bprocessor.Geometry;
 import com.bprocessor.Polyhedron;
-import com.bprocessor.util.ModifyGeometry;
+import com.bprocessor.util.ModifyEntity;
 
-public class DeleteGeometry extends ModifyGeometry<Polyhedron> {
+public class DeleteGeometry extends ModifyEntity<Polyhedron> {
 	private Geometry target;
 	
 	public DeleteGeometry(Geometry target) {
