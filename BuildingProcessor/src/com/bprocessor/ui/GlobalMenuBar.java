@@ -69,6 +69,7 @@ public class GlobalMenuBar extends MenuBar {
 		editMenu.copyItem.setEnabled(false);
 		editMenu.pasteItem.setEnabled(false);
 		editMenu.deleteItem.setEnabled(view.canDeleteSelection());
+		editMenu.extrudeItem.setEnabled(view.canExtrudeSelection());
 	}
 
 	public class FileMenu extends Menu {
@@ -191,6 +192,7 @@ public class GlobalMenuBar extends MenuBar {
 		public MenuItem copyItem;
 		public MenuItem pasteItem;
 		public MenuItem deleteItem;
+		public MenuItem extrudeItem;
 		
 		public EditMenu(String title) {
 			super(title);
@@ -236,6 +238,17 @@ public class GlobalMenuBar extends MenuBar {
 					}
 				});
 				add(deleteItem);
+			}
+			addSeparator();
+			{
+				extrudeItem = new MenuItem("Extrude...");
+				extrudeItem.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent event) {
+						view.extrudeSelection();
+					}
+				});
+				add(extrudeItem);
 			}
 		}
 	}

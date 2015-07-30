@@ -6,6 +6,7 @@ import java.util.Set;
 
 public class Composite extends Mesh {
     protected List<Mesh> items;
+    protected Object tag;
 
     public Composite() {}
     public Composite(Composite prototype) {
@@ -30,12 +31,21 @@ public class Composite extends Mesh {
     public void setItems(List<Mesh> items) {
         this.items = items;
     }
+    
+    public Object getTag() {
+    	return tag;
+    }
+    public void setTag(Object value) {
+    	tag = value;
+    }
 
     @Override
     public void accept(ItemVisitor visitor) {
+    	visitor.enterComposite(this);
         for (Mesh current : items) {
             current.accept(visitor);
         }
+        visitor.exitComposite(this);
     }
     protected void applyComposite(Composite prototype) {
     	super.applyItem(prototype);

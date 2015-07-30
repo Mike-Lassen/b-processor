@@ -20,12 +20,14 @@ import com.bprocessor.Camera;
 import com.bprocessor.Color;
 import com.bprocessor.Composite;
 import com.bprocessor.Entity;
+import com.bprocessor.Group;
 import com.bprocessor.Handle;
 import com.bprocessor.Mesh;
 import com.bprocessor.Line;
 import com.bprocessor.Net;
 import com.bprocessor.Edge;
 import com.bprocessor.Face;
+import com.bprocessor.Path;
 import com.bprocessor.PolyFace;
 import com.bprocessor.Geometry;
 import com.bprocessor.Polyhedron;
@@ -35,6 +37,8 @@ import com.bprocessor.Sketch;
 import com.bprocessor.Surface;
 import com.bprocessor.Vertex;
 import com.bprocessor.io.ObjFileReader;
+import com.bprocessor.ui.actions.Action;
+import com.bprocessor.ui.actions.ExtrudeSufaceAction;
 import com.bprocessor.ui.commands.DeleteGeometry;
 import com.bprocessor.ui.panels.AttributePanel;
 import com.bprocessor.util.CommandManager;
@@ -98,6 +102,12 @@ public class SketchView extends View3d {
 				public void visit(Net current) {}
 				@Override
 				public void visit(Polyhedron current) {}
+				@Override
+				public void enterComposite(Composite current) {
+				}
+				@Override
+				public void exitComposite(Composite current) {
+				}
 			});
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -126,6 +136,9 @@ public class SketchView extends View3d {
 	public void setAttributePanel(AttributePanel panel) {
 		attributePanel = panel;
 		attributePanel.setSketchView(this);
+	}
+	public AttributePanel getAttributePanel() {
+		return attributePanel;
 	}
 
 	public void setDelegate(InputListener listener) {
@@ -221,11 +234,21 @@ public class SketchView extends View3d {
 		if (selected != null) {
 			if (selected instanceof Geometry) {
 				CommandManager.instance().apply(new DeleteGeometry((Geometry) selected));
-			
+
 				selected = null;
 				checkpoint();
 				repaint();
 			}
+		}
+	}
+
+	public boolean canExtrudeSelection() {
+		return selected instanceof Surface;
+	}
+	public void extrudeSelection() {
+		if (selected instanceof Surface) {
+			Action action = new ExtrudeSufaceAction((Surface) selected, 1.0);
+			attributePanel.setTarget(action);
 		}
 	}
 
@@ -236,13 +259,13 @@ public class SketchView extends View3d {
 		protected int height;
 		protected int hits;
 		protected IntBuffer buffer;
-		protected ArrayList<Geometry> objects;
+		protected ArrayList<Object> objects;
 
-		public int register(Geometry object) {
+		public int register(Object object) {
 			objects.add(object);
 			return objects.size();
 		}
-		public Geometry get(int id) {
+		public Object get(int id) {
 			return objects.get(id - 1);
 		}
 
@@ -251,15 +274,15 @@ public class SketchView extends View3d {
 			this.y = y;
 			width = 6;
 			height = 6;
-			objects = new ArrayList<Geometry>();
+			objects = new ArrayList<Object>();
 		}
 	}
 	public class PickingResult {
-		protected Geometry nearest;
-		protected LinkedList<Surface> surfaces;
-		protected LinkedList<Edge> edges;
-		protected LinkedList<Vertex> vertices;
-		public PickingResult(Geometry nearest, LinkedList<Surface> surfaces, LinkedList<Edge> edges, LinkedList<Vertex> vertices) {
+		protected Path<? extends Geometry> nearest;
+		protected LinkedList<Path<Surface>> surfaces;
+		protected LinkedList<Path<Edge>> edges;
+		protected LinkedList<Path<Vertex>> vertices;
+		public PickingResult(Path<? extends Geometry> nearest, LinkedList<Path<Surface>> surfaces, LinkedList<Path<Edge>> edges, LinkedList<Path<Vertex>> vertices) {
 			this.nearest = nearest;
 			this.edges = edges;
 			this.vertices = vertices;
@@ -455,15 +478,15 @@ public class SketchView extends View3d {
 		int names = 0;
 		long zMax = 0xFFFFFFFFL;
 
-		LinkedList<Vertex> vertices = new LinkedList<Vertex>();
-		LinkedList<Edge> edges = new LinkedList<Edge>();
-		LinkedList<Surface> surfaces = new LinkedList<Surface>();
+		LinkedList<Path<Vertex>> vertices = new LinkedList<Path<Vertex>>();
+		LinkedList<Path<Edge>> edges = new LinkedList<Path<Edge>>();
+		LinkedList<Path<Surface>> surfaces = new LinkedList<Path<Surface>>();
 
-		Vertex currentVertex = null;
+		Path<Vertex> currentVertex = null;
 		double vertex_z = 1.0;
-		Edge currentEdge = null;
+		Path<Edge> currentEdge = null;
 		double edge_z = 1.0;
-		Surface currentSurface = null;
+		Path<Surface> currentSurface = null;
 		double surface_z = 1.0;
 
 		for (int i = 0; i < picking.hits; i++) {
@@ -475,48 +498,54 @@ public class SketchView extends View3d {
 			double z = (near + far) / 2;
 			bufferOffset += 3;
 			if (names > 0) {
-				int id = picking.buffer.get(bufferOffset + names - 1);
-				bufferOffset += names;
-				Geometry current = picking.get(id);
-				if (filter == null || filter.evaluate(current)) {
-					if (current instanceof Vertex) {
-						if (z < vertex_z) {
-							currentVertex = (Vertex) current;
-							vertex_z = z;
+				for (int j = 0; j < names; j++) {
+					int id = picking.buffer.get(bufferOffset + j);
+					Object current = picking.get(id);
+					if (current instanceof Geometry) {
+						Path<? extends Geometry> path = new Path<Geometry>(null, (Geometry) current);
+						if (filter == null || filter.evaluate(path.target())) {
+							if (path.target() instanceof Vertex) {
+								if (z < vertex_z) {
+									currentVertex = (Path<Vertex>) path;
+									vertex_z = z;
+								}
+								vertices.add((Path<Vertex>) path);
+							} else if (path.target() instanceof Edge) {
+								if (z < edge_z) {
+									currentEdge = (Path<Edge>) path;
+									edge_z = z;
+								}
+								edges.add((Path<Edge>) path);
+							} else if (current instanceof Surface) {
+								if (z < surface_z) {
+									currentSurface = (Path<Surface>) path;
+									surface_z =z;
+								}
+								surfaces.add((Path<Surface>) path);
+							} else {
+								System.out.println("selected " + current.getClass().getName());
+							}
 						}
-						vertices.add((Vertex) current);
-					} else if (current instanceof Edge) {
-						Edge edge = (Edge) current;
-						if (z < edge_z) {
-							currentEdge = edge;
-							edge_z = z;
-						}
-						edges.add(edge);
-					} else if (current instanceof Surface) {
-						if (z < surface_z) {
-							currentSurface = (Surface) current;
-							surface_z =z;
-						}
-						surfaces.add((Surface) current);
-					} else {
-						System.out.println("selected " + current.getClass().getName());
+					} else if (current instanceof Group){
+						
 					}
 				}
+				bufferOffset += names;
 			}
 		}
 		picking = null;
 		if (currentSurface != null) {
-			Plane plane = currentSurface.plane();
+			Plane plane = currentSurface.target().plane();
 			if (currentVertex != null) {
 				if (surface_z < vertex_z) {
-					if (!plane.contains(currentVertex)) {
+					if (!plane.contains(currentVertex.target())) {
 						currentVertex = null;
 					}
 				}
 			}
 			if (currentEdge != null) {
 				if (surface_z < edge_z) {
-					if (!plane.contains(currentEdge)) {
+					if (!plane.contains(currentEdge.target())) {
 						currentEdge = null;
 					}
 				}
@@ -524,12 +553,12 @@ public class SketchView extends View3d {
 		}
 		if (currentEdge != null && currentVertex != null) {
 			if (edge_z < vertex_z) {
-				if (!currentEdge.intersects(currentVertex)) {
+				if (!currentEdge.target().intersects(currentVertex.target())) {
 					currentVertex = null;
 				}
 			}
 		}
-		Geometry nearest = null;
+		Path<? extends Geometry> nearest = null;
 		if (currentVertex != null) {
 			nearest = currentVertex;
 		} else if (currentEdge != null) {
@@ -542,7 +571,7 @@ public class SketchView extends View3d {
 
 	public Geometry pickObject(int x, int y, Filter<Geometry> filter) {
 		PickingResult record = pickObjects(x, y, filter);
-		return record.nearest;
+		return record.nearest.target();
 	}
 
 
@@ -556,15 +585,16 @@ public class SketchView extends View3d {
 			result = plane.intersection(ray);
 			type = Intersection.PLANE;
 		} else {
-			if (record.nearest instanceof Vertex) {
-				result = (Vertex) record.nearest;
+			if (record.nearest.target() instanceof Vertex) {
+				result = (Vertex) record.nearest.target();
 				type = Intersection.VERTEX;
-			} else if (record.nearest instanceof Edge) {
-				Edge edge = (Edge) record.nearest;
-				for (Edge current : record.edges) {
-					if (current != edge) {
-						if (!edge.parallel(current)) {
-							result = edge.intersection(current);
+			} else if (record.nearest.target() instanceof Edge) {
+				Edge edge = (Edge) record.nearest.target();
+				for (Path<Edge> current : record.edges) {
+					
+					if (current.target() != edge) {
+						if (!edge.parallel(current.target())) {
+							result = edge.intersection(current.target());
 							if (result != null) {
 								break;
 							}
@@ -575,8 +605,8 @@ public class SketchView extends View3d {
 					result = edge.closest(ray);
 				}
 				type = Intersection.EDGE;
-			} else if (record.nearest instanceof Surface) {
-				Surface surface = (Surface) record.nearest;
+			} else if (record.nearest.target() instanceof Surface) {
+				Surface surface = (Surface) record.nearest.target();
 				result = surface.plane().intersection(ray);
 				type = Intersection.SURFACE;
 			}
@@ -824,6 +854,16 @@ public class SketchView extends View3d {
 				drawPolyFaceForDisplay(current);
 			}
 		}
+		@Override
+		public void enterComposite(Composite current) {
+			// TODO Auto-generated method stub
+
+		}
+		@Override
+		public void exitComposite(Composite current) {
+			// TODO Auto-generated method stub
+
+		}
 	}
 
 	public class PickingPainter extends Painter {
@@ -879,6 +919,16 @@ public class SketchView extends View3d {
 		@Override
 		public void visit(PolyFace current) {
 		}
+		@Override
+		public void enterComposite(Composite current) {
+			if (current.getTag() != null) {
+				gl.glPushName(picking.register(current.getTag()));
+			}
+		}
+		@Override
+		public void exitComposite(Composite current) {
+
+		}
 	}
 
 	public class WireFramePainter extends Painter {
@@ -919,6 +969,16 @@ public class SketchView extends View3d {
 			gl.glEnd();
 			gl.glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 			gl.glColor4f(0.9f, 0.9f, 1.0f, 1.0f);
+		}
+		@Override
+		public void enterComposite(Composite current) {
+			// TODO Auto-generated method stub
+
+		}
+		@Override
+		public void exitComposite(Composite current) {
+			// TODO Auto-generated method stub
+
 		}
 	}
 }

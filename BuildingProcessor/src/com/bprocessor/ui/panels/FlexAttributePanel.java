@@ -12,6 +12,7 @@ import java.awt.event.MouseListener;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -22,6 +23,7 @@ import javax.swing.SwingConstants;
 import com.bprocessor.Attribute;
 import com.bprocessor.Entity;
 import com.bprocessor.Format;
+import com.bprocessor.ui.actions.Operation;
 
 @SuppressWarnings("serial")
 public class FlexAttributePanel extends AttributePanel {
@@ -30,13 +32,13 @@ public class FlexAttributePanel extends AttributePanel {
 	private Font labelFont;
 	private JTextField defaultField;
 	private int width;
-	
+
 	public FlexAttributePanel() {
 		setLayout(new BorderLayout());
 		headingFont = new Font("Helvetica Neue", Font.BOLD, 12);
 		labelFont = new Font("Helvetica Neue", Font.PLAIN, 12);
 	}
-	
+
 	public void setTarget(Entity value) {
 		if (value != target) {
 			target = value;
@@ -68,7 +70,7 @@ public class FlexAttributePanel extends AttributePanel {
 		}
 		return body;
 	}
-	
+
 	public int renderSection(JComponent body, Attribute attribute, int x, int y) {
 		int height = renderHeader(body, attribute.getName(), x, y);
 		y += height;
@@ -87,7 +89,7 @@ public class FlexAttributePanel extends AttributePanel {
 		body.add(line);
 		return height;
 	}
-	
+
 	public int renderHeader(JComponent body, String name, int x, int y) {
 		JLabel label = new JLabel(name, SwingConstants.LEFT);
 		label.setBounds(x, y, 300, 24);
@@ -96,13 +98,22 @@ public class FlexAttributePanel extends AttributePanel {
 		body.add(label);
 		return 24;
 	}
-	
+
 	public int renderAtribute(JComponent body, Attribute attribute, int x, int y) {
-		renderLabel(body, attribute.getName(), x, y);
-		int height = renderObject(body, attribute.getValue(), x + 77, y);
+		int height = 24;
+		if (attribute.getValue() instanceof Operation) {
+			JButton button = new JButton(attribute.getName());
+			button.setFont(headingFont);
+			button.setBounds(x, y + 2, width - 2*x, 20);
+			button.addActionListener(new ApplyOperation((Operation) attribute.getValue()));
+			body.add(button);
+		} else {
+			renderLabel(body, attribute.getName(), x, y);
+			height = renderObject(body, attribute.getValue(), x + 77, y);
+		}
 		return height;
 	}
-	
+
 	public void renderLabel(JComponent body, String name, int x, int y) {
 		JLabel label = new JLabel(name, SwingConstants.RIGHT);
 		label.setBounds(x, y, 70, 24);
@@ -111,7 +122,7 @@ public class FlexAttributePanel extends AttributePanel {
 		label.setForeground(new Color(0X505050));
 		body.add(label);
 	}
-	
+
 	public int renderObject(JComponent body, Object value, int x, int y) {
 		int height;
 		if (value instanceof Format) {
@@ -123,7 +134,7 @@ public class FlexAttributePanel extends AttributePanel {
 		}
 		return height;
 	}
-	
+
 	public int renderString(JComponent body, String name, int x, int y) {
 		JLabel label = new JLabel(name);
 		label.setFont(labelFont);
@@ -133,7 +144,7 @@ public class FlexAttributePanel extends AttributePanel {
 		body.add(label);
 		return 24;
 	}
-	
+
 	public int renderEntity(JComponent body, Entity entity, int x, int y) {
 		String name;
 		if (entity == null) {
@@ -141,7 +152,7 @@ public class FlexAttributePanel extends AttributePanel {
 		} else {
 			name = entity.label();
 		}
- 		JLabel label = new JLabel(name);
+		JLabel label = new JLabel(name);
 		label.setFont(labelFont);
 		Dimension size = label.getPreferredSize();
 		label.setBounds(x, y, size.width, 24);
@@ -150,7 +161,7 @@ public class FlexAttributePanel extends AttributePanel {
 		body.add(label);
 		return 24;
 	}
-	
+
 	public int renderFormat(JComponent body, Format format, int x, int y) {
 		JTextField field = new JTextField(format.format());
 		field.setFont(labelFont);
@@ -163,6 +174,19 @@ public class FlexAttributePanel extends AttributePanel {
 		return 24;
 	}
 	
+	class ApplyOperation implements ActionListener {
+		private Operation operation;
+		
+		public ApplyOperation(Operation operation) {
+			this.operation = operation;
+		}
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			operation.evaluate();
+			view.repaint();
+		}
+	}
+
 	class ApplyValue implements ActionListener {
 		private Format format;
 		private JTextField field;
@@ -175,7 +199,7 @@ public class FlexAttributePanel extends AttributePanel {
 			format.apply(field.getText());
 			field.select(0, Integer.MAX_VALUE);
 		}
-		
+
 	}
 	class FollowReference implements MouseListener {
 		private Entity target;

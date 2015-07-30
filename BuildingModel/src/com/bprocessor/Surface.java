@@ -183,6 +183,7 @@ public class Surface extends Geometry {
 		for (Surface hole : getHoles()) {
 			Surface holetop;
 			holetop = hole.extrude(normal, delta, sides);
+			holetop.setVisible(hole.isVisible());
 			top.add(holetop);
 			tops.add(holetop);
 		}

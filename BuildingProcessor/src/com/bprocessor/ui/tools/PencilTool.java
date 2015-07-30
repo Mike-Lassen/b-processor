@@ -19,7 +19,8 @@ import com.bprocessor.ui.Intersection;
 import com.bprocessor.ui.SketchView;
 import com.bprocessor.ui.StandardTool;
 import com.bprocessor.ui.StatusBar;
-import com.bprocessor.ui.commands.ExtrudeSurface;
+import com.bprocessor.ui.actions.Action;
+import com.bprocessor.ui.actions.ExtrudeSufaceAction;
 import com.bprocessor.ui.commands.InsertSurface;
 import com.bprocessor.util.Command;
 import com.bprocessor.util.CommandManager;
@@ -55,18 +56,6 @@ public class PencilTool extends StandardTool {
 	}
 	
 	public void evaluate(String value) {
-		try {
-			double length = Double.valueOf(value);
-			for (Surface current : view.getSketch().getPolyhedron().getSurfaces()) {
-				if (current.getExterior() == null) {
-					Command command = new ExtrudeSurface(current, new Vertex(0, 0, 1), length);
-					CommandManager.instance().apply(command);
-				}
-			}
-		} catch (Exception error) {
-
-		}
-		view.repaint();
 	}
 
 	public void prepare() {

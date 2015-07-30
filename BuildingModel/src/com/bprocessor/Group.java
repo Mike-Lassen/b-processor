@@ -5,20 +5,28 @@ import java.util.List;
 
 public class Group extends Component {
 	private Mesh mesh;
+	private List<Component> children;
 	public Group() { }
 
-	public Group(Entity prototype) {
+	public Group(Group prototype) {
 		super(prototype);
 	}
 	
 	public Group(String name, Mesh mesh) {
 		super(name);
 		this.mesh = mesh;
+		this.children = new LinkedList<Component>();
 	}
 
 	@Override
 	public Mesh display() {
-		return mesh;
+		Composite composite = new Composite("");
+		composite.add(mesh);
+		composite.setTag(this);
+		for (Component current : children) {
+			composite.add(current.display());
+		}
+		return composite;
 	}
 	
 	public List<Attribute> getAttributes() {
