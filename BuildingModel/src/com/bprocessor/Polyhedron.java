@@ -2,6 +2,7 @@ package com.bprocessor;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import com.bprocessor.util.Function;
 import com.bprocessor.util.Util;
@@ -197,4 +198,8 @@ public class Polyhedron extends Mesh {
     	attributes.add(new Attribute("Polyhedron", section));
     	return attributes;
     }
+	@Override
+	public void collectVertices(Set<Vertex> vertices) {
+		vertices.addAll(getVertices());
+	}
 }

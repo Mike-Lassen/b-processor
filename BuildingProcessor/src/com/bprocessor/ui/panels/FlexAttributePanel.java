@@ -23,7 +23,7 @@ import javax.swing.SwingConstants;
 import com.bprocessor.Attribute;
 import com.bprocessor.Entity;
 import com.bprocessor.Format;
-import com.bprocessor.ui.actions.Operation;
+import com.bprocessor.util.Operation;
 
 @SuppressWarnings("serial")
 public class FlexAttributePanel extends AttributePanel {

@@ -5,8 +5,9 @@ import java.util.List;
 
 import com.bprocessor.Attribute;
 import com.bprocessor.Entity;
+import com.bprocessor.util.Operation;
 
-public class Action extends Entity {
+public abstract class Action extends Entity {
 
 	public Action() {
 	}
@@ -15,9 +16,7 @@ public class Action extends Entity {
 		super(prototype);
 	}
 
-	public void evaluate() {
-		
-	}
+	public abstract void evaluate();
 	
 	public List<Attribute> getAttributes() {
     	List<Attribute> attributes = super.getAttributes();

@@ -70,6 +70,9 @@ public class GlobalMenuBar extends MenuBar {
 		editMenu.pasteItem.setEnabled(false);
 		editMenu.deleteItem.setEnabled(view.canDeleteSelection());
 		editMenu.extrudeItem.setEnabled(view.canExtrudeSelection());
+		editMenu.rotateItem.setEnabled(view.canRotateSelection());
+		editMenu.translateItem.setEnabled(view.canTranslateSelection());
+		editMenu.scaleItem.setEnabled(view.canScaleSelection());
 	}
 
 	public class FileMenu extends Menu {
@@ -193,6 +196,9 @@ public class GlobalMenuBar extends MenuBar {
 		public MenuItem pasteItem;
 		public MenuItem deleteItem;
 		public MenuItem extrudeItem;
+		public MenuItem rotateItem;
+		public MenuItem translateItem;
+		public MenuItem scaleItem;
 		
 		public EditMenu(String title) {
 			super(title);
@@ -249,6 +255,33 @@ public class GlobalMenuBar extends MenuBar {
 					}
 				});
 				add(extrudeItem);
+			}
+			addSeparator();
+			{
+				rotateItem = new MenuItem("Rotate...");
+				rotateItem.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent event) {
+						view.rotateSelection();
+					}
+				});
+				add(rotateItem);
+				translateItem = new MenuItem("Translate...");
+				translateItem.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent event) {
+						view.translateSelection();
+					}
+				});
+				add(translateItem);
+				scaleItem = new MenuItem("Scale...");
+				scaleItem.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent event) {
+						view.scaleSelection();
+					}
+				});
+				add(scaleItem);
 			}
 		}
 	}

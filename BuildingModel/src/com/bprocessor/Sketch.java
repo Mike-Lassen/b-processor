@@ -7,7 +7,7 @@ public class Sketch extends Component {
     private int uid;
     private Polyhedron polyhedron;
     private Group group;
-    private Net grid;
+    private Grid grid;
     private boolean modified;
     private String path;
 
@@ -16,7 +16,7 @@ public class Sketch extends Component {
     	super(name);
         this.polyhedron = new Polyhedron("Main");
         this.group = new Group("Top", this.polyhedron);
-        this.grid = new Net("Main");
+        this.grid = new Grid("Grid");
     }
 
     public int getUid() {
@@ -31,10 +31,10 @@ public class Sketch extends Component {
     public void setPolyhedron(Polyhedron value) {
         this.polyhedron = value;
     }
-    public Net getGrid() {
+    public Grid getGrid() {
     	return grid;
     }
-    public void setGrid(Net value) {
+    public void setGrid(Grid value) {
     	grid = value;
     }
     public boolean isModified() {
@@ -57,7 +57,7 @@ public class Sketch extends Component {
 	@Override
 	public Mesh display() {
 		Composite mesh = new Composite("Constructed");
-		mesh.add(grid);
+		mesh.add(grid.display());
 		mesh.add(group.display());
 		return mesh;
 	}

@@ -39,6 +39,9 @@ import com.bprocessor.Vertex;
 import com.bprocessor.io.ObjFileReader;
 import com.bprocessor.ui.actions.Action;
 import com.bprocessor.ui.actions.ExtrudeSufaceAction;
+import com.bprocessor.ui.actions.RotateAction;
+import com.bprocessor.ui.actions.ScaleAction;
+import com.bprocessor.ui.actions.TranslateAction;
 import com.bprocessor.ui.commands.DeleteGeometry;
 import com.bprocessor.ui.panels.AttributePanel;
 import com.bprocessor.util.CommandManager;
@@ -161,8 +164,9 @@ public class SketchView extends View3d {
 	}
 
 	public Net guideLayer() {
-		return sketch.getGrid();
+		return sketch.getGrid().getNet();
 	}
+	
 	public void setSelected(Entity selected) {
 		this.selected = selected;
 		if (selected != null) {
@@ -207,7 +211,13 @@ public class SketchView extends View3d {
 
 	public void setCoordinateSystem(CoordinateSystem system) {
 		this.system = system;
+		if (system != null) {
+			sketch.getGrid().apply(system);
+		} else {
+			sketch.getGrid().apply(CoordinateSystem.xy());
+		}
 	}
+	
 	public CoordinateSystem getCoordinateSystem() {
 		if (system != null) {
 			return system;
@@ -248,6 +258,36 @@ public class SketchView extends View3d {
 	public void extrudeSelection() {
 		if (selected instanceof Surface) {
 			Action action = new ExtrudeSufaceAction((Surface) selected, 1.0);
+			attributePanel.setTarget(action);
+		}
+	}
+	
+	public boolean canRotateSelection() {
+		return selected instanceof Geometry;
+	}
+	public void rotateSelection() {
+		if (selected instanceof Geometry) {
+			Action action = new RotateAction(((Geometry) selected).getOwner(), 45);
+			attributePanel.setTarget(action);
+		}
+	}
+	
+	public boolean canTranslateSelection() {
+		return selected instanceof Geometry;
+	}
+	public void translateSelection() {
+		if (selected instanceof Geometry) {
+			Action action = new TranslateAction(((Geometry) selected).getOwner(), 0, 0, 0);
+			attributePanel.setTarget(action);
+		}
+	}
+	
+	public boolean canScaleSelection() {
+		return selected instanceof Geometry;
+	}
+	public void scaleSelection() {
+		if (selected instanceof Geometry) {
+			Action action = new ScaleAction(((Geometry) selected).getOwner(), 1.0);
 			attributePanel.setTarget(action);
 		}
 	}
@@ -571,7 +611,11 @@ public class SketchView extends View3d {
 
 	public Geometry pickObject(int x, int y, Filter<Geometry> filter) {
 		PickingResult record = pickObjects(x, y, filter);
-		return record.nearest.target();
+		if (record.nearest != null) {
+			return record.nearest.target();
+		} else {
+			return null;
+		}
 	}
 
 

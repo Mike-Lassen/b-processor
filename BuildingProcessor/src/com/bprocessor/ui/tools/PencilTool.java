@@ -19,8 +19,6 @@ import com.bprocessor.ui.Intersection;
 import com.bprocessor.ui.SketchView;
 import com.bprocessor.ui.StandardTool;
 import com.bprocessor.ui.StatusBar;
-import com.bprocessor.ui.actions.Action;
-import com.bprocessor.ui.actions.ExtrudeSufaceAction;
 import com.bprocessor.ui.commands.InsertSurface;
 import com.bprocessor.util.Command;
 import com.bprocessor.util.CommandManager;
@@ -74,7 +72,7 @@ public class PencilTool extends StandardTool {
 	public void finish() {
 		view.setRestrictToPlane(false);
 		view.repaint();
-		setLines(Collections.<Line>emptyList());
+		//setLines(Collections.<Line>emptyList());
 		view.removeOverlay(editing);
 		view.removeOverlay(feedback);
 		lines = null;
@@ -173,7 +171,7 @@ public class PencilTool extends StandardTool {
 						editing.add(edge);
 					}
 					makeSurface();
-					setLines(Collections.<Line>emptyList());
+					//setLines(Collections.<Line>emptyList());
 				}
 			} else {
 				currentVertex = currentVertex.copy();
@@ -210,7 +208,7 @@ public class PencilTool extends StandardTool {
 							lst.add(createLine(first, n, bluish));
 						}
 					}
-					setLines(lst);
+					//setLines(lst);
 				}
 			}
 

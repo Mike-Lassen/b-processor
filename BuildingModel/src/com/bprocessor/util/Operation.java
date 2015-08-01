@@ -1,4 +1,4 @@
-package com.bprocessor.ui.actions;
+package com.bprocessor.util;
 
 public abstract class Operation {
 	private String name;

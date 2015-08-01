@@ -65,6 +65,11 @@ public class Vertex extends Geometry {
         y = vertex.y;
         z = vertex.z;
     }
+    public void set(double[] values) {
+    	x = values[0];
+    	y = values[1];
+    	z = values[2];
+    }
     public double get(Coord coord) {
     	switch(coord) {
     	case X:
@@ -78,6 +83,10 @@ public class Vertex extends Geometry {
     }
     public Vertex copy() {
         return new Vertex(x, y, z);
+    }
+    
+    public double[] values() {
+    	return new double[]{x, y, z, 1};
     }
 
     public double length() {

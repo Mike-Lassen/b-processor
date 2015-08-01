@@ -40,9 +40,7 @@ public abstract class Mesh extends Entity {
     	name = prototype.name;
     }
     
-    public void collectVertices(Set<Vertex> vertices) {
-    	
-    }
+    public abstract void collectVertices(Set<Vertex> vertices);
     
     public void scaleIt(double factor) {
     	Set<Vertex> vertices = new HashSet<Vertex>();
