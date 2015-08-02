@@ -55,7 +55,6 @@ import static javax.media.opengl.GL2.*; // GL2 constants
 @SuppressWarnings("serial")
 public class SketchView extends View3d {
 	private InputListener delegate;
-	protected Camera camera;
 	protected CoordinateSystem system;
 
 	protected double[] modelMatrix = new double[16];
@@ -126,13 +125,8 @@ public class SketchView extends View3d {
 		}
 		gridVisible = true;
 		snapToGrid = true;
-		coordinateSystemVisible = true;
-		Vertex center = new Vertex(4, 2, 1.3);
-		Vertex eye = new Vertex(6, -9, 8);
-		Vertex up = new Vertex(0, 0, 1);
-		camera = new Camera(center, eye, up);
+		coordinateSystemVisible = false;
 		overlay = new LinkedList<Mesh>();
-		addOverlay(man);
 		this.addGLEventListener(this);
 	}
 
@@ -142,6 +136,10 @@ public class SketchView extends View3d {
 	}
 	public AttributePanel getAttributePanel() {
 		return attributePanel;
+	}
+	
+	public Camera getCamera() {
+		return sketch.getCamera();
 	}
 
 	public void setDelegate(InputListener listener) {
@@ -442,7 +440,10 @@ public class SketchView extends View3d {
 			glu.gluPickMatrix(picking.x, viewport[3] - picking.y, picking.width, picking.height, viewport, 0);
 		}
 
-		glu.gluPerspective(45.0, aspect, 5, 500.0);
+		double fov = getCamera().getFov();
+		double near = getCamera().getNear();
+		double far = getCamera().getFar();
+		glu.gluPerspective(fov, aspect, near, far);
 
 		if (picking != null) {
 			picking.buffer = Buffers.newDirectIntBuffer(256);
@@ -458,7 +459,7 @@ public class SketchView extends View3d {
 		gl.glLoadIdentity();
 
 		if (sketch != null) {
-			applyCamera(camera);
+			applyCamera(getCamera());
 			CoordinateSystemView systemView = new CoordinateSystemView();
 			List<Mesh> meshes = getMeshes(picking != null);
 

@@ -1,12 +1,18 @@
 package com.bprocessor;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 
-public class Camera {
+public class Camera extends Entity {
     protected Vertex center;
     protected Vertex eye;
     protected Vertex up;
+    protected double fov;
+    protected double near;
+    protected double far;
+    
 
     public Camera() {
     }
@@ -15,6 +21,9 @@ public class Camera {
         this.center = center;
         this.eye = eye;
         this.up = up;
+        fov = 45.0f;
+        near = 0.1f;
+        far = 1000.0f;
     }
 
     public Vertex getCenter() {
@@ -34,6 +43,24 @@ public class Camera {
     }
     public void setUp(Vertex up) {
         this.up = up;
+    }
+    public double getFov() {
+    	return fov;
+    }
+    public void setFov(double value) {
+    	fov = value;
+    }
+    public double getNear() {
+    	return near;
+    }
+    public void setNear(double value) {
+    	near = value;
+    }
+    public double getFar() {
+    	return far;
+    }
+    public void setFar(float value) {
+    	far = value;
     }
 
     public void translate(Vertex vector) {
@@ -84,4 +111,42 @@ public class Camera {
         //double radius = sphere.radius();
         center.set(sphere.center());
     }
+    
+    public List<Attribute> getAttributes() {
+		List<Attribute> attributes = super.getAttributes();
+		List<Attribute> section = new LinkedList<Attribute>();
+
+		section.add(new Attribute("FOV", new Format() {
+			@Override
+			public String format() {
+				return String.valueOf(fov);
+			}
+			@Override
+			public void apply(String value) {
+				fov = Double.valueOf(value);
+			}
+		}));
+		section.add(new Attribute("Near", new Format() {
+			@Override
+			public String format() {
+				return String.valueOf(near);
+			}
+			@Override
+			public void apply(String value) {
+				near = Double.valueOf(value);
+			}
+		}));
+		section.add(new Attribute("Far", new Format() {
+			@Override
+			public String format() {
+				return String.valueOf(far);
+			}
+			@Override
+			public void apply(String value) {
+				far = Double.valueOf(value);
+			}
+		}));
+		attributes.add(new Attribute("Camera", section));
+		return attributes;
+	}
 }

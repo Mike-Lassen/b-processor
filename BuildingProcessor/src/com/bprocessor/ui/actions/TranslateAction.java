@@ -62,10 +62,6 @@ public class TranslateAction extends Action {
 			public void apply(String value) {
 				x = Double.valueOf(value);
 			}
-			@Override
-			public List<String> values() {
-				return null;
-			}
 		}));
 		section.add(new Attribute("Y", new Format() {
 			@Override
@@ -76,10 +72,6 @@ public class TranslateAction extends Action {
 			public void apply(String value) {
 				y = Double.valueOf(value);
 			}
-			@Override
-			public List<String> values() {
-				return null;
-			}
 		}));
 		section.add(new Attribute("Z", new Format() {
 			@Override
@@ -89,10 +81,6 @@ public class TranslateAction extends Action {
 			@Override
 			public void apply(String value) {
 				z = Double.valueOf(value);
-			}
-			@Override
-			public List<String> values() {
-				return null;
 			}
 		}));
 		attributes.add(new Attribute("Translate Mesh", section));

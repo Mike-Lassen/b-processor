@@ -38,7 +38,7 @@ public abstract class StandardTool extends Tool {
 	
 	    @Override
 	    public void mouseDragged(MouseEvent event) {
-	        Camera camera = view.camera;
+	        Camera camera = view.getCamera();
 	        Vertex center = camera.getCenter();
 	        Vertex eye = camera.getEye();
 	
@@ -105,8 +105,8 @@ public abstract class StandardTool extends Tool {
 	        double angleX = ((double)(event.getX() - x) / 360) * Math.PI;
 	        double angleY = ((double)(event.getY() - y) / 360) * Math.PI;
 	
-	        view.camera.rotateHorizontally(-angleX);
-	        view.camera.rotateVertically(angleY);
+	        view.getCamera().rotateHorizontally(-angleX);
+	        view.getCamera().rotateVertically(angleY);
 	
 	        x = event.getX();
 	        y = event.getY();
@@ -118,9 +118,9 @@ public abstract class StandardTool extends Tool {
 	    @Override
 	    public void keyPressed(KeyEvent event) {
 	        if (event.getKeyChar() == ' ') {
-	            System.out.println("camera.eye " + view.camera.getEye());
-	            System.out.println("camera.center " + view.camera.getCenter());
-	            System.out.println("camera.up " + view.camera.getUp());
+	            System.out.println("camera.eye " + view.getCamera().getEye());
+	            System.out.println("camera.center " + view.getCamera().getCenter());
+	            System.out.println("camera.up " + view.getCamera().getUp());
 	        }
 	    }
 	    @Override
@@ -170,11 +170,11 @@ public abstract class StandardTool extends Tool {
 	    public void mouseDragged(MouseEvent event) {
 	        int dy = event.getY() - y;
 	        if (dy > 8) {
-	            view.camera.zoomOut();
+	            view.getCamera().zoomOut();
 	            y = event.getY();
 	        }
 	        if (dy < -8) {
-	            view.camera.zoomIn();
+	            view.getCamera().zoomIn();
 	            y = event.getY();
 	        }
 	        view.repaint();
@@ -189,7 +189,7 @@ public abstract class StandardTool extends Tool {
 	    @Override
 	    public void keyPressed(KeyEvent event) {
 	        if (event.getKeyChar() == ' ') {
-	            view.camera.focusOn(null);
+	            view.getCamera().focusOn(null);
 	            view.repaint();
 	        }
 	    }

@@ -46,10 +46,6 @@ public class ExtrudeSufaceAction extends Action {
 			public void apply(String value) {
 				distance = Double.valueOf(value);
 			}
-			@Override
-			public List<String> values() {
-				return null;
-			}
 		}));
     	section.add(new Attribute("Surface", target));
     	attributes.add(new Attribute("Extrude Surface", section));

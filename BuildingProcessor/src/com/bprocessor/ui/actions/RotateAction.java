@@ -62,10 +62,6 @@ public class RotateAction extends Action {
 			public void apply(String value) {
 				degrees = Double.valueOf(value);
 			}
-			@Override
-			public List<String> values() {
-				return null;
-			}
 		}));
 		attributes.add(new Attribute("Rotate Mesh", section));
 		return attributes;

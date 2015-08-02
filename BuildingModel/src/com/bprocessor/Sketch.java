@@ -8,6 +8,7 @@ public class Sketch extends Component {
     private Polyhedron polyhedron;
     private Group group;
     private Grid grid;
+    private Camera camera;
     private boolean modified;
     private String path;
 
@@ -17,6 +18,10 @@ public class Sketch extends Component {
         this.polyhedron = new Polyhedron("Main");
         this.group = new Group("Top", this.polyhedron);
         this.grid = new Grid("Grid");
+        Vertex center = new Vertex(4, 2, 1.3);
+		Vertex eye = new Vertex(6, -9, 8);
+		Vertex up = new Vertex(0, 0, 1);
+		camera = new Camera(center, eye, up);
     }
 
     public int getUid() {
@@ -36,6 +41,12 @@ public class Sketch extends Component {
     }
     public void setGrid(Grid value) {
     	grid = value;
+    }
+    public Camera getCamera() {
+    	return camera;
+    }
+    public void setCamera(Camera value) {
+    	camera = value;
     }
     public boolean isModified() {
         return modified;
@@ -67,6 +78,7 @@ public class Sketch extends Component {
     	List<Attribute> section = new LinkedList<Attribute>();
     	section.add(new Attribute("Content", group));
     	section.add(new Attribute("Grid", grid));
+    	section.add(new Attribute("Camera", camera));
     	
     	attributes.add(new Attribute("Sketch", section));
     	return attributes;

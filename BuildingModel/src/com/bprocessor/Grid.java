@@ -109,10 +109,6 @@ public class Grid extends Component {
 			public void apply(String value) {
 				hsize = Double.valueOf(value);
 			}
-			@Override
-			public List<String> values() {
-				return null;
-			}
 		}));
 		section.add(new Attribute("Col Gutter", new Format() {
 			@Override
@@ -122,10 +118,6 @@ public class Grid extends Component {
 			@Override
 			public void apply(String value) {
 				hgutter = Double.valueOf(value);
-			}
-			@Override
-			public List<String> values() {
-				return null;
 			}
 		}));
 		section.add(new Attribute("Columns", new Format() {
@@ -137,10 +129,6 @@ public class Grid extends Component {
 			public void apply(String value) {
 				hcount = Integer.valueOf(value);
 			}
-			@Override
-			public List<String> values() {
-				return null;
-			}
 		}));
 		section.add(new Attribute("Row Height", new Format() {
 			@Override
@@ -150,10 +138,6 @@ public class Grid extends Component {
 			@Override
 			public void apply(String value) {
 				vsize = Double.valueOf(value);
-			}
-			@Override
-			public List<String> values() {
-				return null;
 			}
 		}));
 		section.add(new Attribute("Row Gutter", new Format() {
@@ -165,10 +149,6 @@ public class Grid extends Component {
 			public void apply(String value) {
 				vgutter = Double.valueOf(value);
 			}
-			@Override
-			public List<String> values() {
-				return null;
-			}
 		}));
 		section.add(new Attribute("Rows", new Format() {
 			@Override
@@ -178,10 +158,6 @@ public class Grid extends Component {
 			@Override
 			public void apply(String value) {
 				vcount = Integer.valueOf(value);
-			}
-			@Override
-			public List<String> values() {
-				return null;
 			}
 		}));
 		section.add(new Attribute("Net", net));

@@ -8,7 +8,6 @@ import com.bprocessor.Attribute;
 import com.bprocessor.Format;
 import com.bprocessor.Mesh;
 import com.bprocessor.Vertex;
-import com.bprocessor.util.Matrix;
 
 public class ScaleAction extends Action {
 	private Mesh target;
@@ -57,10 +56,6 @@ public class ScaleAction extends Action {
 			@Override
 			public void apply(String value) {
 				factor = Double.valueOf(value);
-			}
-			@Override
-			public List<String> values() {
-				return null;
 			}
 		}));
 		attributes.add(new Attribute("Scale Mesh", section));
