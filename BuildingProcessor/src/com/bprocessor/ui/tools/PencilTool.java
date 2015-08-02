@@ -3,14 +3,11 @@ package com.bprocessor.ui.tools;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 
 import com.bprocessor.Color;
 import com.bprocessor.Net;
 import com.bprocessor.Handle;
-import com.bprocessor.Line;
 import com.bprocessor.Edge;
 import com.bprocessor.Polyhedron;
 import com.bprocessor.Surface;
@@ -22,13 +19,11 @@ import com.bprocessor.ui.StatusBar;
 import com.bprocessor.ui.commands.InsertSurface;
 import com.bprocessor.util.Command;
 import com.bprocessor.util.CommandManager;
-import com.bprocessor.util.CoordinateSystem;
 
 public class PencilTool extends StandardTool {
 	private LinkedList<Vertex> vertices;
 	private LinkedList<Edge> edges;
-	private List<Line> lines;
-
+	
 	private Polyhedron editing;
 
 	private Net feedback;
@@ -64,7 +59,6 @@ public class PencilTool extends StandardTool {
 		feedback = new Net("guides");
 		feedback.clear();
 		view.addOverlay(feedback);
-		lines = new LinkedList<Line>();
 		buffer = new StringBuffer();
 		view.requestFocus();
 		view.repaint();
@@ -72,34 +66,12 @@ public class PencilTool extends StandardTool {
 	public void finish() {
 		view.setRestrictToPlane(false);
 		view.repaint();
-		//setLines(Collections.<Line>emptyList());
 		view.removeOverlay(editing);
 		view.removeOverlay(feedback);
-		lines = null;
 		editing = null;
 		vertices = null;
 		edges = null;
 		currentVertex = null;
-	}
-
-
-	public Line createLine(Vertex origin, Vertex direction, Color color) {
-		Vertex from = origin.copy();
-		Vertex to = from.add(direction.scale(20));
-		Line line = new Line(from, to, color);
-		line.setStippled(true);
-		return line;
-	}
-
-	public void setLines(List<Line> objects) {
-		for (Line current : lines) {
-			feedback.remove(current);
-		}
-		lines.clear();
-		for (Line current : objects) {
-			feedback.add(current);
-			lines.add(current);
-		}
 	}
 
 	public void selectVertex(int x, int y) {
@@ -171,7 +143,6 @@ public class PencilTool extends StandardTool {
 						editing.add(edge);
 					}
 					makeSurface();
-					//setLines(Collections.<Line>emptyList());
 				}
 			} else {
 				currentVertex = currentVertex.copy();
@@ -183,33 +154,6 @@ public class PencilTool extends StandardTool {
 					editing.add(edge);
 				}
 				vertices.add(currentVertex);
-
-				{
-					CoordinateSystem system = view.getCoordinateSystem();					
-					List<Line> lst = new LinkedList<Line>();
-					Color green = new Color(0.1, 0.8, 0.1);
-					Color red = new Color(0.8, 0.1, 0.1);
-					Color blue = new Color(0.1, 0.1, 0.8);
-					
-					Color bluish = new Color(0.3, 0.6, 1.0);
-					Vertex i = system.getI();
-					Vertex j = system.getJ();
-					Vertex n = j.cross(i);
-					lst.add(createLine(currentVertex, i, green));
-					lst.add(createLine(currentVertex, j, red));
-					if (!view.getRestrictToPlane()) {
-						lst.add(createLine(currentVertex, n, blue));
-					}
-					if (vertices.size() > 1) {
-						Vertex first = vertices.getFirst();
-						lst.add(createLine(first, i, bluish));
-						lst.add(createLine(first, j, bluish));
-						if (!view.getRestrictToPlane()) {
-							lst.add(createLine(first, n, bluish));
-						}
-					}
-					//setLines(lst);
-				}
 			}
 
 			view.repaint();

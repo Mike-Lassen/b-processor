@@ -236,17 +236,24 @@ public class SketchView extends View3d {
 
 
 	public boolean canDeleteSelection() {
-		return selected != null;
+		return selected instanceof Geometry;
 	}
 	public void deleteSelection() {
-		if (selected != null) {
-			if (selected instanceof Geometry) {
-				CommandManager.instance().apply(new DeleteGeometry((Geometry) selected));
+		if (selected instanceof Geometry) {
+			CommandManager.instance().apply(new DeleteGeometry((Geometry) selected));
 
-				selected = null;
-				checkpoint();
-				repaint();
-			}
+			selected = null;
+			checkpoint();
+			repaint();
+		}
+	}
+	
+	public boolean canGroupSelection() {
+		return selected instanceof Geometry;
+	}
+	public void groupSelection() {
+		if (selected instanceof Geometry) {
+			
 		}
 	}
 
@@ -812,7 +819,6 @@ public class SketchView extends View3d {
 		public void drawSurfaces(List<Surface> surfaces) {
 			gl.glEnable(GL2.GL_POLYGON_OFFSET_FILL);
 			gl.glPolygonOffset(1.0f, 1.0f);
-			//gl.glEnable(GL2.GL_LIGHTING);
 			for (Surface current : surfaces) {
 				if (current.isVisible()) {
 					if (current != selected) {
@@ -821,7 +827,6 @@ public class SketchView extends View3d {
 				}
 			}
 			gl.glDisable(GL2.GL_POLYGON_OFFSET_FILL);
-			//gl.glDisable(GL2.GL_LIGHTING);
 
 		}
 		@Override
