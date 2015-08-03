@@ -210,8 +210,7 @@ public class FlexAttributePanel extends AttributePanel {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			view.setSelected(target);
-			view.repaint();
+			setTarget(target);
 		}
 
 		@Override

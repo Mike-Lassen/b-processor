@@ -21,9 +21,9 @@ public class Camera extends Entity {
         this.center = center;
         this.eye = eye;
         this.up = up;
-        fov = 45.0f;
-        near = 0.1f;
-        far = 1000.0f;
+        fov = 45.0;
+        near = 0.1;
+        far = 1000.0;
     }
 
     public Vertex getCenter() {

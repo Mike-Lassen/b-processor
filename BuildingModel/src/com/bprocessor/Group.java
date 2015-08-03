@@ -17,6 +17,20 @@ public class Group extends Component {
 		this.mesh = mesh;
 		this.children = new LinkedList<Component>();
 	}
+	
+	public Mesh getMesh() {
+		return mesh;
+	}
+	public void setMesh(Mesh value) {
+		mesh = value;
+	}
+	
+	public void add(Component child) {
+		children.add(child);
+	}
+	public void remove(Component child) {
+		children.remove(child);
+	}
 
 	@Override
 	public Mesh display() {
@@ -36,5 +50,9 @@ public class Group extends Component {
     	attributes.add(new Attribute("Group", section));
     	return attributes;
     }
+	
+	public String toString() {
+		return "{Group " + name + " | " + children.size() + "}";
+	}
 	
 }

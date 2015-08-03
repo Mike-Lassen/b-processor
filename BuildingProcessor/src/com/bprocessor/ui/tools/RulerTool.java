@@ -11,6 +11,7 @@ import com.bprocessor.Color;
 import com.bprocessor.Line;
 import com.bprocessor.Edge;
 import com.bprocessor.Geometry;
+import com.bprocessor.Path;
 import com.bprocessor.Vertex;
 import com.bprocessor.ui.SketchView;
 import com.bprocessor.ui.StandardTool;
@@ -111,9 +112,10 @@ public class RulerTool extends StandardTool {
         startx = event.getX();
         starty = event.getY();
         moving = false;
-        Geometry result = view.pickObject(event.getX(), event.getY(), null);
-        if (result instanceof Edge) {
-            Edge edge = (Edge) result;
+        Path<? extends Geometry> result = view.pickObject(event.getX(), event.getY(), null);
+        
+        if (result != null && result.target() instanceof Edge) {
+            Edge edge = (Edge) result.target();
             Vertex from = edge.getFrom().copy();
             Vertex to = edge.getTo().copy();
             Color blue = new Color(0.3, 0.6, 1.0);

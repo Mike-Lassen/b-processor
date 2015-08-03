@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 import com.bprocessor.Geometry;
+import com.bprocessor.Path;
 import com.bprocessor.ui.SketchView;
 import com.bprocessor.ui.StandardTool;
 import com.bprocessor.ui.StatusBar;
@@ -33,13 +34,13 @@ public class SelectTool extends StandardTool {
 
     @Override
     public void mousePressed(MouseEvent event) {
-        Geometry geometry = view.pickObject(event.getX(), event.getY(), new Filter<Geometry>() {
+        Path<? extends Geometry> path = view.pickObject(event.getX(), event.getY(), new Filter<Geometry>() {
 			@Override
 			public boolean evaluate(Geometry object) {
 				return object.getOwner() != null && object.getOwner().isSelectable();
 			}
 		});
-        view.setSelected(geometry);
+        view.setSelected(path);
         view.repaint();
     }
 

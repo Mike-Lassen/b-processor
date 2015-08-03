@@ -69,6 +69,7 @@ public class GlobalMenuBar extends MenuBar {
 		editMenu.copyItem.setEnabled(false);
 		editMenu.pasteItem.setEnabled(false);
 		editMenu.deleteItem.setEnabled(view.canDeleteSelection());
+		editMenu.groupItem.setEnabled(view.canGroupSelection());
 		editMenu.extrudeItem.setEnabled(view.canExtrudeSelection());
 		editMenu.rotateItem.setEnabled(view.canRotateSelection());
 		editMenu.translateItem.setEnabled(view.canTranslateSelection());
@@ -195,6 +196,7 @@ public class GlobalMenuBar extends MenuBar {
 		public MenuItem copyItem;
 		public MenuItem pasteItem;
 		public MenuItem deleteItem;
+		public MenuItem groupItem;
 		public MenuItem extrudeItem;
 		public MenuItem rotateItem;
 		public MenuItem translateItem;
@@ -244,6 +246,16 @@ public class GlobalMenuBar extends MenuBar {
 					}
 				});
 				add(deleteItem);
+			}
+			addSeparator();
+			{
+				groupItem = new MenuItem("Group");
+				groupItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent event) {
+						view.groupSelection();
+					}
+				});
+				add(groupItem);
 			}
 			addSeparator();
 			{

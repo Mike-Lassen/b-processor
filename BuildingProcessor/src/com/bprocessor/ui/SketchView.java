@@ -18,8 +18,8 @@ import javax.media.opengl.glu.GLU;
 
 import com.bprocessor.Camera;
 import com.bprocessor.Color;
+import com.bprocessor.Component;
 import com.bprocessor.Composite;
-import com.bprocessor.Entity;
 import com.bprocessor.Group;
 import com.bprocessor.Handle;
 import com.bprocessor.Mesh;
@@ -63,7 +63,6 @@ public class SketchView extends View3d {
 
 
 
-
 	protected Picking picking;
 
 	protected Sketch sketch;
@@ -83,9 +82,7 @@ public class SketchView extends View3d {
 
 	private SketchController controller;
 	private AttributePanel attributePanel;
-	protected Entity selected;
-
-
+	protected Path<? extends Geometry> selected;
 
 	public SketchView(SketchController controller) {
 		this.controller = controller;
@@ -137,9 +134,13 @@ public class SketchView extends View3d {
 	public AttributePanel getAttributePanel() {
 		return attributePanel;
 	}
-	
+
 	public Camera getCamera() {
-		return sketch.getCamera();
+		if (sketch != null) {
+			return sketch.getCamera();
+		} else {
+			return null;
+		}
 	}
 
 	public void setDelegate(InputListener listener) {
@@ -164,17 +165,21 @@ public class SketchView extends View3d {
 	public Net guideLayer() {
 		return sketch.getGrid().getNet();
 	}
-	
-	public void setSelected(Entity selected) {
+
+	public void setSelected(Path<? extends Geometry> selected) {
 		this.selected = selected;
-		if (selected != null) {
-			attributePanel.setTarget(selected);
+		if (selected != null && selected.target() != null) {
+			attributePanel.setTarget(selected.target());
 		} else{
 			attributePanel.setTarget(sketch);
 		}
 	}
-	public Entity getSelected() {
-		return selected;
+	public Geometry getSelected() {
+		if (selected != null) {
+			return selected.target();
+		} else {
+			return null;
+		}
 	}
 	public void addOverlay(Mesh geometry) {
 		overlay.add(geometry);
@@ -215,7 +220,7 @@ public class SketchView extends View3d {
 			sketch.getGrid().apply(CoordinateSystem.xy());
 		}
 	}
-	
+
 	public CoordinateSystem getCoordinateSystem() {
 		if (system != null) {
 			return system;
@@ -236,63 +241,95 @@ public class SketchView extends View3d {
 
 
 	public boolean canDeleteSelection() {
-		return selected instanceof Geometry;
+		return getSelected() instanceof Geometry;
 	}
 	public void deleteSelection() {
-		if (selected instanceof Geometry) {
-			CommandManager.instance().apply(new DeleteGeometry((Geometry) selected));
+		if (getSelected() instanceof Geometry) {
+			CommandManager.instance().apply(new DeleteGeometry((Geometry) getSelected()));
 
-			selected = null;
+			setSelected(null);
 			checkpoint();
 			repaint();
 		}
 	}
-	
+
 	public boolean canGroupSelection() {
-		return selected instanceof Geometry;
+		return getSelected() instanceof Geometry;
 	}
 	public void groupSelection() {
-		if (selected instanceof Geometry) {
+		if (getSelected() instanceof Geometry) {
+			System.out.println("path: " + selected);
+			Group group = (Group) selected.path().getLast();
+			Polyhedron polyhedron = (Polyhedron) group.getMesh();
+			List<Surface> surfaces = new LinkedList<Surface>(polyhedron.getSurfaces());
+			List<Edge> edges = new LinkedList<Edge>(polyhedron.getEdges());
+			List<Vertex> vertices = new LinkedList<Vertex>(polyhedron.getVertices());
 			
+			for (Surface surface : surfaces) {
+				polyhedron.remove(surface);
+			}
+			for (Edge edge : edges) {
+				polyhedron.remove(edge);
+			}
+			for (Vertex vertex : vertices) {
+				polyhedron.remove(vertex);
+			}
+			
+			Polyhedron mesh = new Polyhedron("Child Mesh");
+			for (Vertex vertex : vertices) {
+				mesh.add(vertex);
+			}
+			for (Edge edge : edges) {
+				mesh.add(edge);
+			}
+			for (Surface surface : surfaces) {
+				mesh.add(surface);
+			}
+			
+			Group child = new Group("Child", mesh);
+			group.add(child);
+			
+			setSelected(null);
+			repaint();
 		}
 	}
 
 	public boolean canExtrudeSelection() {
-		return selected instanceof Surface;
+		return getSelected() instanceof Surface;
 	}
 	public void extrudeSelection() {
-		if (selected instanceof Surface) {
-			Action action = new ExtrudeSufaceAction((Surface) selected, 1.0);
+		if (getSelected() instanceof Surface) {
+			Action action = new ExtrudeSufaceAction((Surface) getSelected(), 1.0);
 			attributePanel.setTarget(action);
 		}
 	}
-	
+
 	public boolean canRotateSelection() {
-		return selected instanceof Geometry;
+		return getSelected() instanceof Geometry;
 	}
 	public void rotateSelection() {
-		if (selected instanceof Geometry) {
-			Action action = new RotateAction(((Geometry) selected).getOwner(), 45);
+		if (getSelected() instanceof Geometry) {
+			Action action = new RotateAction(((Geometry) getSelected()).getOwner(), 45);
 			attributePanel.setTarget(action);
 		}
 	}
-	
+
 	public boolean canTranslateSelection() {
-		return selected instanceof Geometry;
+		return getSelected() instanceof Geometry;
 	}
 	public void translateSelection() {
-		if (selected instanceof Geometry) {
-			Action action = new TranslateAction(((Geometry) selected).getOwner(), 0, 0, 0);
+		if (getSelected() instanceof Geometry) {
+			Action action = new TranslateAction(((Geometry) getSelected()).getOwner(), 0, 0, 0);
 			attributePanel.setTarget(action);
 		}
 	}
-	
+
 	public boolean canScaleSelection() {
-		return selected instanceof Geometry;
+		return getSelected() instanceof Geometry;
 	}
 	public void scaleSelection() {
-		if (selected instanceof Geometry) {
-			Action action = new ScaleAction(((Geometry) selected).getOwner(), 1.0);
+		if (getSelected() instanceof Geometry) {
+			Action action = new ScaleAction(((Geometry) getSelected()).getOwner(), 1.0);
 			attributePanel.setTarget(action);
 		}
 	}
@@ -435,6 +472,7 @@ public class SketchView extends View3d {
 	 */
 	@Override
 	public void display(GLAutoDrawable drawable) {
+
 		gl = drawable.getGL().getGL2();
 		callback.init(gl, glu);
 
@@ -446,11 +484,12 @@ public class SketchView extends View3d {
 			int[] viewport = new int[] {0, 0, width, height};
 			glu.gluPickMatrix(picking.x, viewport[3] - picking.y, picking.width, picking.height, viewport, 0);
 		}
-
-		double fov = getCamera().getFov();
-		double near = getCamera().getNear();
-		double far = getCamera().getFar();
-		glu.gluPerspective(fov, aspect, near, far);
+		if (sketch != null) {
+			double fov = getCamera().getFov();
+			double near = getCamera().getNear();
+			double far = getCamera().getFar();
+			glu.gluPerspective(fov, aspect, near, far);
+		}
 
 		if (picking != null) {
 			picking.buffer = Buffers.newDirectIntBuffer(256);
@@ -546,11 +585,12 @@ public class SketchView extends View3d {
 			double z = (near + far) / 2;
 			bufferOffset += 3;
 			if (names > 0) {
+				LinkedList<Component> components = new LinkedList<Component>();
 				for (int j = 0; j < names; j++) {
 					int id = picking.buffer.get(bufferOffset + j);
 					Object current = picking.get(id);
 					if (current instanceof Geometry) {
-						Path<? extends Geometry> path = new Path<Geometry>(null, (Geometry) current);
+						Path<? extends Geometry> path = new Path<Geometry>(components, (Geometry) current);
 						if (filter == null || filter.evaluate(path.target())) {
 							if (path.target() instanceof Vertex) {
 								if (z < vertex_z) {
@@ -574,8 +614,8 @@ public class SketchView extends View3d {
 								System.out.println("selected " + current.getClass().getName());
 							}
 						}
-					} else if (current instanceof Group){
-						
+					} else if (current instanceof Component){
+						components.add((Component) current);
 					}
 				}
 				bufferOffset += names;
@@ -617,13 +657,9 @@ public class SketchView extends View3d {
 		return new PickingResult(nearest, surfaces, edges, vertices);
 	}
 
-	public Geometry pickObject(int x, int y, Filter<Geometry> filter) {
+	public Path<? extends Geometry> pickObject(int x, int y, Filter<Geometry> filter) {
 		PickingResult record = pickObjects(x, y, filter);
-		if (record.nearest != null) {
-			return record.nearest.target();
-		} else {
-			return null;
-		}
+		return record.nearest;
 	}
 
 
@@ -643,7 +679,7 @@ public class SketchView extends View3d {
 			} else if (record.nearest.target() instanceof Edge) {
 				Edge edge = (Edge) record.nearest.target();
 				for (Path<Edge> current : record.edges) {
-					
+
 					if (current.target() != edge) {
 						if (!edge.parallel(current.target())) {
 							result = edge.intersection(current.target());
@@ -811,7 +847,7 @@ public class SketchView extends View3d {
 						continue;
 					}
 				}
-				if (current != selected) {
+				if (current != getSelected()) {
 					drawEdge(current);
 				}
 			}
@@ -821,7 +857,7 @@ public class SketchView extends View3d {
 			gl.glPolygonOffset(1.0f, 1.0f);
 			for (Surface current : surfaces) {
 				if (current.isVisible()) {
-					if (current != selected) {
+					if (current != getSelected()) {
 						drawSurface(current);
 					}
 				}
@@ -833,9 +869,9 @@ public class SketchView extends View3d {
 		public void visit(Polyhedron current) {
 			gl.glColor3f(0.0f, 0.0f, 0.0f);
 			drawEdges(current.getEdges());
-			if (selected instanceof Edge) {
+			if (getSelected() instanceof Edge) {
 				apply(selected_color, 1.0f);
-				drawEdge((Edge) selected);
+				drawEdge((Edge) getSelected());
 			}
 			apply(babyblue, 1.0f);
 			drawSurfaces(current.getSurfaces());
@@ -843,21 +879,21 @@ public class SketchView extends View3d {
 			for (Surface surface : current.getSurfaces()) {
 				mark.addAll(surface.getVertices());
 			}
-			if (selected instanceof Surface) {
+			if (getSelected() instanceof Surface) {
 				apply(selected_color, 0.2f);
-				drawSurface((Surface) selected);
+				drawSurface((Surface) getSelected());
 			}
 			gl.glColor3f(0.0f, 0.0f, 0.0f);
 			gl.glDisable(GL_DEPTH_TEST);
 			for (Vertex vertex : current.getVertices()) {
-				if (vertex != selected) {
+				if (vertex != getSelected()) {
 					if (!mark.contains(vertex)) {
 						drawVertex(vertex);
 					}
 				}
 			}
-			if (selected instanceof Vertex) {
-				Vertex vertex = (Vertex) selected;
+			if (getSelected() instanceof Vertex) {
+				Vertex vertex = (Vertex) getSelected();
 				apply(selected_color, 1.0f);
 				drawVertex(vertex);
 			}
