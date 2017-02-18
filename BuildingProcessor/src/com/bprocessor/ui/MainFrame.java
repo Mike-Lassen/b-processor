@@ -31,7 +31,7 @@ public class MainFrame extends JFrame implements SketchObserver {
 	private GroovyShell shell;
 	
 	private GlobalMenuBar menubar;
-	private ToolBar toolbar;
+	private Toolbar toolbar;
 	private StatusBar statusbar;
 	private SketchView view;
 	private SketchHierarchy hierarchy;
@@ -125,7 +125,7 @@ public class MainFrame extends JFrame implements SketchObserver {
 		binding.setVariable("controller", controller);
 		shell = new GroovyShell(binding);
 
-		toolbar = new ToolBar();
+		toolbar = new Toolbar();
 		toolbar.setPreferredSize(new Dimension(1280, 40));
 		toolbar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 		add(toolbar, BorderLayout.NORTH);

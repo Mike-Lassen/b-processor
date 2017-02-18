@@ -19,7 +19,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
 @SuppressWarnings("serial")
-public class ToolBar extends JPanel {
+public class Toolbar extends JPanel {
     private JToolBar toolBar;
     private Map<Tool, JToggleButton> buttons;
     private Map<String, Tool> tools;
@@ -27,7 +27,7 @@ public class ToolBar extends JPanel {
     private ButtonGroup group;
     private InputListener listener;
 
-    public ToolBar() {
+    public Toolbar() {
         toolBar = new JToolBar();
         toolBar.setFloatable(false);
         add(toolBar);
