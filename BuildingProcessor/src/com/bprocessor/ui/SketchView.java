@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Set;
 
 
-import javax.media.opengl.GL2;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.glu.GLU;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.glu.GLU;
 
 import com.bprocessor.Camera;
 import com.bprocessor.Color;
@@ -49,8 +49,8 @@ import com.bprocessor.util.CoordinateSystem;
 import com.bprocessor.util.Filter;
 import com.bprocessor.util.Plane;
 import com.jogamp.common.nio.Buffers;
-import static javax.media.opengl.GL.*;  // GL constants
-import static javax.media.opengl.GL2.*; // GL2 constants
+import static com.jogamp.opengl.GL.*;  // GL constants
+import static com.jogamp.opengl.GL2.*; // GL2 constants
 
 @SuppressWarnings("serial")
 public class SketchView extends View3d {
